@@ -28,7 +28,7 @@ SPDX-License-Identifier: Apache-2.0
 
 ## About
 
-The Age Verification (AV) android app is part of the Age Verification Solution Toolbox and serves as a component that can be used by memberstates, if necessary, to develop a national solution and build upon the building blocks of the toolbox.
+The Age Verification (AV) android application is part of the Age Verification Solution Toolbox.
 
 This android app is forked from [EUDI Android Wallet reference application](https://github.com/eu-digital-identity-wallet/eudi-app-android-wallet-ui), which is built based on the [Architecture Reference Framework](https://github.com/eu-digital-identity-wallet/eudi-doc-architecture-and-reference-framework/blob/main/docs/architecture-and-reference-framework-main.md) and aims to showcase a robust and interoperable platform for digital identification, authentication, and electronic signatures based on common standards across the European Union.
 
@@ -43,12 +43,14 @@ The AV Android is the application that allows users to:
 
 This is an initial version of the software, developed solely for the purpose of demonstrating the business flow of the solution. It is not intended for production use, and does not yet include the full set of functional, security, or integration features required for a live deployment.
 
+The initial version is based on the [Architecture Reference Framework](https://github.com/eu-digital-identity-wallet/eudi-doc-architecture-and-reference-framework/blob/main/docs/architecture-and-reference-framework-main.md). FSubsequent versions will be developed to ensure alignment with the  [Age Verification Solution Technical Specification](https://github.com/eu-digital-identity-wallet/av-doc-technical-specification) and the [Age Verification Profile](https://github.com/eu-digital-identity-wallet/av-doc-technical-specification/blob/main/docs/annexes/annex-4/annex-4-av-profile.md).
+
 The current release provides only basic functionality, with several key features to be introduced in future versions, including:
  - Support for batch issuing
  - App and device verification based on Google Play Integrity API and Apple App Attestation
  - Additional issuance methods beyond the currently implemented eID based method. 
 
-These planned features align with the requirements and methods described in the Age Verification Profile.
+These planned features align with the requirements and methods described in the [Age Verification Profile](https://github.com/eu-digital-identity-wallet/av-doc-technical-specification/blob/main/docs/annexes/annex-4/annex-4-av-profile.md).
 
 This version should be considered a foundational prototype to support early testing, feedback, and integration discussions.
 - The initial development release may be changed substantially over time and might introduce new features but also may change or remove existing ones, potentially breaking compatibility with your existing code.
@@ -63,7 +65,7 @@ This version should be considered a foundational prototype to support early test
 
 ### Specifications Employed
 
-The app consumes the SDK called EUDIW Wallet core [Wallet core](https://github.com/eu-digital-identity-wallet/eudi-lib-android-wallet-core) and a list of available libraries to facilitate remote presentation and issuing test/demo functionality following partially the specification of the [ARF](https://github.com/eu-digital-identity-wallet/eudi-doc-architecture-and-reference-framework), including:
+The app consumes the SDK called EUDI Wallet core [Wallet core](https://github.com/eu-digital-identity-wallet/eudi-lib-android-wallet-core) and a list of available libraries to facilitate remote presentation and issuing test/demo functionality following partially the specification of the [ARF](https://github.com/eu-digital-identity-wallet/eudi-doc-architecture-and-reference-framework), including:
  
 - OpenID4VP - draft 23 (remote presentation), presentation exchange v2.0,
  
@@ -125,8 +127,8 @@ By participating in this project, you agree to abide by its [Code of Conduct](./
 
 ## Licensing
 
-Copyright (C) 2025 European Commission, Scytales, T-Systems International GmbH and all other contributors.
+Copyright (c) 2025 European Commission
 
-This project follows the [REUSE standard for software licensing](https://reuse.software/). Each file contains copyright and license information, and license texts can be found in the [./LICENSES](./LICENSES) folder. For more information visit https://reuse.software/. You can find a guide for developers at https://telekom.github.io/reuse-template/.  
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at [http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0)
 
-Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the LICENSES folder.
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
