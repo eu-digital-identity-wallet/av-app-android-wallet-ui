@@ -33,7 +33,7 @@ The AV Android is the application that allows users to:
 1. Obtain, store, and present an age verification attestation.
 2. Share the proof of age attestation with online services to gain access.
 
-## Dislaimer
+## Disclaimer
 
 This is an initial version of the software, developed solely for the purpose of demonstrating the business flow of the solution. It is not intended for production use, and does not yet include the full set of functional, security, or integration features required for a live deployment.
 
