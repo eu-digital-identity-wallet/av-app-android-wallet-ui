@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: github-runner-dune
+    runs-on: ubuntu-latest
     env:
       ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
       ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}

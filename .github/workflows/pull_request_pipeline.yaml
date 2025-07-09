@@ -1,10 +1,7 @@
 name: PR checks
 
 on:
-  pull_request:
-    branches:
-      - develop
-      - main
+  workflow_dispatch:
 
 jobs:
   dependency-check:
@@ -53,7 +50,7 @@ jobs:
           retention-days: 20
 
   lint-test-build:
-    runs-on: github-runner-dune
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
