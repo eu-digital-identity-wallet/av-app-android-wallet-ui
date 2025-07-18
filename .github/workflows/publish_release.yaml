@@ -1,9 +1,7 @@
 name: Publish Release and add tag
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -11,7 +9,7 @@ permissions:
 
 jobs:
   build-release:
-    runs-on: github-runner-dune
+    runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     env:
       ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
