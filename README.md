@@ -43,7 +43,6 @@ engineering or other attacks. Production deployments must implement appropriate 
 measures.
 
 The current release provides only basic functionality, with several key features to be introduced in future versions, including:
- - App and device verification based on Google Play Integrity API and Apple App Attestation
  - Additional issuance methods beyond the currently implemented eID based method. 
 
 These planned features align with the requirements and methods described in the Age Verification Profile.
