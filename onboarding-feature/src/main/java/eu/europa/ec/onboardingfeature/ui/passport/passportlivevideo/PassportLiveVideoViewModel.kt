@@ -91,8 +91,9 @@ class PassportLiveVideoViewModel(
 
     override fun handleEvents(event: Event) {
         when (event) {
-            Event.OnBackPressed -> setEffect {
-                Effect.Navigation.GoBack
+            Event.OnBackPressed -> {
+                viewState.value.config?.faceImageTempPath?.let { deleteTempFile(it) }
+                setEffect { Effect.Navigation.GoBack }
             }
 
             Event.OnLiveVideoCapture -> {
@@ -180,12 +181,14 @@ class PassportLiveVideoViewModel(
                     is FaceMatchPartialState.Failure -> {
                         logController.e(TAG) { "Face match failed: ${matchResult.error}" }
                         setState { copy(isLoading = false) }
+                        deleteTempFile(config.faceImageTempPath)
                         showError(matchResult.error)
                     }
                 }
             } catch (e: Exception) {
                 logController.e(TAG, e) { "Exception during live video capture" }
                 setState { copy(isLoading = false) }
+                deleteTempFile(config.faceImageTempPath)
                 showError(e.message ?: "An unexpected error occurred")
             }
         }
