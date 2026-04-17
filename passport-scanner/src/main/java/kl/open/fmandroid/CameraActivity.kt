@@ -134,7 +134,7 @@ class CameraActivity : AppCompatActivity() {
     private fun captureFrame() {
         logController.d("CameraActivity") { "captureFrame: Capturing frame" }
         val finalFile =
-            File(getExternalFilesDir(null), "captured_frame_${System.currentTimeMillis()}.png")
+            File(filesDir, "captured_frame_${System.currentTimeMillis()}.png")
 
         val imageCaptureCallback = object : ImageCapture.OnImageCapturedCallback() {
             override fun onCaptureSuccess(imageProxy: ImageProxy) {
@@ -148,21 +148,25 @@ class CameraActivity : AppCompatActivity() {
 
                 // If we got a valid Bitmap, rotate and save as PNG
                 if (bitmap != null) {
-                    // Rotate the bitmap to upright orientation
-                    val matrix =
-                        Matrix().apply { if (rotationDegrees != 0f) postRotate(rotationDegrees) }
-                    val rotatedBitmap = Bitmap.createBitmap(
-                        bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true
-                    )
+                    try {
+                        // Rotate the bitmap to upright orientation
+                        val matrix =
+                            Matrix().apply { if (rotationDegrees != 0f) postRotate(rotationDegrees) }
+                        val rotatedBitmap = Bitmap.createBitmap(
+                            bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true
+                        )
 
-                    // Save as lossless PNG
-                    finalFile.outputStream().use { out ->
-                        rotatedBitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+                        // Save as lossless PNG
+                        finalFile.outputStream().use { out ->
+                            rotatedBitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+                        }
+
+                        logController.d("CameraActivity") { "captureFrame: Image saved to ${finalFile.absolutePath}" }
+                        // Pass the saved file path into the processing pipeline
+                        processCapturedImage(finalFile.absolutePath)
+                    } finally {
+                        finalFile.delete()
                     }
-
-                    logController.d("CameraActivity") { "captureFrame: Image saved to ${finalFile.absolutePath}" }
-                    // Pass the saved file path into the processing pipeline
-                    processCapturedImage(finalFile.absolutePath)
                 } else {
                     logController.e("CameraActivity") {
                         "captureFrame: Failed to convert imageProxy to bitmap"
