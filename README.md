@@ -7,7 +7,7 @@ SPDX-License-Identifier: Apache-2.0
 
 > [!IMPORTANT]
 > The demo version is being updated.
-> We will continue to release updates on the demo versions for community testing. The next release will be published April 17th, 2026.
+> We will continue to release updates on the demo versions for community testing. 
 
 ![Proof of age attestations for all Europeans - An age verification solution for EU citizens and residents](./docs/media/top-banner-av.png)
 

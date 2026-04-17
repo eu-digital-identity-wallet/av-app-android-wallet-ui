@@ -55,7 +55,7 @@ class DocumentIdentificationInteractorImpl(
         dateOfBirth: String,
         expiryDate: String,
     ): DocumentValidationState {
-        logController.d(TAG) { "Validating document - DOB: $dateOfBirth, Expiry: $expiryDate" }
+        logController.d(TAG) { "Validating document" }
 
         return try {
             val today = clock.todayIn(TimeZone.currentSystemDefault())
@@ -82,7 +82,7 @@ class DocumentIdentificationInteractorImpl(
                 return DocumentValidationState.Failure(errorMessage)
             }
 
-            logController.d(TAG) { "Document validation successful - age: $age, expires: $expiry" }
+            logController.d(TAG) { "Document validation successful - user meets age requirement" }
             DocumentValidationState.Success
         } catch (e: Exception) {
             logController.e(TAG) { "Error parsing document dates: ${e.message}" }

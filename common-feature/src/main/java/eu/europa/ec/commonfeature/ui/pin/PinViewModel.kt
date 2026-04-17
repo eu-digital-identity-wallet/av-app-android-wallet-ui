@@ -198,7 +198,6 @@ class PinViewModel(
 
             is Event.NextButtonPressed -> {
                 val state = viewState.value
-                logController.d("PIN") { "state on button pressed: $state" }
                 when (state.pinState) {
                     PinValidationState.ENTER -> {
                         // Set state for re-enter phase
@@ -415,7 +414,7 @@ class PinViewModel(
                     resetPin = false
                 )
             }
-            logController.d("PIN") { "state after validation: ${viewState.value}" }
+            logController.d("PIN") { "validation result: isValid=${validationResult.isValid}" }
 
             // FFWD to next screen if the pin is valid
             if (validationResult.isValid) {

@@ -84,7 +84,7 @@ object DocumentScannerIntentHelper {
         val isPassport = intent.getBooleanExtra(ScannerConstants.IS_PASSPORT, false)
 
         logController.d("DocumentScan") {
-            "Extracted from Intent extras: dateOfBirth: $dateOfBirth expiryDate: $expiryDate"
+            "Extracted from Intent extras: dateOfBirth: [REDACTED] expiryDate: [REDACTED]"
         }
 
         if (!isPassport) {
