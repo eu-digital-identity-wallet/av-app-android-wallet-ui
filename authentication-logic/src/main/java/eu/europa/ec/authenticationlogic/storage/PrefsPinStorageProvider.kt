@@ -21,6 +21,7 @@ import eu.europa.ec.businesslogic.controller.crypto.CryptoController
 import eu.europa.ec.businesslogic.controller.storage.PrefsController
 import eu.europa.ec.businesslogic.extension.decodeFromBase64
 import eu.europa.ec.businesslogic.extension.encodeToBase64String
+import java.security.MessageDigest
 
 class PrefsPinStorageProvider(
     private val prefsController: PrefsController,
@@ -34,11 +35,11 @@ class PrefsPinStorageProvider(
     }
 
     /**
-     * Retrieves the stored PIN after decrypting it.
+     * Checks whether a PIN has been stored.
      *
-     * @return The decrypted PIN as a String. Returns an empty string if no PIN is stored or if decryption fails.
+     * @return True if a non-blank PIN is stored, false otherwise.
      */
-    override fun retrievePin(): String = decryptedAndLoad()
+    override fun hasPin(): Boolean = decryptedAndLoad().isNotBlank()
 
     /**
      * Stores the given PIN in an encrypted format.
@@ -54,12 +55,20 @@ class PrefsPinStorageProvider(
     }
 
     /**
-     * Checks if the provided PIN is valid.
+     * Checks if the provided PIN is valid using constant-time comparison
+     * to prevent timing side-channel attacks.
      *
      * @param pin The PIN to validate.
      * @return True if the provided PIN matches the stored PIN, false otherwise.
      */
-    override fun isPinValid(pin: String): Boolean = retrievePin() == pin
+    override fun isPinValid(pin: String): Boolean {
+        val stored = decryptedAndLoad().toByteArray(Charsets.UTF_8)
+        try {
+            return MessageDigest.isEqual(stored, pin.toByteArray(Charsets.UTF_8))
+        } finally {
+            stored.fill(0)
+        }
+    }
 
     private fun encryptAndStore(pin: String) {
 

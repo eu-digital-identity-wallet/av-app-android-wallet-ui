@@ -26,7 +26,7 @@ sealed class PinValidationResult {
 }
 
 interface PinStorageController {
-    fun retrievePin(): String
+    fun hasPin(): Boolean
     fun setPin(pin: String)
     fun isPinValid(pin: String): PinValidationResult
 }
@@ -40,7 +40,7 @@ class PinStorageControllerImpl(private val storageConfig: StorageConfig) : PinSt
 
     private val pinStorageProvider = storageConfig.pinStorageProvider
 
-    override fun retrievePin(): String = pinStorageProvider.retrievePin()
+    override fun hasPin(): Boolean = pinStorageProvider.hasPin()
 
     override fun setPin(pin: String) {
         pinStorageProvider.setPin(pin)

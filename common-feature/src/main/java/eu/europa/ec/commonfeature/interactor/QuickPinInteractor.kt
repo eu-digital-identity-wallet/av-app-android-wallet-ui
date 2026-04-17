@@ -49,7 +49,7 @@ class QuickPinInteractorImpl(
     private val genericErrorMsg
         get() = resourceProvider.genericErrorMessage()
 
-    override fun hasPin(): Boolean = pinStorageController.retrievePin().isNotBlank()
+    override fun hasPin(): Boolean = pinStorageController.hasPin()
 
     override fun setPin(
         newPin: String,

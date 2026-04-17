@@ -79,12 +79,12 @@ class TestQuickPinInteractor {
     //region hasPin
 
     // Case 1:
-    // prefKeys.getDevicePin() returns empty String.
+    // pinStorageController.hasPin() returns false.
     @Test
     fun `Given Case 1, When hasPin is called, Then it returns false`() {
         // Given
-        whenever(pinStorageController.retrievePin())
-            .thenReturn(mockedEmptyPin)
+        whenever(pinStorageController.hasPin())
+            .thenReturn(false)
 
         // When
         val actual = interactor.hasPin()
@@ -94,16 +94,16 @@ class TestQuickPinInteractor {
 
         assertEquals(expected, actual)
         verify(pinStorageController, times(1))
-            .retrievePin()
+            .hasPin()
     }
 
     // Case 2:
-    // pinStorageController.retrievePin() returns blank String.
+    // pinStorageController.hasPin() returns false.
     @Test
     fun `Given Case 2, When hasPin is called, Then it returns false`() {
         // Given
-        whenever(pinStorageController.retrievePin())
-            .thenReturn(mockedBlankPin)
+        whenever(pinStorageController.hasPin())
+            .thenReturn(false)
 
         // When
         val actual = interactor.hasPin()
@@ -113,16 +113,16 @@ class TestQuickPinInteractor {
 
         assertEquals(expected, actual)
         verify(pinStorageController, times(1))
-            .retrievePin()
+            .hasPin()
     }
 
     // Case 3:
-    // pinStorageController.retrievePin() returns a valid String.
+    // pinStorageController.hasPin() returns true.
     @Test
     fun `Given Case 3, When hasPin is called, Then it returns true`() {
         // Given
-        whenever(pinStorageController.retrievePin())
-            .thenReturn(mockedPin)
+        whenever(pinStorageController.hasPin())
+            .thenReturn(true)
 
         // When
         val actual = interactor.hasPin()
@@ -132,7 +132,7 @@ class TestQuickPinInteractor {
 
         assertEquals(expected, actual)
         verify(pinStorageController, times(1))
-            .retrievePin()
+            .hasPin()
     }
     //endregion
 
