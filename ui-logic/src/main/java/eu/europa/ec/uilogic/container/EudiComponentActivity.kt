@@ -18,6 +18,8 @@ package eu.europa.ec.uilogic.container
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Bundle
+import android.view.WindowManager
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -51,6 +53,14 @@ open class EudiComponentActivity : FragmentActivity() {
 
     internal var pendingDeepLink: Uri? = null
     internal var pendingIntent: Intent? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_SECURE,
+            WindowManager.LayoutParams.FLAG_SECURE
+        )
+    }
 
     internal fun cacheDeepLink(intent: Intent?) {
         pendingDeepLink = intent?.data
