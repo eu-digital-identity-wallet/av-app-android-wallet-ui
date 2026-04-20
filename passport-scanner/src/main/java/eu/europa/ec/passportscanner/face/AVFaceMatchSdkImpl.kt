@@ -125,7 +125,8 @@ class AVFaceMatchSdkImpl(
                     modelDownloader.prepareModel(
                         config.embeddingExtractorModel,
                         modelBasePath,
-                        embeddingOutputFilename
+                        embeddingOutputFilename,
+                        config.embeddingExtractorModelSha256
                     ) { progress ->
                         _initStatus.value = SdkInitStatus.Preparing(progress)
                     }

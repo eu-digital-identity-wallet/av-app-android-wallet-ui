@@ -64,6 +64,7 @@ class FaceMatchControllerImpl(
         return FaceMatchConfig(
             faceDetectorModel = coreConfig.faceDetectorModel,
             embeddingExtractorModel = coreConfig.embeddingExtractorModel,
+            embeddingExtractorModelSha256 = coreConfig.embeddingExtractorModelSha256,
             livenessModel0 = coreConfig.livenessModel0,
             livenessModel1 = coreConfig.livenessModel1,
             livenessThreshold = coreConfig.livenessThreshold,

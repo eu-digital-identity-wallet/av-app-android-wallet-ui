@@ -104,6 +104,7 @@ internal class WalletCoreConfigImpl(
     override val faceMatchConfig: FaceMatchConfig = FaceMatchConfig(
         faceDetectorModel = "mediapipe_long.onnx",
         embeddingExtractorModel = "https://github.com/eu-digital-identity-wallet/av-app-android-wallet-ui/releases/download/2025.10-2/glintr100.onnx",
+        embeddingExtractorModelSha256 = "a7933ea5330113b01c9b60351d8f4c33003f145d8470ac5f0e52ee2effe25c60",
         livenessModel0 = "silentface40.onnx",
         livenessModel1 = "silentface27.onnx",
         livenessThreshold = 0.972017,

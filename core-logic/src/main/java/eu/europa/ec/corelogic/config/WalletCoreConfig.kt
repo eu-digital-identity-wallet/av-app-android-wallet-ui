@@ -30,6 +30,7 @@ import java.time.Duration
 data class FaceMatchConfig(
     val faceDetectorModel: String,
     val embeddingExtractorModel: String,
+    val embeddingExtractorModelSha256: String? = null,
     val livenessModel0: String,
     val livenessModel1: String,
     val livenessThreshold: Double,

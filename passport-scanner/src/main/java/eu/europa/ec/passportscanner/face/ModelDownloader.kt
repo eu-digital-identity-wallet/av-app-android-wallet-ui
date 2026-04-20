@@ -25,6 +25,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
+import java.security.MessageDigest
 
 /**
  * Handles downloading and preparing model files for face matching SDK
@@ -44,6 +45,7 @@ class ModelDownloader(
      * @param urlString URL to download from
      * @param destDir Destination directory path
      * @param outputFilename Optional custom filename for the downloaded file. If null, extracts from URL
+     * @param expectedSha256 Optional expected SHA-256 hash (hex) for integrity verification
      * @param onProgress Optional callback for download progress (percentage: 0-100)
      * @return The local filename of the downloaded file, or null if failed
      */
@@ -51,6 +53,7 @@ class ModelDownloader(
         urlString: String,
         destDir: String,
         outputFilename: String? = null,
+        expectedSha256: String? = null,
         onProgress: ((Int) -> Unit)? = null,
     ): String? = withContext(Dispatchers.IO) {
         logController.d(TAG) { "downloadModelFromUrl: Starting download from $urlString" }
@@ -126,6 +129,20 @@ class ModelDownloader(
 
                 tempFile.renameTo(destFile)
                 logController.d(TAG) { "downloadModelFromUrl: Download complete: ${destFile.length()} bytes" }
+
+                if (expectedSha256 != null) {
+                    val actualHash = computeSha256(destFile)
+                    if (!actualHash.equals(expectedSha256, ignoreCase = true)) {
+                        logController.e(TAG) {
+                            "downloadModelFromUrl: SHA-256 integrity check FAILED. " +
+                                    "Expected: $expectedSha256, Got: $actualHash"
+                        }
+                        destFile.delete()
+                        return@withContext null
+                    }
+                    logController.d(TAG) { "downloadModelFromUrl: SHA-256 integrity check passed" }
+                }
+
                 filename
             } else {
                 logController.e(TAG) { "downloadModelFromUrl: HTTP error code: $responseCode" }
@@ -139,6 +156,18 @@ class ModelDownloader(
             // Clean up temp file if it wasn't successfully renamed
             tempFile.delete()
         }
+    }
+
+    private fun computeSha256(file: File): String {
+        val digest = MessageDigest.getInstance("SHA-256")
+        file.inputStream().use { input ->
+            val buffer = ByteArray(8192)
+            var bytesRead: Int
+            while (input.read(buffer).also { bytesRead = it } != -1) {
+                digest.update(buffer, 0, bytesRead)
+            }
+        }
+        return digest.digest().joinToString("") { "%02x".format(it) }
     }
 
     /**
@@ -169,6 +198,7 @@ class ModelDownloader(
      * @param modelPath Either an asset filename or HTTP(S) URL
      * @param destDir Destination directory path
      * @param outputFilename Optional custom filename for downloaded files. Only used for URLs
+     * @param expectedSha256 Optional expected SHA-256 hash (hex) for integrity verification
      * @param onProgress Optional callback for download progress (percentage: 0-100)
      * @return The local filename, or null if preparation failed
      */
@@ -176,12 +206,13 @@ class ModelDownloader(
         modelPath: String,
         destDir: String,
         outputFilename: String? = null,
+        expectedSha256: String? = null,
         onProgress: ((Int) -> Unit)? = null,
     ): String? {
         if (modelPath.isEmpty()) return null
 
         return if (modelPath.startsWith("https://")) {
-            downloadModelFromUrl(modelPath, destDir, outputFilename, onProgress)
+            downloadModelFromUrl(modelPath, destDir, outputFilename, expectedSha256, onProgress)
         } else if (modelPath.startsWith("http://")) {
             logController.e(TAG) { "Rejecting insecure HTTP URL for model download: $modelPath" }
             null
