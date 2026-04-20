@@ -132,12 +132,17 @@ class ModelDownloader(
 
                 if (expectedSha256 != null) {
                     val actualHash = computeSha256(destFile)
-                    if (!actualHash.equals(expectedSha256, ignoreCase = true)) {
+                    if (actualHash.uppercase() != expectedSha256.uppercase()) {
                         logController.e(TAG) {
                             "downloadModelFromUrl: SHA-256 integrity check FAILED. " +
                                     "Expected: $expectedSha256, Got: $actualHash"
                         }
-                        destFile.delete()
+                        val deleted = destFile.delete()
+                        if (!deleted) {
+                            logController.w(TAG) {
+                                "downloadModelFromUrl: Failed to delete corrupted file"
+                            }
+                        }
                         return@withContext null
                     }
                     logController.d(TAG) { "downloadModelFromUrl: SHA-256 integrity check passed" }
