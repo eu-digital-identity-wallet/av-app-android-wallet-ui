@@ -31,7 +31,9 @@ interface PinStorageController {
     fun isPinValid(pin: String): PinValidationResult
 }
 
-class PinStorageControllerImpl(private val storageConfig: StorageConfig) : PinStorageController {
+class PinStorageControllerImpl(
+    private val storageConfig: StorageConfig,
+) : PinStorageController {
 
     companion object {
         private const val MAX_ATTEMPTS = 4
@@ -62,12 +64,14 @@ class PinStorageControllerImpl(private val storageConfig: StorageConfig) : PinSt
 
             if (newAttemptCount >= MAX_ATTEMPTS) {
                 val lockoutDuration = calculateLockoutDuration(newAttemptCount)
-                val lockoutUntil = System.currentTimeMillis() + lockoutDuration
-
-                pinStorageProvider.setLockoutUntil(lockoutUntil)
+                // Intentional: the deadline is anchored to elapsedRealtime() via the storage
+                // provider so advancing the system clock cannot bypass a lockout. The provider
+                // also binds the deadline to BOOT_COUNT — on reboot the deadline is re-anchored
+                // to now + duration so attackers gain nothing from rebooting.
+                pinStorageProvider.setLockoutForDuration(lockoutDuration)
 
                 return PinValidationResult.LockedOut(
-                    lockoutEndTimeMillis = lockoutUntil,
+                    lockoutEndTimeMillis = pinStorageProvider.getLockoutUntil(),
                     attemptsUsed = newAttemptCount
                 )
             } else {

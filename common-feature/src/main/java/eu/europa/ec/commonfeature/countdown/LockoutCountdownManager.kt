@@ -16,7 +16,7 @@
 
 package eu.europa.ec.commonfeature.countdown
 
-import eu.europa.ec.businesslogic.controller.log.LogController
+import eu.europa.ec.businesslogic.provider.ElapsedRealtimeClock
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -25,20 +25,23 @@ import kotlin.time.Duration.Companion.seconds
 
 class LockoutCountdownManager(
     private val coroutineScope: CoroutineScope,
+    private val clock: ElapsedRealtimeClock,
     private val getIsLockedOut: () -> Boolean,
     private val getLockoutEndTime: () -> Long,
     private val onCountdownUpdate: (String?) -> Unit,
     private val onLockoutEnd: () -> Unit,
-    private val getTimeMessage: (minutes: Long, seconds: Long) -> String,
-    private val logController: LogController,
+    private val getTimeMessage: (minutes: Long, seconds: Long) -> String
 ) {
     private var job: Job? = null
 
     fun start() {
         job?.cancel()
         job = coroutineScope.launch {
+            // Boundary: the storage layer treats `now >= deadline` as released.
+            // Mirror that here so the countdown fires onLockoutEnd at the exact instant
+            // PinStorageProvider.isCurrentlyLockedOut() would flip to false.
             while (getIsLockedOut()) {
-                val currentTime = System.currentTimeMillis()
+                val currentTime = clock.now()
                 val lockoutEndTime = getLockoutEndTime()
 
                 if (currentTime >= lockoutEndTime) {

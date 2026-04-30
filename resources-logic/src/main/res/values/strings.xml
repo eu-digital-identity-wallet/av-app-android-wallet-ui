@@ -339,8 +339,6 @@
     <string name="settings_screen_version">Version</string>
     <string name="splash_screen_sponsors">Powered by</string>
     <string name="splash_screen_title">Age Verification</string>
-    <string name="device_integrity_compromised_title">Device Security Warning</string>
-    <string name="device_integrity_compromised_message">This device appears to be rooted or tampered with. For the security of your credentials, the wallet cannot operate on compromised devices.</string>
     <string name="unknown_verifier">Online service</string>
     <string name="warning_authentication_failed">Authentication has failed! Please try to scan the document again or introduce the data manually.</string>
     <string name="warning_cla_not_supported">Impossible to read the document. Passport doesn\'t support CLA .</string>

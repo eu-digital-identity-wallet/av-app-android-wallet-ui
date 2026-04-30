@@ -25,14 +25,30 @@ import eu.europa.ec.eudi.wallet.issue.openid4vci.OpenId4VciManager
 import java.time.Duration
 
 /**
+ * Where a face-match model is loaded from. The sealed hierarchy couples a remote URL
+ * to its expected SHA-256 so a configuration cannot supply a URL without a pinned hash.
+ */
+sealed interface FaceMatchModelSource {
+    /** Model shipped inside the APK as an asset file. */
+    data class Asset(val filename: String) : FaceMatchModelSource
+
+    /**
+     * Model fetched from [url] (must be https) and verified against [sha256Hex]
+     * (case-insensitive hex digest). Downloads whose hash does not match are discarded.
+     */
+    data class Remote(val url: String, val sha256Hex: String) : FaceMatchModelSource
+}
+
+/**
  * Configuration for Face Match SDK used in passport verification
  */
 data class FaceMatchConfig(
-    val faceDetectorModel: String,
-    val embeddingExtractorModel: String,
-    val livenessModel0: String,
-    val livenessModel1: String,
+    val faceDetectorModel: FaceMatchModelSource,
+    val embeddingExtractorModel: FaceMatchModelSource,
+    val livenessModel0: FaceMatchModelSource,
+    val livenessModel1: FaceMatchModelSource,
     val livenessThreshold: Double,
+    /** Minimum cosine-similarity score to accept as the same subject. Recommended to be >= 0.8. */
     val matchingThreshold: Double,
 )
 

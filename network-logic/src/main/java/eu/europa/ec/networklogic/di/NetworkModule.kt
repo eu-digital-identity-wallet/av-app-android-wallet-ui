@@ -52,6 +52,7 @@ fun provideHttpClient(json: Json, configLogic: ConfigLogic): HttpClient {
 
         install(Logging) {
             logger = Logger.DEFAULT
+            // Intentional: Logging is restricted to DEBUG builds only. RELEASE builds always use NONE.
             level = when (configLogic.appBuildType) {
                 AppBuildType.DEBUG -> LogLevel.HEADERS
                 AppBuildType.RELEASE -> LogLevel.NONE

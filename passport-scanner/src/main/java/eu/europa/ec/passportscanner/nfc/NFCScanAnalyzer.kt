@@ -43,7 +43,7 @@ open class NFCScanAnalyzer(
             return
         }
 
-        logController.d(SmartScannerActivity.TAG) { "Got MRZ result: $mrzRecord" }
+        logController.d(SmartScannerActivity.TAG) { "MRZ parsed successfully (format: ${mrzRecord.format})" }
 
         when (mrzRecord.format) {
             MrzFormat.PASSPORT -> startNFCScanActivity(result)

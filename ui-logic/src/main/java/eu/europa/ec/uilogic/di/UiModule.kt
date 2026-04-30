@@ -17,10 +17,12 @@
 package eu.europa.ec.uilogic.di
 
 import eu.europa.ec.analyticslogic.controller.AnalyticsController
+import eu.europa.ec.businesslogic.provider.ElapsedRealtimeClock
 import eu.europa.ec.uilogic.config.ConfigUILogic
 import eu.europa.ec.uilogic.config.ConfigUILogicImpl
 import eu.europa.ec.uilogic.navigation.RouterHost
 import eu.europa.ec.uilogic.navigation.RouterHostImpl
+import eu.europa.ec.uilogic.navigation.helper.DcApiIntentHolder
 import eu.europa.ec.uilogic.serializer.UiSerializer
 import eu.europa.ec.uilogic.serializer.UiSerializerImpl
 import org.koin.core.annotation.ComponentScan
@@ -43,4 +45,8 @@ fun provideUiSerializer(): UiSerializer = UiSerializerImpl()
 
 @Single
 fun provideConfigUILogic(): ConfigUILogic = ConfigUILogicImpl()
+
+@Single
+fun provideDcApiIntentHolder(clock: ElapsedRealtimeClock): DcApiIntentHolder =
+    DcApiIntentHolder(clock)
 

@@ -26,7 +26,7 @@ import eu.europa.ec.uilogic.serializer.adapter.SerializableTypeAdapter
 data class PassportLiveVideoUiConfig(
     val dateOfBirth: String,
     val expiryDate: String,
-    val faceImageTempPath: String,
+    val sessionId: String,
 ) : UiSerializable {
 
     companion object Parser : UiSerializableParser {

@@ -334,8 +334,6 @@
     <string name="settings_screen_version">Versione</string>
     <string name="splash_screen_sponsors">Fornito da</string>
     <string name="splash_screen_title">Verifica dell\'età</string>
-    <string name="device_integrity_compromised_title">Avviso di sicurezza del dispositivo</string>
-    <string name="device_integrity_compromised_message">Questo dispositivo sembra essere rootato o manomesso. Per la sicurezza delle tue credenziali, il portafoglio non può funzionare su dispositivi compromessi.</string>
     <string name="unknown_verifier">Servizio online</string>
     <string name="warning_authentication_failed">Autenticazione non riuscita! Prova a scansionare di nuovo il documento o inserisci i dati manualmente.</string>
     <string name="warning_cla_not_supported">Impossibile leggere il documento. Il passaporto non supporta il CLA.</string>

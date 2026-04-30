@@ -63,7 +63,7 @@ class DeviceAuthenticationControllerImpl(
                     promptInfo = BiometricPrompt.PromptInfo.Builder()
                         .setTitle(resourceProvider.getString(R.string.biometric_prompt_title))
                         .setSubtitle(resourceProvider.getString(R.string.biometric_prompt_subtitle))
-                        .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_WEAK or BiometricManager.Authenticators.DEVICE_CREDENTIAL)
+                        .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)
                         .build(),
                     notifyOnAuthenticationFailure = notifyOnAuthenticationFailure
                 )

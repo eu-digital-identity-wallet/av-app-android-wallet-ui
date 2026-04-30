@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 European Commission
+ * Copyright (c) 2025 European Commission
  *
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
  * Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
@@ -14,17 +14,8 @@
  * governing permissions and limitations under the Licence.
  */
 
-package eu.europa.ec.corelogic.service
+package eu.europa.ec.businesslogic.provider
 
-import eu.europa.ec.eudi.iso18013.transfer.TransferManager
-import eu.europa.ec.eudi.wallet.EudiWallet
-import org.koin.android.ext.android.inject
-import eu.europa.ec.eudi.iso18013.transfer.engagement.NfcEngagementService as BaseService
-
-class NfcEngagementService : BaseService() {
-
-    val wallet: EudiWallet by inject()
-
-    override val transferManager: TransferManager
-        get() = wallet.transferManager
+fun interface ElapsedRealtimeClock {
+    fun now(): Long
 }

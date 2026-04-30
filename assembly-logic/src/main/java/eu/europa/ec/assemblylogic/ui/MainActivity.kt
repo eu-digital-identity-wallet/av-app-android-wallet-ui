@@ -30,6 +30,10 @@ import eu.europa.ec.presentationfeature.router.presentationGraph
 import eu.europa.ec.startupfeature.router.featureStartupGraph
 import eu.europa.ec.uilogic.container.EudiComponentActivity
 
+// Intentional: FLAG_SECURE is not set. This wallet displays only age-over-X boolean
+// attestations — no passport images, document numbers, or sensitive PII appear on screen.
+// The PIN field already masks input. Teams adding richer credential display should set
+// window.setFlags(FLAG_SECURE, FLAG_SECURE) in onCreate() before calling super.
 class MainActivity : EudiComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 

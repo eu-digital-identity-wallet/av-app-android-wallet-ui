@@ -113,8 +113,11 @@ open class EudiComponentActivity : FragmentActivity() {
         if (isDCAPIIntent(intent)) {
             logController.d("DCAPI") { "Detected DCAPI intent: ${intent?.action}" }
 
-            // Cache the intent BEFORE checking if user is logged in
-            // This ensures it survives the PIN entry flow
+            // Intentional: the intent is cached before the PIN/biometric check so that it
+            // survives the authentication flow and can be consumed after login completes.
+            // The presentation screen shows the request source and requires PIN/biometric
+            // before sharing any data, so no re-authentication gate is needed here.
+            // The cache has a 60-second TTL (DcApiIntentHolder) to prevent stale-intent replay.
             cacheIntent(intent)
             logController.i("DCAPI") { "Cached DCAPI intent for later retrieval" }
 

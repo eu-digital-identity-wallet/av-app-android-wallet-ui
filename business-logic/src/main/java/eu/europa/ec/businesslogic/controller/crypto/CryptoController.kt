@@ -134,7 +134,7 @@ class CryptoControllerImpl(
     override fun rotateKey(
         reEncryptData: (decryptCipher: (ByteArray) -> Cipher?, encryptCipher: () -> Cipher?) -> Boolean
     ): RotationResult {
-        val result = keystoreController.rotateKey(userAuthenticationRequired = false)
+        val result = keystoreController.rotateKey(userAuthenticationRequired = true)
         if (result is RotationResult.Failure) return result
 
         val success = result as RotationResult.Success

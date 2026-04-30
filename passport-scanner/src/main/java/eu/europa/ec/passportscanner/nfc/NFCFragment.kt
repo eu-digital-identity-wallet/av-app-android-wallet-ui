@@ -54,6 +54,7 @@ import org.jmrtd.lds.icao.MRZInfo
 import org.koin.android.ext.android.inject
 import org.spongycastle.jce.provider.BouncyCastleProvider
 import java.io.IOException
+import java.security.MessageDigest
 import java.security.Security
 
 class NFCFragment : Fragment() {
@@ -99,8 +100,14 @@ class NFCFragment : Fragment() {
             return
         }
         val tag = intent.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG) ?: return
-        val cscaInputStream = requireContext().assets.open("csca.ks")
-        val keyStore = KeyStoreUtils().readKeystoreFromFile(cscaInputStream, "")
+
+        val cscaBytes = requireContext().assets.open("csca.ks").use { it.readBytes() }
+        if (!verifyCscaIntegrity(cscaBytes)) {
+            logController.e(TAG) { "csca.ks integrity check failed — aborting NFC read" }
+            nfcFragmentListener?.onCardException(SecurityException("CSCA keystore integrity check failed"))
+            return
+        }
+        val keyStore = KeyStoreUtils().readKeystoreFromFile(cscaBytes.inputStream(), "")
 
         val mrtdTrustStore = MRTDTrustStore()
         if (keyStore != null) {
@@ -279,7 +286,9 @@ class NFCFragment : Fragment() {
     }
 
     private fun openHelpUrl() {
-        // Placeholder URL - replace with actual help URL when available
+        // Intentional: example.com is a template placeholder. Replace with the real help URL
+        // before shipping. Do not leave example.com in production — a third party could register
+        // that domain and serve attacker-controlled content in the Custom Tab.
         val helpUrl = "https://example.com/passport-help"
         try {
             val customTabsIntent = CustomTabsIntent.Builder()
@@ -320,6 +329,14 @@ class NFCFragment : Fragment() {
         fun onDisableNfc()
         fun onPassportRead(passport: Passport?)
         fun onCardException(cardException: Exception?)
+    }
+
+    // SHA-256 of the shipped csca.ks asset. Update this constant whenever csca.ks is replaced.
+    private fun verifyCscaIntegrity(bytes: ByteArray): Boolean {
+        val expected = "c82bfd5e730d6b8b73fa7712e442ad9e7adcbfb51112e3155357a2ae5a96b8b1"
+        val actual = MessageDigest.getInstance("SHA-256").digest(bytes)
+            .joinToString("") { "%02x".format(it) }
+        return actual == expected
     }
 
     companion object {

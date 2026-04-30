@@ -27,27 +27,6 @@
         android:name="android.hardware.camera.any"
         android:required="true" />
 
-    <uses-feature
-        android:name="android.hardware.bluetooth"
-        android:required="true" />
-
-    <uses-feature
-        android:name="android.hardware.bluetooth_le"
-        android:required="true" />
-
-    <uses-permission
-        android:name="android.permission.BLUETOOTH"
-        android:maxSdkVersion="30" />
-
-    <uses-permission
-        android:name="android.permission.BLUETOOTH_ADMIN"
-        android:maxSdkVersion="30" />
-
-    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
-    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.HIDE_OVERLAY_WINDOWS" />
 
@@ -74,22 +53,6 @@
                 android:resource="@xml/provider_paths" />
         </provider>
 
-        <service
-            android:name="eu.europa.ec.corelogic.service.NfcEngagementService"
-            android:exported="true"
-            android:label="@string/nfc_engagement_service_desc"
-            android:permission="android.permission.BIND_NFC_SERVICE">
-            <intent-filter>
-                <action android:name="android.nfc.action.NDEF_DISCOVERED" />
-                <action android:name="android.nfc.cardemulation.action.HOST_APDU_SERVICE" />
-            </intent-filter>
-
-            <!-- the following "@xml/nfc_engagement_apdu_service" in meta-data is provided by the library -->
-            <meta-data
-                android:name="android.nfc.cardemulation.host_apdu_service"
-                android:resource="@xml/nfc_engagement_apdu_service" />
-        </service>
-
         <activity
             android:name=".ui.MainActivity"
             android:exported="true"
@@ -110,6 +73,13 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
 
+            <!--
+                Intentional: custom URI schemes are used instead of https:// App Links because
+                the OpenID4VP, mDL, and credential-offer protocol specifications mandate them.
+                Even if a link is intercepted by another app, no credential data travels in the
+                inbound URL — the wallet still requires user confirmation and PIN/biometric before
+                sharing anything. android:autoVerify is not applicable to custom schemes.
+            -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 

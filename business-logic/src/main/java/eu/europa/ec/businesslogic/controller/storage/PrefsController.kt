@@ -16,10 +16,6 @@
 
 package eu.europa.ec.businesslogic.controller.storage
 
-import android.content.SharedPreferences
-import androidx.core.content.edit
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKeys
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 
 interface PrefsController {
@@ -41,70 +37,35 @@ class PrefsControllerImpl(
     private val resourceProvider: ResourceProvider
 ) : PrefsController {
 
-    private val encryptedPrefs: SharedPreferences by lazy {
-        val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
-        EncryptedSharedPreferences.create(
-            "eudi-wallet-encrypted",
-            masterKeyAlias,
-            resourceProvider.provideContext(),
-            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-        )
+    private val store: SecurePrefsStore by lazy {
+        SecurePrefsStore(resourceProvider.provideContext())
     }
 
-    private fun getSharedPrefs(): SharedPreferences = encryptedPrefs
+    override fun contains(key: String): Boolean = store.contains(key)
 
-    override fun contains(key: String): Boolean {
-        return getSharedPrefs().contains(key)
-    }
+    override fun clear(key: String) = store.clear(key)
 
-    override fun clear(key: String) {
-        getSharedPrefs().edit { remove(key) }
-    }
+    override fun clear() = store.clear()
 
-    override fun clear() {
-        getSharedPrefs().edit { clear() }
-    }
+    override fun setString(key: String, value: String) = store.setString(key, value)
 
-    override fun setString(key: String, value: String) {
-        getSharedPrefs().edit {
-            putString(key, value)
-        }
-    }
+    override fun setLong(key: String, value: Long) = store.setLong(key, value)
 
-    override fun setLong(key: String, value: Long) {
-        getSharedPrefs().edit {
-            putLong(key, value)
-        }
-    }
+    override fun setBool(key: String, value: Boolean) = store.setBool(key, value)
 
-    override fun setBool(key: String, value: Boolean) {
-        getSharedPrefs().edit {
-            putBoolean(key, value)
-        }
-    }
+    override fun getString(key: String, defaultValue: String): String =
+        store.getString(key, defaultValue)
 
-    override fun getString(key: String, defaultValue: String): String {
-        return getSharedPrefs().getString(key, null) ?: defaultValue
-    }
+    override fun getLong(key: String, defaultValue: Long): Long =
+        store.getLong(key, defaultValue)
 
-    override fun getLong(key: String, defaultValue: Long): Long {
-        return getSharedPrefs().getLong(key, defaultValue)
-    }
+    override fun getBool(key: String, defaultValue: Boolean): Boolean =
+        store.getBool(key, defaultValue)
 
-    override fun getBool(key: String, defaultValue: Boolean): Boolean {
-        return getSharedPrefs().getBoolean(key, defaultValue)
-    }
+    override fun getInt(key: String, defaultValue: Int): Int =
+        store.getInt(key, defaultValue)
 
-    override fun getInt(key: String, defaultValue: Int): Int {
-        return getSharedPrefs().getInt(key, defaultValue)
-    }
-
-    override fun setInt(key: String, value: Int) {
-        getSharedPrefs().edit {
-            putInt(key, value)
-        }
-    }
+    override fun setInt(key: String, value: Int) = store.setInt(key, value)
 }
 
 interface PrefKeys {

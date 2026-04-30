@@ -334,8 +334,6 @@
     <string name="settings_screen_version">Version</string>
     <string name="splash_screen_sponsors">Drevet af</string>
     <string name="splash_screen_title">Aldersverifikation</string>
-    <string name="device_integrity_compromised_title">Advarsel om enhedssikkerhed</string>
-    <string name="device_integrity_compromised_message">Denne enhed ser ud til at være rootet eller manipuleret med. Af hensyn til sikkerheden af dine legitimationsoplysninger kan tegnebogen ikke fungere på kompromitterede enheder.</string>
     <string name="unknown_verifier">Online tjeneste</string>
     <string name="warning_authentication_failed">Godkendelse mislykkedes! Prøv at scanne dokumentet igen, eller indtast dataene manuelt.</string>
     <string name="warning_cla_not_supported">Umuligt at læse dokumentet. Pas understøtter ikke CLA .</string>

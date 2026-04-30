@@ -7,7 +7,6 @@
 * [Scoped Issuance Document Configuration](#scoped-issuance-document-configuration)
     * [Passport Scanning Issuer Configuration](#passport-scanning-issuer-configuration)
     * [Face Match Configuration](#face-match-configuration)
-* [How to work with self-signed certificates](#how-to-work-with-self-signed-certificates)
 * [Batch Document Issuance Configuration](#batch-document-issuance-configuration)
 * [Theme configuration](#theme-configuration)
 * [Pin Storage configuration](#pin-storage-configuration)
@@ -416,75 +415,6 @@ The model paths can be specified as:
 > The models referenced in the default configuration are currently hosted on GitHub Releases for
 > development and testing purposes only. **This is NOT recommended for production environments.**
 
-## How to work with self-signed certificates
-
-This section describes configuring the application to interact with services utilizing self-signed certificates.
-
-*To enable support for self-signed certificates, you must customize the existing Ktor `HttpClient`
-used by the application.*
-
-1. Open the `NetworkModule.kt` file of the `network-logic` module.
-2. Add the following imports:
-
-    ```kotlin
-    import android.annotation.SuppressLint
-    import java.security.SecureRandom
-    import javax.net.ssl.HostnameVerifier
-    import javax.net.ssl.SSLContext
-    import javax.net.ssl.TrustManager
-    import javax.net.ssl.X509TrustManager
-    import javax.security.cert.CertificateException
-    ```
-
-3. Replace the `provideHttpClient` function with the following:
-
-    ```kotlin
-    @SuppressLint("TrustAllX509TrustManager", "CustomX509TrustManager")
-    @Single
-    fun provideHttpClient(json: Json): HttpClient {
-        val trustAllCerts = arrayOf<TrustManager>(
-            object : X509TrustManager {
-                @Throws(CertificateException::class)
-                override fun checkClientTrusted(
-                    chain: Array<java.security.cert.X509Certificate>,
-                    authType: String
-                ) {
-                }
-    
-                @Throws(CertificateException::class)
-                override fun checkServerTrusted(
-                    chain: Array<java.security.cert.X509Certificate>,
-                    authType: String
-                ) {
-                }
-    
-                override fun getAcceptedIssuers(): Array<java.security.cert.X509Certificate> {
-                    return arrayOf()
-                }
-            }
-        )
-    
-        return HttpClient(Android) {
-            install(Logging)
-            install(ContentNegotiation) {
-                json(
-                    json = json,
-                    contentType = ContentType.Application.Json
-                )
-            }
-            engine {
-                requestConfig
-                sslManager = { httpsURLConnection ->
-                    httpsURLConnection.sslSocketFactory = SSLContext.getInstance("TLS").apply {
-                        init(null, trustAllCerts, SecureRandom())
-                    }.socketFactory
-                    httpsURLConnection.hostnameVerifier = HostnameVerifier { _, _ -> true }
-                }
-            }
-        }
-    }
-    ```
-
 ## Batch Document Issuance Configuration
 
 The app is configured to use batch document issuance by default, requesting a batch of credentials
@@ -560,23 +490,58 @@ interface StorageConfig {
 You can provide your storage implementation by implementing the *PinStorageProvider* interface and then setting it as the default to the *StorageConfigImpl* pinStorageProvider variable.
 The project utilizes Koin for Dependency Injection (DI), thus requiring adjustment of the *LogicAuthenticationModule* graph to provide the configuration.
 
+The *PinStorageProvider* interface:
+
+```kotlin
+interface PinStorageProvider {
+    fun hasPin(): Boolean
+    fun setPin(pin: String)
+    fun isPinValid(pin: String): Boolean
+
+    fun getFailedAttempts(): Int
+    fun incrementFailedAttempts(): Int
+    fun resetFailedAttempts()
+
+    fun setLockoutForDuration(durationMillis: Long)
+    fun getLockoutUntil(): Long
+    fun isCurrentlyLockedOut(): Boolean
+}
+```
+
 Implementation Example:
 
 ```kotlin
 class PrefsPinStorageProvider(
     private val prefsController: PrefsController,
-    private val cryptoController: CryptoController
+    private val clock: ElapsedRealtimeClock,
+    private val bootIdProvider: BootIdProvider,
 ) : PinStorageProvider {
 
-    override fun retrievePin(): String = decryptedAndLoad()
-
-    override fun setPin(pin: String) {
-       encryptAndStore(pin)
+    override fun hasPin(): Boolean {
+        return prefsController.getString(KEY_PIN_HASH, "").isNotEmpty()
     }
 
-    override fun isPinValid(pin: String): Boolean = retrievePin() == pin
+    override fun setPin(pin: String) {
+        val salt = generateSalt()
+        val hash = hashPin(pin, salt)
+        prefsController.setString(KEY_PIN_HASH, hash.toHexString())
+        prefsController.setString(KEY_PIN_SALT, salt.toHexString())
+        resetFailedAttempts()
+    }
+
+    override fun isPinValid(pin: String): Boolean {
+        val storedHashHex = prefsController.getString(KEY_PIN_HASH, "")
+        val saltHex = prefsController.getString(KEY_PIN_SALT, "")
+        if (storedHashHex.isEmpty() || saltHex.isEmpty()) return false
+
+        val salt = saltHex.hexToByteArray()
+        val computedHash = hashPin(pin, salt)
+        return MessageDigest.isEqual(computedHash, storedHashHex.hexToByteArray())
+    }
 }
 ```
+
+The default implementation uses PBKDF2 with HMAC-SHA256 for PIN hashing with a random salt, constant-time comparison to prevent timing attacks, and reboot-aware lockout via `ElapsedRealtimeClock` and `BootIdProvider`.
 
 Config Example:
 
@@ -598,9 +563,10 @@ Config Construction via Koin DI Example:
 @Single
 fun provideStorageConfig(
     prefsController: PrefsController,
-    cryptoController: CryptoController
+    clock: ElapsedRealtimeClock,
+    bootIdProvider: BootIdProvider,
 ): StorageConfig = StorageConfigImpl(
-    pinImpl = PrefsPinStorageProvider(prefsController, cryptoController),
+    pinImpl = PrefsPinStorageProvider(prefsController, clock, bootIdProvider),
     biometryImpl = PrefsBiometryStorageProvider(prefsController)
 )
 ```

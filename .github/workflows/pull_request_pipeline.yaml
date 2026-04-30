@@ -94,6 +94,52 @@ jobs:
           gradle-version: wrapper
           cache-read-only: false
 
+      - name: Check TLS pin-set expiration
+        run: |
+          python3 - <<'EOF'
+          import re, sys
+          from datetime import date, timedelta
+
+          WARN_DAYS = 120
+          config = open("network-logic/src/main/res/xml/network_security_config.xml").read()
+          dates = re.findall(r'expiration="(\d{4}-\d{2}-\d{2})"', config)
+          if not dates:
+              print("WARNING: No pin-set expiration dates found in network_security_config.xml")
+              sys.exit(0)
+          threshold = date.today() + timedelta(days=WARN_DAYS)
+          failed = False
+          for d in dates:
+              exp = date.fromisoformat(d)
+              if exp <= threshold:
+                  print(f"ERROR: TLS pin-set expires {d}, which is within {WARN_DAYS} days. Rotate pins before this date.")
+                  failed = True
+          if failed:
+              sys.exit(1)
+          print(f"TLS pin-set expiration check passed. Earliest expiry: {min(dates)}")
+          EOF
+
+      - name: Check CSCA keystore integrity constant
+        run: |
+          python3 - <<'EOF'
+          import hashlib, re, sys
+
+          asset = "passport-scanner/src/main/assets/csca.ks"
+          source = "passport-scanner/src/main/java/eu/europa/ec/passportscanner/nfc/NFCFragment.kt"
+
+          actual = hashlib.sha256(open(asset, "rb").read()).hexdigest()
+          code = open(source).read()
+          match = re.search(r'val expected = "([0-9a-f]{64})"', code)
+          if not match:
+              print("ERROR: Could not find expected SHA-256 constant in NFCFragment.kt")
+              sys.exit(1)
+          expected = match.group(1)
+          if actual != expected:
+              print(f"ERROR: csca.ks hash mismatch. File: {actual}  Constant: {expected}")
+              print("Update verifyCscaIntegrity() in NFCFragment.kt to match the new asset.")
+              sys.exit(1)
+          print(f"csca.ks integrity constant is up-to-date ({actual[:16]}...)")
+          EOF
+
       - name: Run lint check
         run: ./gradlew lint
 

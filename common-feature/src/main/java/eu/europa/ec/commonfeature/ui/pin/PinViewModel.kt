@@ -18,11 +18,10 @@ package eu.europa.ec.commonfeature.ui.pin
 
 import androidx.lifecycle.viewModelScope
 import eu.europa.ec.businesslogic.controller.log.LogController
+import eu.europa.ec.businesslogic.provider.ElapsedRealtimeClock
 import eu.europa.ec.businesslogic.validator.Form
 import eu.europa.ec.businesslogic.validator.FormValidationResult
 import eu.europa.ec.businesslogic.validator.Rule
-import eu.europa.ec.commonfeature.config.IssuanceFlowType
-import eu.europa.ec.commonfeature.config.IssuanceUiConfig
 import eu.europa.ec.commonfeature.config.SuccessUIConfig
 import eu.europa.ec.commonfeature.countdown.LockoutCountdownManager
 import eu.europa.ec.commonfeature.interactor.QuickPinInteractor
@@ -123,11 +122,13 @@ class PinViewModel(
     private val resourceProvider: ResourceProvider,
     private val uiSerializer: UiSerializer,
     private val logController: LogController,
+    private val clock: ElapsedRealtimeClock,
     @InjectedParam private val pinFlow: PinFlow,
 ) : MviViewModel<Event, State, Effect>() {
 
     private val lockoutCountdownManager = LockoutCountdownManager(
         coroutineScope = viewModelScope,
+        clock = clock,
         getIsLockedOut = { viewState.value.isLockedOut },
         getLockoutEndTime = { viewState.value.lockoutEndTime },
         onCountdownUpdate = { message ->
@@ -149,8 +150,7 @@ class PinViewModel(
                 )
             else
                 resourceProvider.getString(R.string.quick_pin_change_lockout_countdown_seconds, seconds)
-        },
-        logController = logController
+        }
     )
 
     override fun setInitialState(): State {

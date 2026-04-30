@@ -334,8 +334,6 @@
     <string name="settings_screen_version">Version</string>
     <string name="splash_screen_sponsors">Angetrieben von</string>
     <string name="splash_screen_title">Altersverifizierung</string>
-    <string name="device_integrity_compromised_title">Sicherheitswarnung für das Gerät</string>
-    <string name="device_integrity_compromised_message">Dieses Gerät scheint gerootet oder manipuliert zu sein. Zum Schutz Ihrer Zugangsdaten kann das Wallet auf kompromittierten Geräten nicht betrieben werden.</string>
     <string name="unknown_verifier">Online-Dienst</string>
     <string name="warning_authentication_failed">Authentifizierung fehlgeschlagen! Bitte versuchen Sie, das Dokument erneut zu scannen oder die Daten manuell einzugeben.</string>
     <string name="warning_cla_not_supported">Das Dokument kann nicht gelesen werden. Der Reisepass unterstützt CLA nicht.</string>

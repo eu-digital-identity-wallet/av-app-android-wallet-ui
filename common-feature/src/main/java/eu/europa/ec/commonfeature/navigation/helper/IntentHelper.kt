@@ -33,7 +33,8 @@ fun handleIntentAction(
     intentAction: IntentAction,
 ) {
     if (isDCAPIIntent(intentAction.intent)) {
-        DcApiIntentHolder.cacheIntent(intentAction.intent)
+        val dcApiIntentHolder: DcApiIntentHolder by inject(DcApiIntentHolder::class.java)
+        dcApiIntentHolder.cacheIntent(intentAction.intent)
 
         val uiSerializer: UiSerializer by inject(UiSerializer::class.java)
 

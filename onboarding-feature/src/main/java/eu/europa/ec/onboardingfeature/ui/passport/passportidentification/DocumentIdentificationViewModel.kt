@@ -16,12 +16,11 @@
 
 package eu.europa.ec.onboardingfeature.ui.passport.passportidentification
 
-import android.content.Context
-import android.graphics.Bitmap
 import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.onboardingfeature.config.PassportLiveVideoUiConfig
 import eu.europa.ec.onboardingfeature.interactor.DocumentIdentificationInteractor
 import eu.europa.ec.onboardingfeature.interactor.DocumentValidationState
+import eu.europa.ec.onboardingfeature.session.PassportOnboardingSession
 import eu.europa.ec.onboardingfeature.ui.passport.passportidentification.Effect.Navigation.GoBack
 import eu.europa.ec.onboardingfeature.ui.passport.passportidentification.Effect.Navigation.StartMRZScanner
 import eu.europa.ec.onboardingfeature.ui.passport.passportidentification.Effect.Navigation.SwitchScreen
@@ -37,8 +36,6 @@ import eu.europa.ec.uilogic.navigation.helper.generateComposableArguments
 import eu.europa.ec.uilogic.navigation.helper.generateComposableNavigationLink
 import eu.europa.ec.uilogic.serializer.UiSerializer
 import org.koin.android.annotation.KoinViewModel
-import java.io.File
-import java.io.FileOutputStream
 import java.util.UUID
 
 sealed class DocumentErrors(val errorMessage: Int) {
@@ -52,7 +49,7 @@ data class State(
     val scanComplete: Boolean = false,
     val scannedDocument: ScannedDocument? = null,
     val error: ContentErrorConfig? = null,
-    val faceImageTempPath: String? = null,
+    val activeSessionId: String? = null,
 ) : ViewState
 
 sealed class Event : ViewEvent {
@@ -75,17 +72,14 @@ sealed class Effect : ViewSideEffect {
 
 @KoinViewModel
 class DocumentIdentificationViewModel(
-    private val context: Context,
     private val logController: LogController,
     private val uiSerializer: UiSerializer,
     private val documentIdentificationInteractor: DocumentIdentificationInteractor,
     private val resourceProvider: ResourceProvider,
+    private val passportOnboardingSession: PassportOnboardingSession,
 ) : MviViewModel<Event, State, Effect>() {
 
-    override fun setInitialState(): State {
-        cleanupStaleFaceImages()
-        return State()
-    }
+    override fun setInitialState(): State = State()
 
     override fun handleEvents(event: Event) {
         when (event) {
@@ -130,18 +124,13 @@ class DocumentIdentificationViewModel(
             is DocumentValidationState.Success -> {
                 logController.i { "Document validation successful, navigating to live video" }
                 setState { copy(isLoading = false) }
-                var link : Effect.Navigation
-                if (scannedDocument is ScannedDocument.Passport) {
-                    link = generatePasswordLiveLink(scannedDocument)
-                }
-                else{
+                val link: Effect.Navigation = if (scannedDocument is ScannedDocument.Passport) {
+                    generatePasswordLiveLink(scannedDocument)
+                } else {
                     // todo go to issuance flow for eid
-                    link = generateCredentialIssuanceScreenLink()
+                    generateCredentialIssuanceScreenLink()
                 }
-
-                setEffect {
-                    link
-                }
+                setEffect { link }
             }
 
             is DocumentValidationState.Failure -> {
@@ -156,51 +145,39 @@ class DocumentIdentificationViewModel(
         return SwitchScreen(OnboardingScreens.IdentityDocumentCredentialIssuance.screenRoute)
     }
 
-    private fun generatePasswordLiveLink(passport: ScannedDocument.Passport): SwitchScreen =
-        SwitchScreen(
+    private fun generatePasswordLiveLink(passport: ScannedDocument.Passport): SwitchScreen {
+        val faceImage = requireNotNull(passport.faceImage) {
+            "faceImage must not be null — caller already validated it in handlePassportVerification"
+        }
+        val sessionId = UUID.randomUUID().toString()
+        passportOnboardingSession.put(sessionId, faceImage)
+        val previousSessionId = viewState.value.activeSessionId
+        if (previousSessionId != null) {
+            passportOnboardingSession.remove(previousSessionId)
+        }
+        setState { copy(activeSessionId = sessionId) }
+        return SwitchScreen(
             generateComposableNavigationLink(
                 OnboardingScreens.PassportLiveVideo,
                 generateComposableArguments(
                     mapOf(
                         PassportLiveVideoUiConfig.serializedKeyName to uiSerializer.toBase64(
-                            generateUiConfig(passport),
+                            PassportLiveVideoUiConfig(
+                                dateOfBirth = passport.dateOfBirth!!,
+                                expiryDate = passport.expiryDate!!,
+                                sessionId = sessionId,
+                            ),
                             PassportLiveVideoUiConfig.Parser
                         )
                     )
                 )
             )
         )
-
-    private fun generateUiConfig(passport: ScannedDocument.Passport): PassportLiveVideoUiConfig {
-        val tempFile = File(context.cacheDir, "passport_face_${UUID.randomUUID()}.png")
-        FileOutputStream(tempFile).use { fos ->
-            passport.faceImage!!.compress(Bitmap.CompressFormat.PNG, 100, fos)
-        }
-        setState { copy(faceImageTempPath = tempFile.absolutePath) }
-        return PassportLiveVideoUiConfig(
-            dateOfBirth = passport.dateOfBirth!!,
-            expiryDate = passport.expiryDate!!,
-            faceImageTempPath = tempFile.absolutePath,
-        )
-    }
-
-    private fun cleanupStaleFaceImages() {
-        try {
-            context.cacheDir.listFiles { file ->
-                file.name.startsWith("passport_face_") && file.name.endsWith(".png")
-            }?.forEach { it.delete() }
-        } catch (e: Exception) {
-            logController.e { "Failed to clean up stale face images: ${e.message}" }
-        }
     }
 
     override fun onCleared() {
         super.onCleared()
-        viewState.value.faceImageTempPath?.let { path ->
-            try {
-                File(path).delete()
-            } catch (_: Exception) {}
-        }
+        viewState.value.activeSessionId?.let { passportOnboardingSession.remove(it) }
     }
 
     private fun showError(errorMessage: String) {

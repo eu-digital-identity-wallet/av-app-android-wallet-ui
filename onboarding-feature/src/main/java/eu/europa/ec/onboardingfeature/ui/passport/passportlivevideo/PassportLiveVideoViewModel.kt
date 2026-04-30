@@ -24,6 +24,7 @@ import eu.europa.ec.onboardingfeature.config.PassportLiveVideoUiConfig
 import eu.europa.ec.onboardingfeature.interactor.FaceMatchPartialState
 import eu.europa.ec.onboardingfeature.interactor.FaceMatchSDKPartialState
 import eu.europa.ec.onboardingfeature.interactor.PassportLiveVideoInteractor
+import eu.europa.ec.onboardingfeature.session.PassportOnboardingSession
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.component.content.ContentErrorConfig
@@ -40,14 +41,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.annotation.KoinViewModel
 import org.koin.core.annotation.InjectedParam
-import java.io.File
 
 private const val TAG = "PassportLiveVideoViewModel"
 
 data class State(
     val isLoading: Boolean = false,
     val config: PassportLiveVideoUiConfig? = null,
-    val progress: Int = 0, // 0-100 percentage for initialization
+    val progress: Int = 0,
     val isInitializing: Boolean = false,
     val isSdkReady: Boolean = false,
     val error: ContentErrorConfig? = null,
@@ -72,10 +72,12 @@ sealed class Effect : ViewSideEffect {
 
 @KoinViewModel
 class PassportLiveVideoViewModel(
+    private val context: Context,
     private val uiSerializer: UiSerializer,
     private val logController: LogController,
     private val passportLiveVideoInteractor: PassportLiveVideoInteractor,
     private val resourceProvider: ResourceProvider,
+    private val passportOnboardingSession: PassportOnboardingSession,
     @InjectedParam private val passportLiveVideoSerializedConfig: String,
 ) : MviViewModel<Event, State, Effect>() {
 
@@ -163,17 +165,22 @@ class PassportLiveVideoViewModel(
             return
         }
 
+        val passportFace = passportOnboardingSession.get(config.sessionId)
+        if (passportFace == null) {
+            logController.e(TAG) { "Passport face bitmap not in session, cannot proceed" }
+            showError(resourceProvider.getString(R.string.generic_error_retry))
+            return
+        }
+
         setState { copy(isLoading = true, error = null) }
 
         viewModelScope.launch {
             try {
-                when (val matchResult = passportLiveVideoInteractor.captureAndMatchFace(
-                    faceImageTempPath = config.faceImageTempPath
-                )) {
+                when (val matchResult = passportLiveVideoInteractor.captureAndMatchFace(passportFace)) {
                     is FaceMatchPartialState.Success -> {
                         logController.i(TAG) { "Face match successful, navigating to consent screen" }
                         setState { copy(isLoading = false) }
-                        deleteTempFile(config.faceImageTempPath)
+                        passportOnboardingSession.remove(config.sessionId)
                         navigateToNextScreen()
                     }
 
@@ -200,22 +207,12 @@ class PassportLiveVideoViewModel(
         }
     }
 
-
-    private fun deleteTempFile(filePath: String) {
-        try {
-            val file = File(filePath)
-            if (file.exists()) {
-                file.delete()
-            }
-        } catch (e: Exception) {
-            logController.e(TAG, e) { "Exception while deleting temp file" }
-        }
-    }
-
-
+    // On success the bitmap is removed from the session immediately after matching. On any other
+    // exit (back press, error, process death) DocumentIdentificationViewModel.onCleared is the
+    // canonical owner and will recycle it. Nothing to do here.
     override fun onCleared() {
         super.onCleared()
-        viewState.value.config?.faceImageTempPath?.let { deleteTempFile(it) }
+        viewState.value.config?.sessionId?.let { passportOnboardingSession.remove(it) }
     }
 
     private fun showError(errorMessage: String, errorType: ErrorType = ErrorType.GENERIC) {
@@ -231,5 +228,4 @@ class PassportLiveVideoViewModel(
             )
         }
     }
-
 }

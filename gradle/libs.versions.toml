@@ -27,7 +27,6 @@ androidxWindowManager = "1.5.1"
 androidxWork = "2.11.1"
 androidxBiometric = "1.4.0-alpha02"
 androidxAppAuth = "1.0.0"
-androidxSecurityCrypto = "1.0.0"
 coil = "3.3.0"
 constraintlayoutVersion = "1.1.1"
 gmsPlugin = "4.4.4"
@@ -53,7 +52,7 @@ slf4j = "2.0.17"
 gson = "2.13.2"
 googlePhoneNumber = "9.0.24"
 zxing = "3.5.4"
-eudiWalletCore = "0.24.0"
+eudiWalletCore = "0.26.1"
 cameraCore = "1.5.3"
 owaspDependencyCheck = "12.2.0"
 material3 = "1.4.0"
@@ -108,7 +107,6 @@ androidx-lifecycle-viewModelCompose = { group = "androidx.lifecycle", name = "li
 androidx-metrics = { group = "androidx.metrics", name = "metrics-performance", version.ref = "androidxMetrics" }
 androidx-biometric = { group = "androidx.biometric", name = "biometric-ktx", version.ref = "androidxBiometric" }
 androidx-appAuth = { group = "androidx.security", name = "security-app-authenticator", version.ref = "androidxAppAuth" }
-androidx-security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "androidxSecurityCrypto" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "androidxNavigation" }
 androidx-navigation-testing = { group = "androidx.navigation", name = "navigation-testing", version.ref = "androidxNavigation" }
 androidx-profileinstaller = { group = "androidx.profileinstaller", name = "profileinstaller", version.ref = "androidxProfileinstaller" }

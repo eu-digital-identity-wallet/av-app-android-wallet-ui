@@ -37,6 +37,7 @@ import eu.europa.ec.onboardingfeature.interactor.PassportLiveVideoInteractor
 import eu.europa.ec.onboardingfeature.interactor.PassportLiveVideoInteractorImpl
 import eu.europa.ec.onboardingfeature.interactor.PassportScanIntroInteractor
 import eu.europa.ec.onboardingfeature.interactor.PassportScanIntroInteractorImpl
+import eu.europa.ec.onboardingfeature.session.PassportOnboardingSession
 import eu.europa.ec.passportscanner.face.AVFaceMatchSDK
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.serializer.UiSerializer
@@ -49,6 +50,9 @@ import kotlin.time.ExperimentalTime
 @Module
 @ComponentScan("eu.europa.ec.onboardingfeature")
 class FeatureOnboardingModule
+
+@Single
+fun providePassportOnboardingSession(): PassportOnboardingSession = PassportOnboardingSession()
 
 @Factory
 fun provideConsentInteractor(): ConsentInteractor = ConsentInteractorImpl()

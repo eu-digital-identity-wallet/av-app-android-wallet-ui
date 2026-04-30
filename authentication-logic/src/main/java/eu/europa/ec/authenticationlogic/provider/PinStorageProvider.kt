@@ -25,7 +25,29 @@ interface PinStorageProvider {
     fun incrementFailedAttempts(): Int
     fun resetFailedAttempts()
 
-    fun setLockoutUntil(timestampMillis: Long)
+    /**
+     * Persist a lockout lasting [durationMillis] from the current elapsed-realtime clock.
+     * Implementations must also record the current boot identity so the deadline can be
+     * re-anchored after a reboot (see [getLockoutUntil]).
+     */
+    fun setLockoutForDuration(durationMillis: Long)
+
+    /**
+     * Returns the elapsed-realtime deadline at which the active lockout expires,
+     * re-anchored to `now + durationMillis` if the device has rebooted since the
+     * lockout was first set. Returns `0L` if no lockout is active.
+     *
+     * Boundary semantic: the user is locked out for `now < deadline` and released at
+     * `now >= deadline`. Callers rendering a countdown must use the same `>=` boundary
+     * (see `LockoutCountdownManager`) so that the UI's lockout-end signal agrees with
+     * [isCurrentlyLockedOut].
+     */
     fun getLockoutUntil(): Long
+
+    /**
+     * Returns true while `now < getLockoutUntil()`. The boundary instant itself is
+     * treated as "released" — this matches the `>=` check in `LockoutCountdownManager`
+     * so the UI never shows a 0-second countdown after the gate has opened.
+     */
     fun isCurrentlyLockedOut(): Boolean
 }

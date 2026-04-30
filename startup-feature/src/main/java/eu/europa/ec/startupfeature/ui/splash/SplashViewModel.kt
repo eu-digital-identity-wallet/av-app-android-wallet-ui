@@ -17,23 +17,19 @@
 package eu.europa.ec.startupfeature.ui.splash
 
 import androidx.lifecycle.viewModelScope
-import eu.europa.ec.businesslogic.controller.device.DeviceIntegrityLevel
 import eu.europa.ec.startupfeature.interactor.SplashInteractor
 import eu.europa.ec.uilogic.mvi.MviViewModel
 import eu.europa.ec.uilogic.mvi.ViewEvent
 import eu.europa.ec.uilogic.mvi.ViewSideEffect
 import eu.europa.ec.uilogic.mvi.ViewState
 import eu.europa.ec.uilogic.navigation.ModuleRoute
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.android.annotation.KoinViewModel
 import kotlin.time.Duration.Companion.milliseconds
 
 data class State(
-    val deviceCompromised: Boolean = false,
-    val integrityDetails: List<String> = emptyList()
+    val placeholder: Unit = Unit
 ) : ViewState
 
 sealed class Event : ViewEvent {
@@ -62,31 +58,10 @@ class SplashViewModel(
     private fun enterApplication() {
         viewModelScope.launch {
             delay(500.milliseconds)
-
-            val integrityResult = withContext(Dispatchers.IO) {
-                interactor.getDeviceIntegrityResult()
+            val screenRoute = interactor.getAfterSplashRoute()
+            setEffect {
+                Effect.Navigation.SwitchScreen(screenRoute)
             }
-
-            when (integrityResult.level) {
-                DeviceIntegrityLevel.COMPROMISED -> {
-                    setState {
-                        copy(
-                            deviceCompromised = true,
-                            integrityDetails = integrityResult.details
-                        )
-                    }
-                }
-
-                DeviceIntegrityLevel.POTENTIALLY_COMPROMISED,
-                DeviceIntegrityLevel.TRUSTED -> proceedToApp()
-            }
-        }
-    }
-
-    private fun proceedToApp() {
-        val screenRoute = interactor.getAfterSplashRoute()
-        setEffect {
-            Effect.Navigation.SwitchScreen(screenRoute)
         }
     }
 }

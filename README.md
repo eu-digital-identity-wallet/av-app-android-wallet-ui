@@ -81,27 +81,11 @@ https://github.com/user-attachments/assets/893cdf19-982a-4646-ab70-3b1b186d706e
 
 https://github.com/user-attachments/assets/e4701cbc-df0e-4bb2-9c34-3fa682630b6a
 
-### How to release the app
-
-To publish the app on the Google Play Store, several steps must be completed. A detailed description can be found [here](./docs/release_guide.md):
-
-* **Create a Developer Account:** Register for a Google Play Developer account using your Google account. You will need to accept the developer distribution agreement and pay a one-time registration fee. If your app will offer in-app purchases or paid content, you must also set up a Google Payments merchant account.
-
-* **Create a New Application:**  In the Google Play Console, select "All Apps" and click "Create App." Enter the app name and choose the default language and app type (app or game).
-
-* **Complete the Store Listing:** Fill out all required information for your app’s store entry, including the app description, screenshots, icon, category, and contact details. The more information you provide, the better your app will be found in search results.
-
-* **Upload the App Bundle (AAB) or APK:** Upload your app’s Android App Bundle (AAB) or APK file. Since August 2021, new apps must be published using the AAB format.
-
-* **Content Rating:** Complete the content rating questionnaire to ensure your app is properly classified. Without this, your app may be removed from the Play Store.
-
-* **Set Pricing and Distribution:** Decide whether your app will be free or paid, and select the countries in which it will be available. Note that you can change a paid app to free, but not vice versa.
-
-* **Review and Launch:** Double-check all information and settings. Once everything is complete and all sections are marked as finished, confirm the release to submit your app for review. Google will review your submission, which can take several hours to a couple of days. After approval, your app will be published on the Play Store
-
 ## Documentation  
 
 [Age Verification Solution Technical Specification](https://github.com/eu-digital-identity-wallet/av-doc-technical-specification)
+
+[Hardware-Backed Authentication](./docs/hardware_backed_authentication.md) - Biometric security configuration, device fallback behavior, and usability trade-offs.
 
 ## Support and feedback
 
@@ -115,9 +99,11 @@ The following channels are available for discussions, feedback, and support requ
 
 ## Important note
 
-This white-label application is a reference implementation of the Age Verification solution that should be customised before publishing it. The current version is not feature complete and will require further integration work before production deployment. In particular, any national-specific enrolment procedures must be implemented by the respective Member States or publishing parties.
+This white-label application is a reference implementation of the Age Verification solution that should be customised before publishing it. 
+The open-source blueprint gives you a working foundation, but it does not cover everything needed for a production deployment. Before going live, a number of technical tasks must be completed by the implementer — covering areas such as app hardening, secure storage, issuer setup, key management, issuance flow security, document-based enrolment, user authentication, and localisation.
 
-To enhance security, it is strongly recommended that the allowed PINs raise the overall security level. Sequential or easily guessable patterns (such as "135246 or "147258") should not be permitted. Additionally, it is advisable to check against a list of the most commonly used or "pwned" PINs to prevent users from choosing weak credentials.
+A full description of each task is provided in the [Implementer Checklist](https://ageverification.dev/Getting%20started/app_implementers_tasks/).
+Note that this checklist covers technical tasks only. Legal compliance, governance agreements, issuer registration on the AV Trusted List, and enrolment method validation are equally important and must be addressed in parallel.
 
 Please note that this application is still under active development. It is regularly updated and new features and improvements are continuously being added.
 

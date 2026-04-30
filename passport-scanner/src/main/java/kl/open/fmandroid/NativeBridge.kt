@@ -32,6 +32,7 @@ class NativeBridge(private val logController: LogController) {
     // Original native methods - these must match the compiled JNI signatures
     external fun jni_init(configJson: String, modelBasePath: String): Boolean
     external fun jni_process(imagePath: String, isReference: Boolean): ProcessResult
+    external fun jni_processEncode(encodedImage: ByteArray, isReference: Boolean): ProcessResult
     external fun jni_setDebugSavePath(debugPath: String)
     external fun jni_match(embedding1: FloatArray, embedding2: FloatArray): Boolean
     external fun jni_release()
@@ -75,6 +76,34 @@ class NativeBridge(private val logController: LogController) {
             jni_process(imagePath, isReference)
         } catch (e: Exception) {
             logController.e(TAG, e) { "safeProcess: Exception in native call" }
+            ProcessResult(
+                livenessChecked = false,
+                isLive = false,
+                faceDetected = false,
+                embeddingExtracted = false,
+                embedding = FloatArray(0)
+            )
+        }
+    }
+
+    fun safeProcessEncode(encodedImage: ByteArray?, isReference: Boolean): ProcessResult {
+        logController.d(TAG) { "safeProcessEncode called with ${encodedImage?.size ?: 0} bytes, isReference: $isReference" }
+
+        if (encodedImage == null || encodedImage.isEmpty()) {
+            logController.e(TAG) { "safeProcessEncode: NULL or empty encoded image, returning empty result" }
+            return ProcessResult(
+                livenessChecked = false,
+                isLive = false,
+                faceDetected = false,
+                embeddingExtracted = false,
+                embedding = FloatArray(0)
+            )
+        }
+
+        return try {
+            jni_processEncode(encodedImage, isReference)
+        } catch (e: Exception) {
+            logController.e(TAG, e) { "safeProcessEncode: Exception in native call" }
             ProcessResult(
                 livenessChecked = false,
                 isLive = false,

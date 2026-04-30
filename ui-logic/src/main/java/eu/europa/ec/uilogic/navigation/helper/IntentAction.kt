@@ -17,6 +17,7 @@
 package eu.europa.ec.uilogic.navigation.helper
 
 import android.content.Intent
+import eu.europa.ec.businesslogic.provider.ElapsedRealtimeClock
 
 data class IntentAction(val intent: Intent)
 
@@ -24,21 +25,31 @@ private const val ACTION_GET_CREDENTIAL =
     "androidx.credentials.registry.provider.action.GET_CREDENTIAL"
 private const val ACTION_GET_CREDENTIALS = "androidx.identitycredentials.action.GET_CREDENTIALS"
 
-/**
- * Temporary storage for DCAPI intent to make it accessible across the app lifecycle
- * This is needed because the intent needs to survive context changes between caching and retrieval
- */
-object DcApiIntentHolder {
-    private var cachedIntent: Intent? = null
+// Intents older than this threshold are discarded to prevent stale-intent replay
+private const val INTENT_MAX_AGE_MS = 60_000L
 
+/**
+ * Temporary storage for DCAPI intent to make it accessible across the app lifecycle.
+ * The intent is timestamped on caching so stale entries cannot be replayed after
+ * a failed or abandoned authentication attempt.
+ */
+class DcApiIntentHolder(private val clock: ElapsedRealtimeClock) {
+    private var cachedIntent: Intent? = null
+    private var cachedAtElapsed: Long = 0L
+
+    @Synchronized
     fun cacheIntent(intent: Intent?) {
         cachedIntent = intent
+        cachedAtElapsed = if (intent != null) clock.now() else 0L
     }
 
+    @Synchronized
     fun retrieveIntent(): Intent? {
-        val intent = cachedIntent
+        val intent = cachedIntent ?: return null
+        val age = clock.now() - cachedAtElapsed
         cachedIntent = null
-        return intent
+        cachedAtElapsed = 0L
+        return if (age <= INTENT_MAX_AGE_MS) intent else null
     }
 }
 

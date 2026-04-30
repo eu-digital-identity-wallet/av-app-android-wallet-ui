@@ -17,7 +17,6 @@
 package eu.europa.ec.corelogic.controller
 
 import android.content.Intent
-import androidx.activity.ComponentActivity
 import eu.europa.ec.authenticationlogic.model.BiometricCrypto
 import eu.europa.ec.businesslogic.extension.addOrReplace
 import eu.europa.ec.businesslogic.extension.safeAsync
@@ -182,11 +181,6 @@ interface WalletCorePresentationController {
     fun startQrEngagement()
 
     /**
-     * Enable/Disable NFC service
-     * */
-    fun toggleNfcEngagement(componentActivity: ComponentActivity, toggle: Boolean)
-
-    /**
      * Transform UI models to Domain and create -> sent the request.
      *
      * @return Flow that emits the creation state. On Success send the request.
@@ -300,6 +294,12 @@ class WalletCorePresentationControllerImpl(
                             .firstOrNull()?.readerAuth?.isVerified == true
                         verifierIsTrusted = isTrusted
 
+                        // Intentional: an unverified verifier (isTrusted == false) is not
+                        // blocked. The trust status is surfaced as a UI badge on the
+                        // presentation request screen so the user can make an informed choice.
+                        // This wallet issues only age-over-X attestations; blocking unverified
+                        // RPs would prevent use with parties that lack a formal mDL certificate
+                        // but still need to verify age.
                         TransferEventPartialState.RequestReceived(
                             requestData = requestedDocuments.requestedDocuments,
                             verifierName = verifierName,
@@ -344,17 +344,6 @@ class WalletCorePresentationControllerImpl(
 
     override fun startQrEngagement() {
         eudiWallet.startProximityPresentation()
-    }
-
-    override fun toggleNfcEngagement(componentActivity: ComponentActivity, toggle: Boolean) {
-        try {
-            if (toggle) {
-                eudiWallet.enableNFCEngagement(componentActivity)
-            } else {
-                eudiWallet.disableNFCEngagement(componentActivity)
-            }
-        } catch (_: Exception) {
-        }
     }
 
     override fun checkForKeyUnlock() = flow {

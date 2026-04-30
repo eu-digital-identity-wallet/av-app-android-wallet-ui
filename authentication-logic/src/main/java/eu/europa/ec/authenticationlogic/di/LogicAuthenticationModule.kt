@@ -30,6 +30,8 @@ import eu.europa.ec.authenticationlogic.storage.PrefsBiometryStorageProvider
 import eu.europa.ec.authenticationlogic.storage.PrefsPinStorageProvider
 import eu.europa.ec.businesslogic.controller.crypto.CryptoController
 import eu.europa.ec.businesslogic.controller.storage.PrefsController
+import eu.europa.ec.businesslogic.provider.BootIdProvider
+import eu.europa.ec.businesslogic.provider.ElapsedRealtimeClock
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import org.koin.core.annotation.ComponentScan
 import org.koin.core.annotation.Factory
@@ -43,8 +45,10 @@ class LogicAuthenticationModule
 @Single
 fun provideStorageConfig(
     prefsController: PrefsController,
+    clock: ElapsedRealtimeClock,
+    bootIdProvider: BootIdProvider,
 ): StorageConfig = StorageConfigImpl(
-    pinImpl = PrefsPinStorageProvider(prefsController),
+    pinImpl = PrefsPinStorageProvider(prefsController, clock, bootIdProvider),
     biometryImpl = PrefsBiometryStorageProvider(prefsController)
 )
 
@@ -72,7 +76,7 @@ fun provideDeviceAuthenticationController(
 
 @Factory
 fun providePinStorageController(
-    storageConfig: StorageConfig
+    storageConfig: StorageConfig,
 ): PinStorageController = PinStorageControllerImpl(storageConfig)
 
 @Factory

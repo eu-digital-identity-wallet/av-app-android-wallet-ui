@@ -17,6 +17,7 @@
 package eu.europa.ec.onboardingfeature.interactor
 
 import android.content.Context
+import android.graphics.Bitmap
 import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.businesslogic.model.ErrorType
 import eu.europa.ec.onboardingfeature.controller.FaceMatchController
@@ -47,7 +48,7 @@ sealed class FaceMatchPartialState {
 
 interface PassportLiveVideoInteractor {
     fun initFaceMatchSDK(context: Context): Flow<FaceMatchSDKPartialState>
-    suspend fun captureAndMatchFace(faceImageTempPath: String): FaceMatchPartialState
+    suspend fun captureAndMatchFace(passportFace: Bitmap): FaceMatchPartialState
 }
 
 class PassportLiveVideoInteractorImpl(
@@ -89,11 +90,11 @@ class PassportLiveVideoInteractorImpl(
         }
     }
 
-    override suspend fun captureAndMatchFace(faceImageTempPath: String): FaceMatchPartialState {
-        logController.d(TAG) { "Starting face capture and match using image: $faceImageTempPath" }
+    override suspend fun captureAndMatchFace(passportFace: Bitmap): FaceMatchPartialState {
+        logController.d(TAG) { "Starting face capture and match" }
 
         val matchResult: FaceMatchResult = try {
-            faceMatchController.captureAndMatch(faceImageTempPath)
+            faceMatchController.captureAndMatch(passportFace)
         } catch (e: IllegalStateException) {
             logController.e(TAG) { "SDK not initialized when calling captureAndMatch: ${e.message}" }
             return FaceMatchPartialState.Failure(

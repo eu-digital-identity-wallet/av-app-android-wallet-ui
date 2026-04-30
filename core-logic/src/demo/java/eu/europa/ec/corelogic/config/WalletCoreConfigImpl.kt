@@ -20,6 +20,7 @@ import android.content.Context
 import eu.europa.ec.corelogic.BuildConfig
 import eu.europa.ec.eudi.wallet.EudiWalletConfig
 import eu.europa.ec.eudi.wallet.issue.openid4vci.OpenId4VciManager
+import eu.europa.ec.eudi.wallet.issue.openid4vci.dpop.DPopConfig
 import eu.europa.ec.eudi.wallet.transfer.openId4vp.ClientIdScheme
 import eu.europa.ec.eudi.wallet.transfer.openId4vp.Format
 import eu.europa.ec.eudi.wallet.zkp.LongfellowCircuits
@@ -38,8 +39,8 @@ internal class WalletCoreConfigImpl(
             if (_config == null) {
                 _config = EudiWalletConfig {
                     configureDocumentKeyCreation(
-                        userAuthenticationRequired = false,
-                        userAuthenticationTimeout = 30.seconds,
+                        userAuthenticationRequired = true,
+                        userAuthenticationTimeout = 10.seconds,
                         useStrongBoxForKeys = true
                     )
                     configureOpenId4Vp {
@@ -89,7 +90,7 @@ internal class WalletCoreConfigImpl(
                 .withClientAuthenticationType(OpenId4VciManager.ClientAuthenticationType.AttestationBased)
                 .withAuthFlowRedirectionURI(BuildConfig.ISSUE_AUTHORIZATION_DEEPLINK)
                 .withParUsage(OpenId4VciManager.Config.ParUsage.NEVER)
-                .withDPoPUsage(OpenId4VciManager.Config.DPoPUsage.Disabled)
+                .withDPopConfig(DPopConfig.Default)
                 .build()
         )
 
@@ -102,19 +103,22 @@ internal class WalletCoreConfigImpl(
             .withClientAuthenticationType(OpenId4VciManager.ClientAuthenticationType.AttestationBased)
             .withAuthFlowRedirectionURI(BuildConfig.ISSUE_AUTHORIZATION_DEEPLINK)
             .withParUsage(OpenId4VciManager.Config.ParUsage.NEVER)
-            .withDPoPUsage(OpenId4VciManager.Config.DPoPUsage.Disabled)
+            .withDPopConfig(DPopConfig.Default)
             .build()
 
     /**
      * Configuration for the face match SDK.
      */
     override val faceMatchConfig: FaceMatchConfig = FaceMatchConfig(
-        faceDetectorModel = "mediapipe_long.onnx",
-        embeddingExtractorModel = "https://github.com/eu-digital-identity-wallet/av-app-android-wallet-ui/releases/download/2025.10-2/glintr100.onnx",
-        livenessModel0 = "silentface40.onnx",
-        livenessModel1 = "silentface27.onnx",
+        faceDetectorModel = FaceMatchModelSource.Asset("mediapipe_long.onnx"),
+        embeddingExtractorModel = FaceMatchModelSource.Remote(
+            url = "https://github.com/eu-digital-identity-wallet/av-app-android-wallet-ui/releases/download/2025.10-2/glintr100.onnx",
+            sha256Hex = "a7933ea5330113b01c9b60351d8f4c33003f145d8470ac5f0e52ee2effe25c60",
+        ),
+        livenessModel0 = FaceMatchModelSource.Asset("silentface40.onnx"),
+        livenessModel1 = FaceMatchModelSource.Asset("silentface27.onnx"),
         livenessThreshold = 0.972017,
-        matchingThreshold = 0.5
+        matchingThreshold = 0.5,
     )
 
     override val walletProviderHost: String

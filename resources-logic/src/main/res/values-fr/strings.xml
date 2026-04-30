@@ -334,8 +334,6 @@
     <string name="settings_screen_version">Version</string>
     <string name="splash_screen_sponsors">Propulsé par</string>
     <string name="splash_screen_title">Vérification de l\'âge</string>
-    <string name="device_integrity_compromised_title">Avertissement de sécurité de l\'appareil</string>
-    <string name="device_integrity_compromised_message">Cet appareil semble être rooté ou altéré. Pour la sécurité de vos identifiants, le portefeuille ne peut pas fonctionner sur des appareils compromis.</string>
     <string name="unknown_verifier">Service en ligne</string>
     <string name="warning_authentication_failed">L\'authentification a échoué! Veuillez essayer de scanner à nouveau le document ou saisir les données manuellement.</string>
     <string name="warning_cla_not_supported">Impossible de lire le document. Le passeport ne prend pas en charge CLA.</string>

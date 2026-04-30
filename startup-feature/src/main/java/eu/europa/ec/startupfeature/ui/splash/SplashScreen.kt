@@ -29,8 +29,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -72,20 +70,14 @@ fun SplashScreen(
     val context = LocalContext.current
     val versionCode = context.getAppVersionCode()
     val versionName = context.getAppVersionName()
-    val state by viewModel.viewState.collectAsState()
-
-    if (state.deviceCompromised) {
-        DeviceCompromisedScreen()
-    } else {
-        Content(
-            effectFlow = viewModel.effect,
-            versionName = versionName,
-            versionCode = versionCode,
-            onNavigationRequested = { navigationEffect ->
-                handleNavigationEffects(navigationEffect, navController)
-            }
-        )
-    }
+    Content(
+        effectFlow = viewModel.effect,
+        versionName = versionName,
+        versionCode = versionCode,
+        onNavigationRequested = { navigationEffect ->
+            handleNavigationEffects(navigationEffect, navController)
+        }
+    )
 
     OneTimeLaunchedEffect {
         viewModel.setEvent(Event.Initialize)
@@ -233,37 +225,6 @@ private fun VersionInfo(versionName: String, versionCode: Long) {
             color = MaterialTheme.colorScheme.primary
         )
     )
-}
-
-@Composable
-private fun DeviceCompromisedScreen() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(SPACING_LARGE.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Spacer(modifier = Modifier.weight(1f))
-        WrapText(
-            modifier = Modifier.fillMaxWidth(),
-            text = stringResource(R.string.device_integrity_compromised_title),
-            textConfig = TextConfig(
-                style = MaterialTheme.typography.headlineMedium,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.error
-            )
-        )
-        VSpacer.ExtraLarge()
-        WrapText(
-            modifier = Modifier.fillMaxWidth(),
-            text = stringResource(R.string.device_integrity_compromised_message),
-            textConfig = TextConfig(
-                style = MaterialTheme.typography.bodyLarge,
-                textAlign = TextAlign.Center
-            )
-        )
-        Spacer(modifier = Modifier.weight(1f))
-    }
 }
 
 @ThemeModePreviews

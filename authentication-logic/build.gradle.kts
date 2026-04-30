@@ -38,6 +38,8 @@ dependencies {
 
     implementation(libs.gson)
     api(libs.androidx.biometric)
+
+    testImplementation(project(LibraryModule.TestLogic.path))
 }
 
 excludeFromKoverReport(

@@ -16,9 +16,6 @@
 
 package eu.europa.ec.startupfeature.interactor
 
-import eu.europa.ec.businesslogic.controller.device.DeviceIntegrityController
-import eu.europa.ec.businesslogic.controller.device.DeviceIntegrityLevel
-import eu.europa.ec.businesslogic.controller.device.DeviceIntegrityResult
 import eu.europa.ec.commonfeature.config.BiometricMode
 import eu.europa.ec.commonfeature.config.BiometricUiConfig
 import eu.europa.ec.commonfeature.config.OnBackNavigationConfig
@@ -37,7 +34,6 @@ import eu.europa.ec.uilogic.serializer.UiSerializer
 
 interface SplashInteractor {
     fun getAfterSplashRoute(): String
-    fun getDeviceIntegrityResult(): DeviceIntegrityResult
 }
 
 class SplashInteractorImpl(
@@ -45,15 +41,10 @@ class SplashInteractorImpl(
     private val uiSerializer: UiSerializer,
     private val resourceProvider: ResourceProvider,
     private val walletCoreDocumentsController: WalletCoreDocumentsController,
-    private val deviceIntegrityController: DeviceIntegrityController,
 ) : SplashInteractor {
 
     private val hasDocuments: Boolean
         get() = walletCoreDocumentsController.getAgeOver18IssuedDocument() != null
-
-    override fun getDeviceIntegrityResult(): DeviceIntegrityResult {
-        return deviceIntegrityController.checkIntegrity()
-    }
 
     override fun getAfterSplashRoute(): String = when (quickPinInteractor.hasPin()) {
         true -> {

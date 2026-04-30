@@ -149,13 +149,8 @@ class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener {
 
         // Send NFC Results via Plugin
         val data = Intent()
-        logController.d(TAG) { "Success from NFC -- RESULT: $nfcResult" }
+        logController.d(TAG) { "NFC read OK (hasPhoto=${passport?.face != null})" }
         data.putExtra(SmartScannerActivity.SCANNER_RESULT, Gson().toJson(nfcResult))
-
-        // Also add raw face image data for our custom handling
-        logController.d(TAG) { "passport object: $passport" }
-        logController.d(TAG) { "passport.face: ${passport?.face}" }
-        logController.d(TAG) { "passport.rawFaceImageData: ${passport?.rawFaceImageData}" }
 
         passport?.rawFaceImageData?.let { rawImageData ->
             logController.d(TAG) {

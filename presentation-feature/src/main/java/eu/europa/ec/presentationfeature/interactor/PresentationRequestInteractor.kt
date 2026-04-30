@@ -66,7 +66,8 @@ class PresentationRequestInteractorImpl(
     private val resourceProvider: ResourceProvider,
     private val uuidProvider: UuidProvider,
     private val walletCorePresentationController: WalletCorePresentationController,
-    private val walletCoreDocumentsController: WalletCoreDocumentsController
+    private val walletCoreDocumentsController: WalletCoreDocumentsController,
+    private val dcApiIntentHolder: DcApiIntentHolder,
 ) : PresentationRequestInteractor {
 
     private val genericErrorMsg
@@ -76,7 +77,7 @@ class PresentationRequestInteractorImpl(
         val domainConfig = config.toDomainConfig()
 
         val finalConfig = if (config.presentationMode is PresentationMode.DcApi) {
-            val intent = DcApiIntentHolder.retrieveIntent()
+            val intent = dcApiIntentHolder.retrieveIntent()
             PresentationControllerConfig.DcApi("", intent)
         } else {
             domainConfig
@@ -86,7 +87,7 @@ class PresentationRequestInteractorImpl(
     }
 
     override fun startDCAPIPresentation(context: Context) {
-        val intent = DcApiIntentHolder.retrieveIntent()
+        val intent = dcApiIntentHolder.retrieveIntent()
         intent?.let {
             walletCorePresentationController.startDCAPIPresentation(it)
         }

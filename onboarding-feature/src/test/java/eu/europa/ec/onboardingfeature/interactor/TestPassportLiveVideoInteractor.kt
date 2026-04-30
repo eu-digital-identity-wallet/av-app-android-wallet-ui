@@ -17,6 +17,7 @@
 package eu.europa.ec.onboardingfeature.interactor
 
 import android.content.Context
+import android.graphics.Bitmap
 import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.businesslogic.model.ErrorType
 import eu.europa.ec.onboardingfeature.controller.FaceMatchController
@@ -57,11 +58,13 @@ class TestPassportLiveVideoInteractor {
     @Mock
     private lateinit var context: Context
 
+    @Mock
+    private lateinit var passportFace: Bitmap
+
     private lateinit var interactor: PassportLiveVideoInteractor
 
     private lateinit var closeable: AutoCloseable
 
-    private val testImagePath = "/path/to/test/image.jpg"
     private val mockedRetryError = "Please try again"
     private val mockedNotProcessedError = "Image could not be processed"
     private val mockedNotLiveError = "Liveness check failed"
@@ -206,11 +209,11 @@ class TestPassportLiveVideoInteractor {
     fun `Given SDK not initialized, When captureAndMatchFace is called, Then returns Failure state`() {
         coroutineRule.runTest {
             // Given - SDK not initialized, controller throws exception
-            whenever(faceMatchController.captureAndMatch(testImagePath))
+            whenever(faceMatchController.captureAndMatch(any()))
                 .thenThrow(IllegalStateException("SDK not initialized"))
 
             // When
-            val result = interactor.captureAndMatchFace(testImagePath)
+            val result = interactor.captureAndMatchFace(passportFace)
 
             // Then
             assert(result is FaceMatchPartialState.Failure)
@@ -227,10 +230,10 @@ class TestPassportLiveVideoInteractor {
                 capturedIsLive = true,
                 isSameSubject = true
             )
-            whenever(faceMatchController.captureAndMatch(testImagePath)).thenReturn(successResult)
+            whenever(faceMatchController.captureAndMatch(any())).thenReturn(successResult)
 
             // When
-            val result = interactor.captureAndMatchFace(testImagePath)
+            val result = interactor.captureAndMatchFace(passportFace)
 
             // Then
             assertEquals(FaceMatchPartialState.Success, result)
@@ -246,10 +249,10 @@ class TestPassportLiveVideoInteractor {
                 capturedIsLive = true,
                 isSameSubject = true
             )
-            whenever(faceMatchController.captureAndMatch(testImagePath)).thenReturn(failureResult)
+            whenever(faceMatchController.captureAndMatch(any())).thenReturn(failureResult)
 
             // When
-            val result = interactor.captureAndMatchFace(testImagePath)
+            val result = interactor.captureAndMatchFace(passportFace)
 
             // Then
             assert(result is FaceMatchPartialState.Failure)
@@ -266,10 +269,10 @@ class TestPassportLiveVideoInteractor {
                 capturedIsLive = false,
                 isSameSubject = true
             )
-            whenever(faceMatchController.captureAndMatch(testImagePath)).thenReturn(failureResult)
+            whenever(faceMatchController.captureAndMatch(any())).thenReturn(failureResult)
 
             // When
-            val result = interactor.captureAndMatchFace(testImagePath)
+            val result = interactor.captureAndMatchFace(passportFace)
 
             // Then
             assert(result is FaceMatchPartialState.Failure)
@@ -286,10 +289,10 @@ class TestPassportLiveVideoInteractor {
                 capturedIsLive = true,
                 isSameSubject = false
             )
-            whenever(faceMatchController.captureAndMatch(testImagePath)).thenReturn(failureResult)
+            whenever(faceMatchController.captureAndMatch(any())).thenReturn(failureResult)
 
             // When
-            val result = interactor.captureAndMatchFace(testImagePath)
+            val result = interactor.captureAndMatchFace(passportFace)
 
             // Then
             assert(result is FaceMatchPartialState.Failure)
@@ -301,11 +304,11 @@ class TestPassportLiveVideoInteractor {
     fun `Given captureAndMatch throws IllegalStateException, When captureAndMatchFace is called, Then returns Failure state`() {
         coroutineRule.runTest {
             // Given
-            whenever(faceMatchController.captureAndMatch(testImagePath))
+            whenever(faceMatchController.captureAndMatch(any()))
                 .thenThrow(IllegalStateException("SDK not ready"))
 
             // When
-            val result = interactor.captureAndMatchFace(testImagePath)
+            val result = interactor.captureAndMatchFace(passportFace)
 
             // Then
             assert(result is FaceMatchPartialState.Failure)
