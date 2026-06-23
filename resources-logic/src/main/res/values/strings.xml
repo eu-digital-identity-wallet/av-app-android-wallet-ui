@@ -27,6 +27,7 @@
     <string name="biometric_prompt_title">Biometric authentication</string>
     <string name="biometric_setup_description">Use your fingerprint or face recognition to log in to the &quot;%s&quot; app.</string>
     <string name="biometric_setup_enable">Start setup</string>
+    <string name="biometric_setup_required_error">Biometric authentication is required to use this app.</string>
     <string name="biometric_setup_skip">Skip</string>
     <string name="biometric_setup_title">Biometric access</string>
     <string name="biometric_unknown_error">Something went wrong initializing biometric authentication. Please try again</string>

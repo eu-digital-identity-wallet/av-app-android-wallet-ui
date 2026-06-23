@@ -22,15 +22,22 @@ import eu.europa.ec.businesslogic.extension.toErrorType
 import eu.europa.ec.businesslogic.model.ErrorType
 import eu.europa.ec.authenticationlogic.provider.VaultKeyProvider
 import eu.europa.ec.businesslogic.provider.UuidProvider
-import eu.europa.ec.commonfeature.config.PresentationMode
+import eu.europa.ec.commonfeature.config.PresentationMode.DcApi as DcApiPresentationMode
 import eu.europa.ec.commonfeature.config.RequestUriConfig
 import eu.europa.ec.commonfeature.config.toDomainConfig
 import eu.europa.ec.commonfeature.ui.request.model.RequestDocumentItemUi
 import eu.europa.ec.commonfeature.ui.request.transformer.RequestTransformer
-import eu.europa.ec.corelogic.controller.PresentationControllerConfig
-import eu.europa.ec.corelogic.controller.TransferEventPartialState
+import eu.europa.ec.corelogic.config.WalletCoreConfig
+import eu.europa.ec.corelogic.controller.PresentationControllerConfig.DcApi as DcApiPresentationControllerConfig
+import eu.europa.ec.corelogic.controller.TransferEventPartialState.Disconnected
+import eu.europa.ec.corelogic.controller.TransferEventPartialState.Error
+import eu.europa.ec.corelogic.controller.TransferEventPartialState.RequestReceived
 import eu.europa.ec.corelogic.controller.WalletCoreDocumentsController
 import eu.europa.ec.corelogic.controller.WalletCorePresentationController
+import eu.europa.ec.presentationfeature.interactor.PresentationRequestInteractorPartialState.Disconnect
+import eu.europa.ec.presentationfeature.interactor.PresentationRequestInteractorPartialState.Failure
+import eu.europa.ec.presentationfeature.interactor.PresentationRequestInteractorPartialState.NoData
+import eu.europa.ec.presentationfeature.interactor.PresentationRequestInteractorPartialState.Success
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.navigation.helper.DcApiIntentHolder
 import kotlinx.coroutines.flow.Flow
@@ -61,6 +68,7 @@ interface PresentationRequestInteractor {
     fun updateRequestedDocuments(items: List<RequestDocumentItemUi>)
     fun setConfig(config: RequestUriConfig)
     fun startDCAPIPresentation(context: Context)
+    fun shouldUseAppAuthenticationBeforePresentation(): Boolean
 }
 
 class PresentationRequestInteractorImpl(
@@ -70,6 +78,7 @@ class PresentationRequestInteractorImpl(
     private val walletCoreDocumentsController: WalletCoreDocumentsController,
     private val dcApiIntentHolder: DcApiIntentHolder,
     private val vaultKeyProvider: VaultKeyProvider,
+    private val walletCoreConfig: WalletCoreConfig,
 ) : PresentationRequestInteractor {
 
     private val genericErrorMsg
@@ -78,9 +87,9 @@ class PresentationRequestInteractorImpl(
     override fun setConfig(config: RequestUriConfig) {
         val domainConfig = config.toDomainConfig()
 
-        val finalConfig = if (config.presentationMode is PresentationMode.DcApi) {
+        val finalConfig = if (config.presentationMode is DcApiPresentationMode) {
             val intent = dcApiIntentHolder.retrieveIntent()
-            PresentationControllerConfig.DcApi("", intent)
+            DcApiPresentationControllerConfig("", intent)
         } else {
             domainConfig
         }
@@ -98,9 +107,9 @@ class PresentationRequestInteractorImpl(
     override fun getRequestDocuments(): Flow<PresentationRequestInteractorPartialState> =
         walletCorePresentationController.events.mapNotNull { response ->
             when (response) {
-                is TransferEventPartialState.RequestReceived -> {
+                is RequestReceived -> {
                     if (response.requestData.all { it.requestedItems.isEmpty() }) {
-                        PresentationRequestInteractorPartialState.NoData(
+                        NoData(
                             verifierName = response.verifierName,
                             verifierIsTrusted = response.verifierIsTrusted,
                         )
@@ -126,7 +135,7 @@ class PresentationRequestInteractorImpl(
                             }
 
                         if (documentsDomain.isNotEmpty()) {
-                            PresentationRequestInteractorPartialState.Success(
+                            Success(
                                 verifierName = response.verifierName,
                                 verifierIsTrusted = response.verifierIsTrusted,
                                 requestDocuments = RequestTransformer.transformToUiItems(
@@ -135,7 +144,7 @@ class PresentationRequestInteractorImpl(
                                 )
                             )
                         } else {
-                            PresentationRequestInteractorPartialState.NoData(
+                            NoData(
                                 verifierName = response.verifierName,
                                 verifierIsTrusted = response.verifierIsTrusted,
                             )
@@ -143,21 +152,21 @@ class PresentationRequestInteractorImpl(
                     }
                 }
 
-                is TransferEventPartialState.Error -> {
-                    PresentationRequestInteractorPartialState.Failure(
+                is Error -> {
+                    Failure(
                         error = response.error,
                         errorType = response.errorType,
                     )
                 }
 
-                is TransferEventPartialState.Disconnected -> {
-                    PresentationRequestInteractorPartialState.Disconnect
+                is Disconnected -> {
+                    Disconnect
                 }
 
                 else -> null
             }
         }.safeAsync {
-            PresentationRequestInteractorPartialState.Failure(
+            Failure(
                 error = it.localizedMessage ?: genericErrorMsg,
                 errorType = it.toErrorType(),
             )
@@ -171,4 +180,7 @@ class PresentationRequestInteractorImpl(
         val disclosedDocuments = RequestTransformer.createDisclosedDocuments(items)
         walletCorePresentationController.updateRequestedDocuments(disclosedDocuments.toMutableList())
     }
+
+    override fun shouldUseAppAuthenticationBeforePresentation(): Boolean =
+        !walletCoreConfig.userAuthenticationRequired
 }
