@@ -30,6 +30,7 @@
     <string name="biometric_setup_skip">Überspringen</string>
     <string name="biometric_setup_title">Biometrischer Zugriff</string>
     <string name="biometric_unknown_error">Bei der Initialisierung der biometrischen Authentifizierung ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
+    <string name="biometric_key_invalidated">Biometrischer Schlüssel ungültig — erneute Registrierung erforderlich</string>
     <string name="cd_close_button">Zurück</string>
     <string name="cd_flash_button">Kamerablitz umschalten</string>
     <string name="confirm_doc_removal_dialog_delete">Ja, löschen</string>

@@ -34,6 +34,7 @@ moduleConfig {
 
 dependencies {
     implementation(project(LibraryModule.BusinessLogic.path))
+    implementation(project(LibraryModule.AuthenticationLogic.path))
     implementation(libs.sqlcipher)
 }
 

@@ -20,6 +20,7 @@ import android.content.Context
 import eu.europa.ec.businesslogic.extension.safeAsync
 import eu.europa.ec.businesslogic.extension.toErrorType
 import eu.europa.ec.businesslogic.model.ErrorType
+import eu.europa.ec.authenticationlogic.provider.VaultKeyProvider
 import eu.europa.ec.businesslogic.provider.UuidProvider
 import eu.europa.ec.commonfeature.config.PresentationMode
 import eu.europa.ec.commonfeature.config.RequestUriConfig
@@ -68,6 +69,7 @@ class PresentationRequestInteractorImpl(
     private val walletCorePresentationController: WalletCorePresentationController,
     private val walletCoreDocumentsController: WalletCoreDocumentsController,
     private val dcApiIntentHolder: DcApiIntentHolder,
+    private val vaultKeyProvider: VaultKeyProvider,
 ) : PresentationRequestInteractor {
 
     private val genericErrorMsg
@@ -109,8 +111,18 @@ class PresentationRequestInteractorImpl(
                             resourceProvider = resourceProvider,
                             uuidProvider = uuidProvider
                         ).getOrThrow()
-                            .filterNot {
-                                walletCoreDocumentsController.isDocumentRevoked(it.docId)
+                            .let { documents ->
+                                // The revoked-documents list lives in the vault-encrypted database. When the app
+                                // is resumed from background (e.g. via the OpenID4VP deeplink) the vault is locked,
+                                // so reading it here would fail. In that case we defer revocation enforcement to the
+                                // loading step, which runs after the user authenticates and the vault is unlocked.
+                                if (vaultKeyProvider.isUnlocked()) {
+                                    documents.filterNot {
+                                        walletCoreDocumentsController.isDocumentRevoked(it.docId)
+                                    }
+                                } else {
+                                    documents
+                                }
                             }
 
                         if (documentsDomain.isNotEmpty()) {

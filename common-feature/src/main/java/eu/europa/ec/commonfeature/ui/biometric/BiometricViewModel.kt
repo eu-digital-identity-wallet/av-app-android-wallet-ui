@@ -19,7 +19,7 @@ package eu.europa.ec.commonfeature.ui.biometric
 import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.viewModelScope
-import eu.europa.ec.authenticationlogic.controller.authentication.BiometricsAuthenticate
+import eu.europa.ec.authenticationlogic.controller.authentication.BiometricVaultResult
 import eu.europa.ec.authenticationlogic.controller.authentication.BiometricsAvailability
 import eu.europa.ec.businesslogic.extension.toUri
 import eu.europa.ec.businesslogic.provider.ElapsedRealtimeClock
@@ -271,16 +271,31 @@ class BiometricViewModel(
     }
 
     private fun authenticate(context: Context) {
-        biometricInteractor.authenticateWithBiometrics(
-            context = context,
-            notifyOnAuthenticationFailure = viewState.value.notifyOnAuthenticationFailure
-        ) {
-            when (it) {
-                is BiometricsAuthenticate.Success -> {
-                    authenticationSuccess()
+        viewModelScope.launch {
+            val result = biometricInteractor.unlockWithBiometrics(context)
+            when (result) {
+                is BiometricVaultResult.Success -> authenticationSuccess()
+                is BiometricVaultResult.KeyInvalidated -> {
+                    setState {
+                        copy(
+                            error = ContentErrorConfig(
+                                errorSubTitle = resourceProvider.getString(R.string.biometric_key_invalidated),
+                                onCancel = { setEvent(Event.OnErrorDismiss) }
+                            )
+                        )
+                    }
                 }
-
-                else -> {}
+                is BiometricVaultResult.Cancelled -> { }
+                is BiometricVaultResult.Failed -> {
+                    setState {
+                        copy(
+                            error = ContentErrorConfig(
+                                errorSubTitle = result.errorMessage,
+                                onCancel = { setEvent(Event.OnErrorDismiss) }
+                            )
+                        )
+                    }
+                }
             }
         }
     }

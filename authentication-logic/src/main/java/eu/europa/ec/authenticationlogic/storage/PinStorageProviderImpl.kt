@@ -21,13 +21,13 @@ import eu.europa.ec.authenticationlogic.provider.VaultKeyProvider
 import eu.europa.ec.businesslogic.controller.crypto.Argon2KeyDerivation
 import eu.europa.ec.businesslogic.provider.BootIdProvider
 import eu.europa.ec.businesslogic.provider.ElapsedRealtimeClock
-import kotlinx.coroutines.runBlocking
 import java.security.SecureRandom
 import javax.crypto.Cipher
 import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.SecretKeySpec
+import kotlinx.coroutines.runBlocking
 
-class PrefsPinStorageProvider(
+class PinStorageProviderImpl(
     private val authMetadataStore: AuthMetadataStore,
     private val clock: ElapsedRealtimeClock,
     private val bootIdProvider: BootIdProvider,
@@ -47,11 +47,25 @@ class PrefsPinStorageProvider(
             val pinSalt = ByteArray(Argon2KeyDerivation.SALT_LEN)
                 .also { SecureRandom().nextBytes(it) }
             val kPin = Argon2KeyDerivation.derive(pinChars, pinSalt)
-            val kVault = ByteArray(32).also { SecureRandom().nextBytes(it) }
+
+            val existing = runBlocking { authMetadataStore.read() }
+
+            if (existing != null && !vaultKeyProvider.isUnlocked()) {
+                throw IllegalStateException("Vault must be unlocked to change the PIN")
+            }
+
+            val kVault: ByteArray = if (existing != null) {
+                vaultKeyProvider.getVaultKey()!!
+            } else {
+                ByteArray(32).also { SecureRandom().nextBytes(it) }
+            }
             val (wrappedVaultIv, wrappedVault) = aesGcmEncrypt(kPin, kVault, pinSalt)
             kPin.fill(0)
-            kVault.fill(0)
-            val meta = AuthMetadata(
+            if (existing == null) {
+                vaultKeyProvider.unlock(kVault)
+                kVault.fill(0)
+            }
+            val meta = existing?.copy(
                 version = 0x01,
                 kdfAlgo = KDF_ALGO,
                 kdfM = Argon2KeyDerivation.M_COST_KIB,
@@ -64,10 +78,16 @@ class PrefsPinStorageProvider(
                 lockoutDeadline = 0L,
                 lockoutDuration = 0L,
                 bootId = bootIdProvider.currentBootId(),
-                biometricEnabled = false,
-                biometricWrappedVaultIv = null,
-                biometricWrappedVault = null,
-                writeCounter = 0L,
+            ) ?: AuthMetadata(
+                version = 0x01,
+                kdfAlgo = KDF_ALGO,
+                kdfM = Argon2KeyDerivation.M_COST_KIB,
+                kdfT = Argon2KeyDerivation.T_COST,
+                kdfP = Argon2KeyDerivation.PARALLELISM,
+                pinSalt = pinSalt,
+                wrappedVaultIv = wrappedVaultIv,
+                wrappedVault = wrappedVault,
+                bootId = bootIdProvider.currentBootId(),
             )
             runBlocking { authMetadataStore.write(meta) }
         } finally {

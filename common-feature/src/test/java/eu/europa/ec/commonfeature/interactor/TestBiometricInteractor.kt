@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 European Commission
+ * Copyright (c) 2026 European Commission
  *
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
  * Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
@@ -16,13 +16,16 @@
 
 package eu.europa.ec.commonfeature.interactor
 
+import android.content.Context
+import androidx.fragment.app.FragmentActivity
 import eu.europa.ec.authenticationlogic.controller.authentication.BiometricAuthenticationController
-import eu.europa.ec.authenticationlogic.controller.authentication.BiometricsAuthenticate
+import eu.europa.ec.authenticationlogic.controller.authentication.BiometricPromptData
+import eu.europa.ec.authenticationlogic.controller.authentication.BiometricVaultResult
 import eu.europa.ec.authenticationlogic.controller.authentication.BiometricsAvailability
 import eu.europa.ec.authenticationlogic.controller.storage.BiometryStorageController
-import eu.europa.ec.testfeature.util.mockedNotifyOnAuthenticationFailure
+import eu.europa.ec.authenticationlogic.storage.BiometricKeyInvalidatedException
+import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.testlogic.base.TestApplication
-import eu.europa.ec.testlogic.base.getMockedContext
 import eu.europa.ec.testlogic.extension.runFlowTest
 import eu.europa.ec.testlogic.extension.runTest
 import eu.europa.ec.testlogic.extension.toFlow
@@ -34,12 +37,11 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.Mockito.mock
 import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import javax.crypto.Cipher
 
 @RunWith(RobolectricTestRunner::class)
 @Config(application = TestApplication::class)
@@ -55,7 +57,16 @@ class TestBiometricInteractor {
     private lateinit var biometricAuthenticationController: BiometricAuthenticationController
 
     @Mock
+    private lateinit var resourceProvider: ResourceProvider
+
+    @Mock
     private lateinit var quickPinInteractor: QuickPinInteractor
+
+    @Mock
+    private lateinit var cipher: Cipher
+
+    @Mock
+    private lateinit var fragmentActivity: FragmentActivity
 
     private lateinit var interactor: BiometricInteractor
 
@@ -64,10 +75,12 @@ class TestBiometricInteractor {
     @Before
     fun before() {
         closeable = MockitoAnnotations.openMocks(this)
+        whenever(resourceProvider.getString(org.mockito.kotlin.any())).thenReturn("mock")
 
         interactor = BiometricInteractorImpl(
             biometryStorageController = biometryStorageController,
             biometricAuthenticationController = biometricAuthenticationController,
+            resourceProvider = resourceProvider,
             quickPinInteractor = quickPinInteractor
         )
     }
@@ -77,120 +90,199 @@ class TestBiometricInteractor {
         closeable.close()
     }
 
-    //region isPinValid
-
-    // Case: isPinValid behaviour
-    // When isCurrentPinValid returns QuickPinInteractorPinValidPartialState.Success,
-    // the expected result of isPinValid is Success
     @Test
     fun `Given isCurrentPinValid returns state Success, When isPinValid is called, Then assert the result is the expected`() =
         coroutineRule.runTest {
-            // Given
             whenever(quickPinInteractor.isCurrentPinValid(mockedPin)).thenReturn(
                 QuickPinInteractorPinValidPartialState.Success.toFlow()
             )
 
-            // When
             interactor.isPinValid(mockedPin).runFlowTest {
-                // Then
                 val expectedResult = QuickPinInteractorPinValidPartialState.Success
                 assertEquals(expectedResult, awaitItem())
             }
         }
-    //endregion
 
-    //region launchBiometricSystemScreen
-
-    // Case: launchBiometricSystemScreen behaviour
     @Test
     fun `When launchBiometricSystemScreen is called, Then verify function is executed on the controller`() {
-        // When
         interactor.launchBiometricSystemScreen()
 
-        // Then
-        verify(biometricAuthenticationController).launchBiometricSystemScreen()
+        org.mockito.kotlin.verify(biometricAuthenticationController).launchBiometricSystemScreen()
     }
-    //endregion
 
-    ///region getBiometricUserSelection
-
-    // Case: getBiometricUserSelection behaviour
-    // When getUseBiometricsAuth returns true, the expected result of getBiometricUserSelection
-    // should be true
     @Test
     fun `When getBiometricUserSelection is called, Then assert the correct value is returned`() {
-        // Given
         whenever(biometryStorageController.getUseBiometricsAuth()).thenReturn(true)
 
-        // When
         val result = interactor.getBiometricUserSelection()
 
-        // Then
         assertEquals(true, result)
-        verify(biometryStorageController).getUseBiometricsAuth()
+        org.mockito.kotlin.verify(biometryStorageController).getUseBiometricsAuth()
     }
-    //endregion
 
-    //region storeBiometricsUsageDecision
-
-    // Case: storeBiometricsUsageDecision behaviour
     @Test
     fun `When storeBiometricsUsageDecision is called, Then verify setUseBiometricsAuth is executed`() {
-        // Given
         val shouldUseBiometrics = true
 
-        // When
         interactor.storeBiometricsUsageDecision(shouldUseBiometrics = shouldUseBiometrics)
 
-        // Then
-        verify(biometryStorageController).setUseBiometricsAuth(shouldUseBiometrics)
+        org.mockito.kotlin.verify(biometryStorageController).setUseBiometricsAuth(shouldUseBiometrics)
     }
-    //endregion
 
-    //region getBiometricsAvailability
-
-    // Case: getBiometricsAvailability behaviour
     @Test
     fun `When getBiometricsAvailability is called, Then verify deviceSupportsBiometrics is executed`() {
-        // Given
-        val mockListener: (BiometricsAvailability) -> Unit = mock()
+        val mockListener: (BiometricsAvailability) -> Unit = org.mockito.kotlin.mock()
 
-        // When
         interactor.getBiometricsAvailability(mockListener)
 
-        // Then
-        verify(biometricAuthenticationController).deviceSupportsBiometrics(mockListener)
+        org.mockito.kotlin.verify(biometricAuthenticationController).deviceSupportsBiometrics(mockListener)
     }
-    //endregion
 
-    //region authenticateWithBiometrics
-
-    // Case: authenticateWithBiometrics behaviour
-    // Defining a mock BiometricsAuthenticate function callback to verify that authenticate function
-    // on the biometricAuthenticationController is executed when authenticateWithBiometrics is called
     @Test
-    fun `When authenticateWithBiometrics is called, Then verify authenticate is executed with correct parameters`() {
-        // Given
-        val mockListener: (BiometricsAuthenticate) -> Unit = mock()
-        val context = getMockedContext()
+    fun `Given enrollBiometric returns cipher and auth succeeds, When enrollBiometricVault, Then returns Success`() =
+        coroutineRule.runTest {
+            whenever(biometryStorageController.enrollBiometric()).thenReturn(cipher)
+            whenever(biometricAuthenticationController.authenticate(
+                org.mockito.kotlin.any(),
+                org.mockito.kotlin.any(),
+                org.mockito.kotlin.any(),
+                org.mockito.kotlin.any()
+            )).thenReturn(BiometricPromptData(org.mockito.kotlin.mock()))
+            whenever(biometryStorageController.commitBiometricEnrolment(org.mockito.kotlin.any())).thenReturn(Unit)
 
-        // When
-        interactor.authenticateWithBiometrics(
-            context = context,
-            notifyOnAuthenticationFailure = mockedNotifyOnAuthenticationFailure,
-            listener = mockListener
-        )
+            val result = interactor.enrollBiometricVault(fragmentActivity)
 
-        // Then
-        verify(biometricAuthenticationController).authenticate(
-            context,
-            mockedNotifyOnAuthenticationFailure,
-            mockListener
-        )
-    }
-    //endregion
+            assertEquals(BiometricVaultResult.Success, result)
+        }
 
-    //region Mocked objects
+    @Test
+    fun `Given enrollBiometric throws, When enrollBiometricVault, Then returns Failed`() =
+        coroutineRule.runTest {
+            whenever(biometryStorageController.enrollBiometric()).thenThrow(RuntimeException("keystore error"))
+
+            val result = interactor.enrollBiometricVault(fragmentActivity)
+
+            assertEquals(BiometricVaultResult.Failed::class, result::class)
+        }
+
+    @Test
+    fun `Given non-Activity context, When enrollBiometricVault, Then returns Failed`() =
+        coroutineRule.runTest {
+            val nonActivityContext: Context = org.mockito.kotlin.mock()
+
+            val result = interactor.enrollBiometricVault(nonActivityContext)
+
+            assertEquals(BiometricVaultResult.Failed::class, result::class)
+        }
+
+    @Test
+    fun `Given auth is cancelled, When enrollBiometricVault, Then returns Cancelled`() =
+        coroutineRule.runTest {
+            whenever(biometryStorageController.enrollBiometric()).thenReturn(cipher)
+            whenever(biometricAuthenticationController.authenticate(
+                org.mockito.kotlin.any(),
+                org.mockito.kotlin.any(),
+                org.mockito.kotlin.any(),
+                org.mockito.kotlin.any()
+            )).thenReturn(BiometricPromptData(null, 10, "cancelled"))
+
+            val result = interactor.enrollBiometricVault(fragmentActivity)
+
+            assertEquals(BiometricVaultResult.Cancelled, result)
+        }
+
+    @Test
+    fun `Given commitBiometricEnrolment throws, When enrollBiometricVault, Then returns Failed`() =
+        coroutineRule.runTest {
+            whenever(biometryStorageController.enrollBiometric()).thenReturn(cipher)
+            whenever(biometricAuthenticationController.authenticate(
+                org.mockito.kotlin.any(),
+                org.mockito.kotlin.any(),
+                org.mockito.kotlin.any(),
+                org.mockito.kotlin.any()
+            )).thenReturn(BiometricPromptData(org.mockito.kotlin.mock()))
+            whenever(biometryStorageController.commitBiometricEnrolment(org.mockito.kotlin.any())).thenThrow(
+                RuntimeException("write failed")
+            )
+
+            val result = interactor.enrollBiometricVault(fragmentActivity)
+
+            assertEquals(BiometricVaultResult.Failed::class, result::class)
+        }
+
+    @Test
+    fun `Given prepareBiometricUnlock returns cipher and auth succeeds, When unlockWithBiometrics, Then returns Success`() =
+        coroutineRule.runTest {
+            whenever(biometryStorageController.prepareBiometricUnlock()).thenReturn(cipher)
+            whenever(biometricAuthenticationController.authenticate(
+                org.mockito.kotlin.any(),
+                org.mockito.kotlin.any(),
+                org.mockito.kotlin.any(),
+                org.mockito.kotlin.any()
+            )).thenReturn(BiometricPromptData(org.mockito.kotlin.mock()))
+            whenever(biometryStorageController.completeBiometricUnlock(org.mockito.kotlin.any())).thenReturn(Unit)
+
+            val result = interactor.unlockWithBiometrics(fragmentActivity)
+
+            assertEquals(BiometricVaultResult.Success, result)
+        }
+
+    @Test
+    fun `Given prepareBiometricUnlock throws BiometricKeyInvalidatedException, When unlockWithBiometrics, Then returns KeyInvalidated`() =
+        coroutineRule.runTest {
+            whenever(biometryStorageController.prepareBiometricUnlock()).thenThrow(
+                BiometricKeyInvalidatedException()
+            )
+
+            val result = interactor.unlockWithBiometrics(fragmentActivity)
+
+            assertEquals(BiometricVaultResult.KeyInvalidated, result)
+        }
+
+    @Test
+    fun `Given non-Activity context, When unlockWithBiometrics, Then returns Failed`() =
+        coroutineRule.runTest {
+            val nonActivityContext: Context = org.mockito.kotlin.mock()
+
+            val result = interactor.unlockWithBiometrics(nonActivityContext)
+
+            assertEquals(BiometricVaultResult.Failed::class, result::class)
+        }
+
+    @Test
+    fun `Given auth is cancelled, When unlockWithBiometrics, Then returns Cancelled`() =
+        coroutineRule.runTest {
+            whenever(biometryStorageController.prepareBiometricUnlock()).thenReturn(cipher)
+            whenever(biometricAuthenticationController.authenticate(
+                org.mockito.kotlin.any(),
+                org.mockito.kotlin.any(),
+                org.mockito.kotlin.any(),
+                org.mockito.kotlin.any()
+            )).thenReturn(BiometricPromptData(null, 13, "cancelled"))
+
+            val result = interactor.unlockWithBiometrics(fragmentActivity)
+
+            assertEquals(BiometricVaultResult.Cancelled, result)
+        }
+
+    @Test
+    fun `Given completeBiometricUnlock throws, When unlockWithBiometrics, Then returns Failed`() =
+        coroutineRule.runTest {
+            whenever(biometryStorageController.prepareBiometricUnlock()).thenReturn(cipher)
+            whenever(biometricAuthenticationController.authenticate(
+                org.mockito.kotlin.any(),
+                org.mockito.kotlin.any(),
+                org.mockito.kotlin.any(),
+                org.mockito.kotlin.any()
+            )).thenReturn(BiometricPromptData(org.mockito.kotlin.mock()))
+            whenever(biometryStorageController.completeBiometricUnlock(org.mockito.kotlin.any())).thenThrow(
+                RuntimeException("unlock failed")
+            )
+
+            val result = interactor.unlockWithBiometrics(fragmentActivity)
+
+            assertEquals(BiometricVaultResult.Failed::class, result::class)
+        }
+
     private val mockedPin = "1234"
-    //endregion
 }

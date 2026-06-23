@@ -53,11 +53,13 @@ fun provideQuickPinInteractor(
 fun provideBiometricInteractor(
     biometryStorageController: BiometryStorageController,
     biometricAuthenticationController: BiometricAuthenticationController,
+    resourceProvider: ResourceProvider,
     quickPinInteractor: QuickPinInteractor
 ): BiometricInteractor {
     return BiometricInteractorImpl(
         biometryStorageController,
         biometricAuthenticationController,
+        resourceProvider,
         quickPinInteractor
     )
 }

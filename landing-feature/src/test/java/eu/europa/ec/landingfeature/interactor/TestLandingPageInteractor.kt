@@ -102,8 +102,8 @@ class TestLandingPageInteractor {
             val mockedDoc = getMockedMainPid().copy(availableCredentials = 2)
 
             // Given
-            whenever(walletCoreDocumentsController.getAgeOver18IssuedDocument())
-                .thenReturn(mockedDoc)
+            whenever(walletCoreDocumentsController.getAllIssuedDocuments())
+                .thenReturn(listOf(mockedDoc))
 
             whenever(resourceProvider.getString(any())).thenReturn("mockedString")
 
@@ -137,7 +137,7 @@ class TestLandingPageInteractor {
     fun `Given Case 2, When getAgeCredential is called, Then Case 2 Expected Result is returned`() {
         coroutineRule.runTest {
             // Given
-            whenever(walletCoreDocumentsController.getAllDocuments())
+            whenever(walletCoreDocumentsController.getAllIssuedDocuments())
                 .thenReturn(emptyList())
 
             // When
@@ -162,7 +162,7 @@ class TestLandingPageInteractor {
     fun `Given Case 3, When getAgeCredential is called, Then Case 3 Expected Result is returned`() {
         coroutineRule.runTest {
             // Given
-            whenever(walletCoreDocumentsController.getAgeOver18IssuedDocument())
+            whenever(walletCoreDocumentsController.getAllIssuedDocuments())
                 .thenThrow(mockedExceptionWithMessage)
 
             // When
@@ -187,7 +187,7 @@ class TestLandingPageInteractor {
     fun `Given Case 4, When getAgeCredential is called, Then Case 4 Expected Result is returned`() {
         coroutineRule.runTest {
             // Given
-            whenever(walletCoreDocumentsController.getAgeOver18IssuedDocument())
+            whenever(walletCoreDocumentsController.getAllIssuedDocuments())
                 .thenThrow(mockedExceptionWithNoMessage)
 
             // When
@@ -204,7 +204,7 @@ class TestLandingPageInteractor {
     }
 
     // Case 5:
-    // 1. walletCoreDocumentsController.getAgeOver18IssuedDocument() returns a document with no claims.
+    // 1. walletCoreDocumentsController.getAllIssuedDocuments() returns a document with no claims.
     // 2. No age_over_* claim with a true value is found.
 
     // Case 5 Expected Result:
@@ -215,8 +215,8 @@ class TestLandingPageInteractor {
             val mockedDoc = getMockedEmptyPid().copy(availableCredentials = 2)
 
             // Given
-            whenever(walletCoreDocumentsController.getAgeOver18IssuedDocument())
-                .thenReturn(mockedDoc)
+            whenever(walletCoreDocumentsController.getAllIssuedDocuments())
+                .thenReturn(listOf(mockedDoc))
 
             whenever(resourceProvider.getString(any())).thenReturn("mockedString")
 
@@ -242,7 +242,7 @@ class TestLandingPageInteractor {
     }
 
     // Case 6:
-    // 1. walletCoreDocumentsController.getAgeOver18IssuedDocument() returns a document where the
+    // 1. walletCoreDocumentsController.getAllIssuedDocuments() returns a document where the
     //    age_over_21 claim is itself an SdJwtVcClaim with non-empty children (i.e. a container node).
     // 2. flattenClaims must include the parent node itself so the threshold is not lost.
 
@@ -277,8 +277,8 @@ class TestLandingPageInteractor {
             )
 
             // Given
-            whenever(walletCoreDocumentsController.getAgeOver18IssuedDocument())
-                .thenReturn(mockedDoc)
+            whenever(walletCoreDocumentsController.getAllIssuedDocuments())
+                .thenReturn(listOf(mockedDoc))
 
             whenever(resourceProvider.getString(any())).thenReturn("mockedString")
 

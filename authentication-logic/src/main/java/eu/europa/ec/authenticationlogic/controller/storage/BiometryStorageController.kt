@@ -17,28 +17,35 @@
 package eu.europa.ec.authenticationlogic.controller.storage
 
 import eu.europa.ec.authenticationlogic.config.StorageConfig
-import eu.europa.ec.authenticationlogic.model.BiometricAuthentication
+import javax.crypto.Cipher
 
 interface BiometryStorageController {
-    fun getBiometricAuthentication(): BiometricAuthentication?
-    fun setBiometricAuthentication(value: BiometricAuthentication?)
     fun setUseBiometricsAuth(value: Boolean)
     fun getUseBiometricsAuth(): Boolean
+    suspend fun enrollBiometric(): Cipher
+    suspend fun commitBiometricEnrolment(cipher: Cipher)
+    suspend fun prepareBiometricUnlock(): Cipher
+    suspend fun completeBiometricUnlock(cipher: Cipher)
 }
 
 class BiometryStorageControllerImpl(private val storageConfig: StorageConfig) :
     BiometryStorageController {
-    override fun getBiometricAuthentication(): BiometricAuthentication? =
-        storageConfig.biometryStorageProvider.getBiometricAuthentication()
-
-    override fun setBiometricAuthentication(value: BiometricAuthentication?) {
-        storageConfig.biometryStorageProvider.setBiometricAuthentication(value)
-    }
-
     override fun setUseBiometricsAuth(value: Boolean) {
         storageConfig.biometryStorageProvider.setUseBiometricsAuth(value)
     }
 
     override fun getUseBiometricsAuth(): Boolean =
         storageConfig.biometryStorageProvider.getUseBiometricsAuth()
+
+    override suspend fun enrollBiometric(): Cipher =
+        storageConfig.biometryStorageProvider.enrollBiometric()
+
+    override suspend fun commitBiometricEnrolment(cipher: Cipher) =
+        storageConfig.biometryStorageProvider.commitBiometricEnrolment(cipher)
+
+    override suspend fun prepareBiometricUnlock(): Cipher =
+        storageConfig.biometryStorageProvider.prepareBiometricUnlock()
+
+    override suspend fun completeBiometricUnlock(cipher: Cipher) =
+        storageConfig.biometryStorageProvider.completeBiometricUnlock(cipher)
 }

@@ -60,7 +60,7 @@ class LandingPageInteractorImpl(
 
     override fun getAgeCredential(): Flow<GetAgeCredentialPartialState> =
         flow {
-            walletCoreDocumentsController.getAgeOver18IssuedDocument()?.let {
+            walletCoreDocumentsController.getAllIssuedDocuments().firstOrNull()?.let {
                 val claimsPaths = it.data.claims.flatMap { claim ->
                     claim.toClaimPaths()
                 }

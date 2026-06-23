@@ -29,11 +29,13 @@ import eu.europa.ec.commonfeature.config.QrScanUiConfig
 import eu.europa.ec.commonfeature.config.SuccessUIConfig
 import eu.europa.ec.commonfeature.model.PinFlow
 import eu.europa.ec.commonfeature.ui.biometric.BiometricScreen
+import eu.europa.ec.commonfeature.ui.biometricloginsuccess.BiometricLoginSuccessScreen
 import eu.europa.ec.commonfeature.ui.biometricsetup.BiometricSetupScreen
 import eu.europa.ec.commonfeature.ui.pin.PinScreen
 import eu.europa.ec.commonfeature.ui.qr_scan.QrScanScreen
 import eu.europa.ec.commonfeature.ui.success.SuccessScreen
 import eu.europa.ec.uilogic.navigation.CommonScreens
+import eu.europa.ec.uilogic.navigation.CommonScreens.BiometricLoginSuccessful
 import eu.europa.ec.uilogic.navigation.ModuleRoute
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -66,6 +68,15 @@ fun NavGraphBuilder.featureCommonGraph(navController: NavController) {
                         )
                     }
                 )
+            )
+        }
+
+        composable(
+            route = BiometricLoginSuccessful.screenRoute
+        ) {
+            BiometricLoginSuccessScreen(
+                navController = navController,
+                viewModel = koinViewModel(),
             )
         }
 

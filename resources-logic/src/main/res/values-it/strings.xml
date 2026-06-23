@@ -30,6 +30,7 @@
     <string name="biometric_setup_skip">Salta</string>
     <string name="biometric_setup_title">Accesso biometrico</string>
     <string name="biometric_unknown_error">Si è verificato un errore durante l\'inizializzazione dell\'autenticazione biometrica. Riprova.</string>
+    <string name="biometric_key_invalidated">Chiave biometrica invalidata — è richiesta una nuova registrazione</string>
     <string name="cd_close_button">Indietro</string>
     <string name="cd_flash_button">Attiva/disattiva il flash della fotocamera</string>
     <string name="confirm_doc_removal_dialog_delete">Sì, elimina</string>

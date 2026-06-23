@@ -30,6 +30,7 @@
     <string name="biometric_setup_skip">Spring over</string>
     <string name="biometric_setup_title">Biometrisk adgang</string>
     <string name="biometric_unknown_error">Noget gik galt ved initialisering af biometrisk godkendelse. Prøv igen</string>
+    <string name="biometric_key_invalidated">Biometrisk nøgle ugyldiggjort — genregistrering påkrævet</string>
     <string name="cd_close_button">Tilbage</string>
     <string name="cd_flash_button">Slå kameraets blitz til/fra</string>
     <string name="confirm_doc_removal_dialog_delete">Ja, slet</string>

@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026.06-3
+
+### Changed
+
+- Bound the database cipher and biometric authentication state to the vault key,
+  including updated storage providers and revocation handling while the vault is
+  locked.
+
+### Fixed
+
+- Presentation flow when the vault is locked.
+
 ## 2026.06-2
 
 ### Fixed

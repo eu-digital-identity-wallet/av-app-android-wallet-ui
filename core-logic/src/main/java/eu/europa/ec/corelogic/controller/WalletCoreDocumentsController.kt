@@ -52,7 +52,7 @@ import eu.europa.ec.eudi.wallet.issue.openid4vci.OfferResult
 import eu.europa.ec.eudi.wallet.issue.openid4vci.OpenId4VciManager
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
-import eu.europa.ec.storagelogic.dao.RevokedDocumentDao
+import eu.europa.ec.storagelogic.storage.DatabaseManager
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.ProducerScope
@@ -201,8 +201,6 @@ interface WalletCoreDocumentsController {
 
     fun getAllDocumentCategories(): DocumentCategories
 
-    fun getAgeOver18IssuedDocument(): IssuedDocument?
-
     suspend fun getRevokedDocumentIds(): List<String>
 
     suspend fun isDocumentRevoked(id: String): Boolean
@@ -210,13 +208,15 @@ interface WalletCoreDocumentsController {
     suspend fun resolveDocumentStatus(document: IssuedDocument): Result<Status>
 
     suspend fun isDocumentLowOnCredentials(document: IssuedDocument): Boolean
+
+    fun hasIssuedDocuments(): Boolean
 }
 
 class WalletCoreDocumentsControllerImpl(
     private val resourceProvider: ResourceProvider,
     private val eudiWallet: EudiWallet,
     private val walletCoreConfig: WalletCoreConfig,
-    private val revokedDocumentDao: RevokedDocumentDao,
+    private val databaseManager: DatabaseManager,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : WalletCoreDocumentsController {
 
@@ -411,7 +411,7 @@ class WalletCoreDocumentsControllerImpl(
         eudiWallet.deleteDocumentById(documentId = documentId)
             .kotlinResult
             .onSuccess {
-                revokedDocumentDao.delete(documentId)
+                databaseManager.revokedDocumentDao().delete(documentId)
                 emit(DeleteDocumentPartialState.Success)
             }
             .onFailure {
@@ -651,13 +651,7 @@ class WalletCoreDocumentsControllerImpl(
         return walletCoreConfig.documentCategories
     }
 
-    override fun getAgeOver18IssuedDocument(): IssuedDocument? {
-        return eudiWallet.getDocuments().filterIsInstance<IssuedDocument>()
-            .firstOrNull {
-                it.toDocumentIdentifier() == DocumentIdentifier.AVAgeOver18 ||
-                        it.toDocumentIdentifier() == DocumentIdentifier.MdocEUDIAgeOver18
-            }
-    }
+    override fun hasIssuedDocuments(): Boolean = eudiWallet.getDocuments{ it is IssuedDocument}.isNotEmpty()
 
     override suspend fun isDocumentLowOnCredentials(document: IssuedDocument): Boolean {
         val documentRemainingCredentials = document.credentialsCount()
@@ -667,10 +661,10 @@ class WalletCoreDocumentsControllerImpl(
     }
 
     override suspend fun getRevokedDocumentIds(): List<String> =
-        revokedDocumentDao.retrieveAll().map { it.identifier }
+        databaseManager.revokedDocumentDao().retrieveAll().map { it.identifier }
 
     override suspend fun isDocumentRevoked(id: String): Boolean =
-        revokedDocumentDao.retrieve(id) != null
+        databaseManager.revokedDocumentDao().retrieve(id) != null
 
     override suspend fun resolveDocumentStatus(document: IssuedDocument): Result<Status> =
         eudiWallet.resolveStatus(document)

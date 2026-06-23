@@ -26,13 +26,12 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-class TestPrefsPinStorageProvider {
+class TestPinStorageProviderImpl {
 
     @Mock
     private lateinit var authMetadataStore: AuthMetadataStore
@@ -42,7 +41,7 @@ class TestPrefsPinStorageProvider {
 
     private lateinit var clock: ElapsedRealtimeClock
     private lateinit var bootIdProvider: BootIdProvider
-    private lateinit var provider: PrefsPinStorageProvider
+    private lateinit var provider: PinStorageProviderImpl
     private lateinit var closeable: AutoCloseable
 
     private var fakeNow: Long = 10_000L
@@ -53,7 +52,7 @@ class TestPrefsPinStorageProvider {
         closeable = MockitoAnnotations.openMocks(this)
         clock = ElapsedRealtimeClock { fakeNow }
         bootIdProvider = BootIdProvider { fakeBootId }
-        provider = PrefsPinStorageProvider(authMetadataStore, clock, bootIdProvider, vaultKeyProvider)
+        provider = PinStorageProviderImpl(authMetadataStore, clock, bootIdProvider, vaultKeyProvider)
     }
 
     @After
@@ -67,6 +66,9 @@ class TestPrefsPinStorageProvider {
         lockoutDuration: Long = 0L,
         bootId: String = fakeBootId,
         writeCounter: Long = 1L,
+        biometricEnabled: Boolean = false,
+        biometricWrappedVaultIv: ByteArray? = null,
+        biometricWrappedVault: ByteArray? = null,
     ) = AuthMetadata(
         version = 0x01,
         kdfAlgo = 0x01,
@@ -76,14 +78,14 @@ class TestPrefsPinStorageProvider {
         pinSalt = ByteArray(32),
         wrappedVaultIv = ByteArray(12),
         wrappedVault = ByteArray(48),
+        bootId = bootId,
         failedAttempts = failedAttempts,
         lockoutDeadline = lockoutDeadline,
         lockoutDuration = lockoutDuration,
-        bootId = bootId,
-        biometricEnabled = false,
-        biometricWrappedVaultIv = null,
-        biometricWrappedVault = null,
         writeCounter = writeCounter,
+        biometricEnabled = biometricEnabled,
+        biometricWrappedVaultIv = biometricWrappedVaultIv,
+        biometricWrappedVault = biometricWrappedVault,
     )
 
     //region isCurrentlyLockedOut
@@ -228,6 +230,94 @@ class TestPrefsPinStorageProvider {
     fun `Given Case 11, When store returns null after rollback, Then isCurrentlyLockedOut returns false`() {
         runBlocking { whenever(authMetadataStore.read()).thenReturn(null) }
         assertEquals(false, provider.isCurrentlyLockedOut())
+    }
+    //endregion
+
+    //region setPin
+
+    // Case 12: setPin with no existing metadata creates fresh AuthMetadata with defaults.
+    @Test
+    fun `Given Case 12, When setPin with no existing metadata, Then fresh AuthMetadata is created with biometric defaults`() = runBlocking {
+        whenever(authMetadataStore.read()).thenReturn(null)
+
+        provider.setPin("123456")
+
+        val captor = argumentCaptor<AuthMetadata>()
+        verify(authMetadataStore, times(1)).write(captor.capture())
+        val written = captor.firstValue
+        assertEquals(false, written.biometricEnabled)
+        assertEquals(null, written.biometricWrappedVaultIv)
+        assertEquals(null, written.biometricWrappedVault)
+        assertEquals(0L, written.writeCounter)
+        assertEquals(0, written.failedAttempts)
+        assertEquals(0L, written.lockoutDeadline)
+        assertEquals(0L, written.lockoutDuration)
+        assertEquals(fakeBootId, written.bootId)
+    }
+
+    // Case 13: setPin with existing metadata preserves biometric fields.
+    @Test
+    fun `Given Case 13, When setPin with existing biometric metadata, Then biometric fields are preserved`() = runBlocking {
+        val bioIv = ByteArray(12) { it.toByte() }
+        val bioVault = ByteArray(48) { (it + 1).toByte() }
+        whenever(vaultKeyProvider.isUnlocked()).thenReturn(true)
+        whenever(vaultKeyProvider.getVaultKey()).thenReturn(ByteArray(32))
+        whenever(authMetadataStore.read()).thenReturn(
+            buildMeta(
+                biometricEnabled = true,
+                biometricWrappedVaultIv = bioIv,
+                biometricWrappedVault = bioVault,
+                writeCounter = 5L,
+            )
+        )
+
+        provider.setPin("654321")
+
+        val captor = argumentCaptor<AuthMetadata>()
+        verify(authMetadataStore, times(1)).write(captor.capture())
+        val written = captor.firstValue
+        assertEquals(true, written.biometricEnabled)
+        assertEquals(true, written.biometricWrappedVaultIv?.contentEquals(bioIv))
+        assertEquals(true, written.biometricWrappedVault?.contentEquals(bioVault))
+        assertEquals(5L, written.writeCounter)
+    }
+
+    // Case 14: setPin with existing metadata resets failedAttempts and lockout.
+    @Test
+    fun `Given Case 14, When setPin with existing lockout state, Then failedAttempts and lockout are reset`() = runBlocking {
+        whenever(vaultKeyProvider.isUnlocked()).thenReturn(true)
+        whenever(vaultKeyProvider.getVaultKey()).thenReturn(ByteArray(32))
+        whenever(authMetadataStore.read()).thenReturn(
+            buildMeta(
+                failedAttempts = 4,
+                lockoutDeadline = 99_000L,
+                lockoutDuration = 60_000L,
+            )
+        )
+
+        provider.setPin("111111")
+
+        val captor = argumentCaptor<AuthMetadata>()
+        verify(authMetadataStore, times(1)).write(captor.capture())
+        val written = captor.firstValue
+        assertEquals(0, written.failedAttempts)
+        assertEquals(0L, written.lockoutDeadline)
+        assertEquals(0L, written.lockoutDuration)
+    }
+
+    // Case 15: setPin with existing metadata reuses vault key when vault is unlocked.
+    @Test
+    fun `Given Case 15, When setPin with unlocked vault, Then vault key is reused`() {
+        runBlocking {
+            whenever(vaultKeyProvider.isUnlocked()).thenReturn(true)
+            whenever(vaultKeyProvider.getVaultKey()).thenReturn(ByteArray(32))
+            whenever(authMetadataStore.read()).thenReturn(buildMeta())
+
+            provider.setPin("999999")
+
+            verify(vaultKeyProvider).isUnlocked()
+            verify(vaultKeyProvider).getVaultKey()
+        }
     }
     //endregion
 }

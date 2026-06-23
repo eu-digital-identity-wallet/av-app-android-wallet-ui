@@ -25,13 +25,13 @@ import eu.europa.ec.commonfeature.config.BiometricMode
 import eu.europa.ec.commonfeature.config.BiometricUiConfig
 import eu.europa.ec.commonfeature.config.OnBackNavigationConfig
 import eu.europa.ec.commonfeature.interactor.QuickPinInteractor
-import eu.europa.ec.corelogic.controller.WalletCoreDocumentsController
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.config.ConfigNavigation
 import eu.europa.ec.uilogic.config.NavigationType
+import eu.europa.ec.uilogic.config.NavigationType.PushScreen
 import eu.europa.ec.uilogic.navigation.CommonScreens
-import eu.europa.ec.uilogic.navigation.LandingScreens
+import eu.europa.ec.uilogic.navigation.CommonScreens.BiometricLoginSuccessful
 import eu.europa.ec.uilogic.navigation.OnboardingScreens
 import eu.europa.ec.uilogic.navigation.StartupScreens
 import eu.europa.ec.uilogic.navigation.helper.generateComposableArguments
@@ -46,7 +46,6 @@ class SplashInteractorImpl(
     private val quickPinInteractor: QuickPinInteractor,
     private val uiSerializer: UiSerializer,
     private val resourceProvider: ResourceProvider,
-    private val walletCoreDocumentsController: WalletCoreDocumentsController,
     private val keystoreController: KeystoreController,
     private val configLogic: ConfigLogic,
     private val logController: LogController,
@@ -55,9 +54,6 @@ class SplashInteractorImpl(
     companion object {
         private const val TAG = "SplashInteractor"
     }
-
-    private val hasDocuments: Boolean
-        get() = walletCoreDocumentsController.getAgeOver18IssuedDocument() != null
 
     override fun getAfterSplashRoute(): String {
         val hasPinEnrolled = quickPinInteractor.hasPin()
@@ -95,13 +91,8 @@ class SplashInteractorImpl(
                             isPreAuthorization = true,
                             shouldInitializeBiometricAuthOnCreate = true,
                             onSuccessNavigation = ConfigNavigation(
-                                navigationType = NavigationType.PushScreen(
-                                    screen = if (hasDocuments) {
-                                        LandingScreens.Landing
-                                    } else {
-                                        OnboardingScreens.Enrollment
-                                    },
-                                    arguments = emptyMap()
+                                navigationType = PushScreen(
+                                    screen = BiometricLoginSuccessful,
                                 )
                             ),
                             onBackNavigationConfig = OnBackNavigationConfig(

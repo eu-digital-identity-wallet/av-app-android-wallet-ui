@@ -34,9 +34,7 @@ sealed class DeleteAgeDocumentsPartialState {
 class SettingsInteractorImpl(
     private val walletCoreDocumentsController: WalletCoreDocumentsController
 ) : SettingsInteractor {
-    private fun hasDocuments(): Boolean {
-        return walletCoreDocumentsController.getAgeOver18IssuedDocument() != null
-    }
+    private fun hasDocuments(): Boolean = walletCoreDocumentsController.hasIssuedDocuments()
 
     override fun deleteAllDocuments(): Flow<DeleteAgeDocumentsPartialState> = flow {
         if (!hasDocuments()) {

@@ -223,9 +223,7 @@ class EnrollmentInteractorImpl(
         )
     }
 
-    override fun hasDocuments(): Boolean {
-        return walletCoreDocumentsController.getAgeOver18IssuedDocument() != null
-    }
+    override fun hasDocuments(): Boolean = walletCoreDocumentsController.hasIssuedDocuments()
 
     override fun isPassportScanningAvailable(): Boolean {
         return walletCoreConfig.passportScanningIssuerConfig != null

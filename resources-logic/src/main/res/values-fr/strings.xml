@@ -30,6 +30,7 @@
     <string name="biometric_setup_skip">Passer</string>
     <string name="biometric_setup_title">Accès biométrique</string>
     <string name="biometric_unknown_error">Un défaut est apparu lors de l\'initialisation de l\'authentification biométrique. Veuillez réessayer.</string>
+    <string name="biometric_key_invalidated">Clé biométrique invalidée — réenregistrement requis</string>
     <string name="cd_close_button">Retour</string>
     <string name="cd_flash_button">Activer/désactiver le flash de l\'appareil photo</string>
     <string name="confirm_doc_removal_dialog_delete">Oui, supprimer.</string>

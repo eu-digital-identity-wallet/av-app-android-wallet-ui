@@ -25,14 +25,14 @@ data class AuthMetadata(
     val pinSalt: ByteArray,
     val wrappedVaultIv: ByteArray,
     val wrappedVault: ByteArray,
-    val failedAttempts: Int,
-    val lockoutDeadline: Long,
-    val lockoutDuration: Long,
     val bootId: String,
-    val biometricEnabled: Boolean,
-    val biometricWrappedVaultIv: ByteArray?,
-    val biometricWrappedVault: ByteArray?,
-    val writeCounter: Long,
+    val failedAttempts: Int = 0,
+    val lockoutDeadline: Long = 0,
+    val lockoutDuration: Long = 0,
+    val biometricEnabled: Boolean = false,
+    val biometricWrappedVaultIv: ByteArray? = null,
+    val biometricWrappedVault: ByteArray? = null,
+    val writeCounter: Long = 0L,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

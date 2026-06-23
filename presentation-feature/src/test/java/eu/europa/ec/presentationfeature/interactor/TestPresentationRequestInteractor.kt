@@ -17,6 +17,7 @@
 package eu.europa.ec.presentationfeature.interactor
 
 import eu.europa.ec.businesslogic.model.ErrorType
+import eu.europa.ec.authenticationlogic.provider.VaultKeyProvider
 import eu.europa.ec.businesslogic.provider.UuidProvider
 import eu.europa.ec.commonfeature.config.PresentationMode
 import eu.europa.ec.commonfeature.config.RequestUriConfig
@@ -81,6 +82,9 @@ class TestPresentationRequestInteractor {
     @Mock
     private lateinit var dcApiIntentHolder: DcApiIntentHolder
 
+    @Mock
+    private lateinit var vaultKeyProvider: VaultKeyProvider
+
     private lateinit var interactor: PresentationRequestInteractor
 
     private lateinit var closeable: AutoCloseable
@@ -95,9 +99,12 @@ class TestPresentationRequestInteractor {
             walletCoreDocumentsController = walletCoreDocumentsController,
             uuidProvider = uuidProvider,
             dcApiIntentHolder = dcApiIntentHolder,
+            vaultKeyProvider = vaultKeyProvider,
         )
 
         whenever(resourceProvider.genericErrorMessage()).thenReturn(mockedGenericErrorMessage)
+        // The revocation filter only runs when the vault is unlocked; the existing cases exercise it.
+        whenever(vaultKeyProvider.isUnlocked()).thenReturn(true)
     }
 
     @After

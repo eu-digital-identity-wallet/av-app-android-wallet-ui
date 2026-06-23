@@ -29,9 +29,8 @@ import eu.europa.ec.authenticationlogic.controller.storage.PinStorageControllerI
 import eu.europa.ec.authenticationlogic.provider.VaultKeyProvider
 import eu.europa.ec.authenticationlogic.provider.VaultKeyProviderImpl
 import eu.europa.ec.authenticationlogic.storage.AuthMetadataStore
-import eu.europa.ec.authenticationlogic.storage.PrefsBiometryStorageProvider
-import eu.europa.ec.authenticationlogic.storage.PrefsPinStorageProvider
-import eu.europa.ec.businesslogic.controller.crypto.CryptoController
+import eu.europa.ec.authenticationlogic.storage.BiometryStorageProviderImpl
+import eu.europa.ec.authenticationlogic.storage.PinStorageProviderImpl
 import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.businesslogic.controller.storage.PrefsController
 import eu.europa.ec.businesslogic.provider.BootIdProvider
@@ -65,21 +64,18 @@ fun provideStorageConfig(
     bootIdProvider: BootIdProvider,
     vaultKeyProvider: VaultKeyProvider,
     prefsController: PrefsController,
+    logController: LogController,
 ): StorageConfig = StorageConfigImpl(
-    pinImpl = PrefsPinStorageProvider(authMetadataStore, clock, bootIdProvider, vaultKeyProvider),
-    biometryImpl = PrefsBiometryStorageProvider(prefsController)
+    pinImpl = PinStorageProviderImpl(authMetadataStore, clock, bootIdProvider, vaultKeyProvider),
+    biometryImpl = BiometryStorageProviderImpl(prefsController, authMetadataStore, vaultKeyProvider, logController)
 )
 
 @Factory
 fun provideBiometricAuthenticationController(
-    cryptoController: CryptoController,
-    biometryStorageController: BiometryStorageController,
     resourceProvider: ResourceProvider
 ): BiometricAuthenticationController =
     BiometricAuthenticationControllerImpl(
-        resourceProvider,
-        cryptoController,
-        biometryStorageController
+        resourceProvider
     )
 
 @Factory

@@ -16,6 +16,7 @@
 
 package eu.europa.ec.presentationfeature.di
 
+import eu.europa.ec.authenticationlogic.provider.VaultKeyProvider
 import eu.europa.ec.businesslogic.provider.UuidProvider
 import eu.europa.ec.commonfeature.interactor.DeviceAuthenticationInteractor
 import eu.europa.ec.corelogic.controller.WalletCoreDocumentsController
@@ -45,6 +46,7 @@ fun providePresentationRequestInteractor(
     walletCoreDocumentsController: WalletCoreDocumentsController,
     @ScopeId(name = PRESENTATION_SCOPE_ID) walletCorePresentationController: WalletCorePresentationController,
     dcApiIntentHolder: DcApiIntentHolder,
+    vaultKeyProvider: VaultKeyProvider,
 ): PresentationRequestInteractor {
     return PresentationRequestInteractorImpl(
         resourceProvider,
@@ -52,17 +54,22 @@ fun providePresentationRequestInteractor(
         walletCorePresentationController,
         walletCoreDocumentsController,
         dcApiIntentHolder,
+        vaultKeyProvider,
     )
 }
 
 @Factory
 fun providePresentationLoadingInteractor(
     @ScopeId(name = PRESENTATION_SCOPE_ID) walletCorePresentationController: WalletCorePresentationController,
+    walletCoreDocumentsController: WalletCoreDocumentsController,
     deviceAuthenticationInteractor: DeviceAuthenticationInteractor,
+    resourceProvider: ResourceProvider,
 ): PresentationLoadingInteractor {
     return PresentationLoadingInteractorImpl(
         walletCorePresentationController,
-        deviceAuthenticationInteractor
+        walletCoreDocumentsController,
+        deviceAuthenticationInteractor,
+        resourceProvider,
     )
 }
 

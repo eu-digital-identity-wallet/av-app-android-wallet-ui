@@ -30,6 +30,7 @@
     <string name="biometric_setup_skip">Skip</string>
     <string name="biometric_setup_title">Biometric access</string>
     <string name="biometric_unknown_error">Something went wrong initializing biometric authentication. Please try again</string>
+    <string name="biometric_key_invalidated">Biometric key invalidated — re-enrollment required</string>
     <string name="cd_close_button">Back</string>
     <string name="cd_flash_button">Toggle camera flash</string>
     <string name="confirm_doc_removal_dialog_delete">Yes, delete</string>

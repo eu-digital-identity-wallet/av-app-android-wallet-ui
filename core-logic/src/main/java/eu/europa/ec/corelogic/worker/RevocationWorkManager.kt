@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import eu.europa.ec.authenticationlogic.provider.VaultKeyProvider
 import eu.europa.ec.businesslogic.util.InProcessEventBus
 import eu.europa.ec.corelogic.controller.WalletCoreDocumentsController
 import eu.europa.ec.corelogic.model.RevokedDocumentDataDomain
@@ -27,8 +28,8 @@ import eu.europa.ec.corelogic.util.CoreActions
 import eu.europa.ec.corelogic.util.CoreActions.REVOCATION_IDS_DETAILS_EXTRA
 import eu.europa.ec.eudi.statium.Status
 import eu.europa.ec.eudi.wallet.document.IssuedDocument
-import eu.europa.ec.storagelogic.dao.RevokedDocumentDao
 import eu.europa.ec.storagelogic.model.RevokedDocument
+import eu.europa.ec.storagelogic.storage.DatabaseManager
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -60,7 +61,8 @@ class RevocationWorkManager(
     workerParams: WorkerParameters,
 ) : CoroutineWorker(appContext, workerParams), KoinComponent {
 
-    private val revokedDocumentDao: RevokedDocumentDao by inject()
+    private val vaultKeyProvider: VaultKeyProvider by inject()
+    private val databaseManager: DatabaseManager by inject()
     private val walletCoreDocumentsController: WalletCoreDocumentsController by inject()
 
     companion object {
@@ -69,47 +71,48 @@ class RevocationWorkManager(
 
     override suspend fun doWork(): Result {
         try {
+            if (vaultKeyProvider.isUnlocked()) {
+                val storedRevokedDocuments = walletCoreDocumentsController.getRevokedDocumentIds()
+                val fromRevokedToValid = mutableListOf<String>()
+                val revokedDocuments = mutableListOf<IssuedDocument>()
 
-            val storedRevokedDocuments = walletCoreDocumentsController.getRevokedDocumentIds()
-            val fromRevokedToValid = mutableListOf<String>()
-            val revokedDocuments = mutableListOf<IssuedDocument>()
-
-            walletCoreDocumentsController
-                .getAllIssuedDocuments()
-                .forEach { document ->
-                    walletCoreDocumentsController.resolveDocumentStatus(document).fold(
-                        onSuccess = { status ->
-                            when (status) {
-                                is Status.Invalid, Status.Suspended -> {
-                                    if (!storedRevokedDocuments.any { it == document.id }) {
-                                        revokedDocuments.add(document)
+                walletCoreDocumentsController
+                    .getAllIssuedDocuments()
+                    .forEach { document ->
+                        walletCoreDocumentsController.resolveDocumentStatus(document).fold(
+                            onSuccess = { status ->
+                                when (status) {
+                                    is Status.Invalid, Status.Suspended -> {
+                                        if (!storedRevokedDocuments.any { it == document.id }) {
+                                            revokedDocuments.add(document)
+                                        }
                                     }
-                                }
 
-                                is Status.Valid -> {
-                                    if (storedRevokedDocuments.any { it == document.id }) {
-                                        fromRevokedToValid.add(document.id)
+                                    is Status.Valid -> {
+                                        if (storedRevokedDocuments.any { it == document.id }) {
+                                            fromRevokedToValid.add(document.id)
+                                        }
                                     }
-                                }
 
-                                else -> {}
-                            }
-                        },
-                        onFailure = {}
-                    )
+                                    else -> {}
+                                }
+                            },
+                            onFailure = {}
+                        )
+                    }
+
+                if (fromRevokedToValid.isNotEmpty()) {
+                    removeRevokedDocumentsFromStorage(fromRevokedToValid)
                 }
 
-            if (fromRevokedToValid.isNotEmpty()) {
-                removeRevokedDocumentsFromStorage(fromRevokedToValid)
-            }
+                if (revokedDocuments.isNotEmpty()) {
+                    storeRevokedDocuments(revokedDocuments)
+                    sendRevocationBroadcasts(revokedDocuments)
+                }
 
-            if (revokedDocuments.isNotEmpty()) {
-                storeRevokedDocuments(revokedDocuments)
-                sendRevocationBroadcasts(revokedDocuments)
-            }
-
-            if (fromRevokedToValid.isNotEmpty() || revokedDocuments.isNotEmpty()) {
-                notifyDocumentsList()
+                if (fromRevokedToValid.isNotEmpty() || revokedDocuments.isNotEmpty()) {
+                    notifyDocumentsList()
+                }
             }
 
             return Result.success()
@@ -120,7 +123,7 @@ class RevocationWorkManager(
 
     @Throws(IllegalArgumentException::class)
     private suspend fun storeRevokedDocuments(revokedDocuments: List<IssuedDocument>) {
-        revokedDocumentDao.storeAll(
+        databaseManager.revokedDocumentDao().storeAll(
             revokedDocuments.map { RevokedDocument(identifier = it.id) }
         )
     }
@@ -128,7 +131,7 @@ class RevocationWorkManager(
     @Throws(IllegalArgumentException::class)
     private suspend fun removeRevokedDocumentsFromStorage(ids: List<String>) {
         ids.forEach {
-            revokedDocumentDao.delete(it)
+            databaseManager.revokedDocumentDao().delete(it)
         }
     }
 

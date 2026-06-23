@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 European Commission
+ * Copyright (c) 2026 European Commission
  *
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
  * Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
@@ -14,15 +14,8 @@
  * governing permissions and limitations under the Licence.
  */
 
-package eu.europa.ec.authenticationlogic.provider
+package eu.europa.ec.authenticationlogic.storage
 
-import javax.crypto.Cipher
-
-interface BiometryStorageProvider {
-    fun setUseBiometricsAuth(value: Boolean)
-    fun getUseBiometricsAuth(): Boolean
-    suspend fun enrollBiometric(): Cipher
-    suspend fun commitBiometricEnrolment(cipher: Cipher)
-    suspend fun prepareBiometricUnlock(): Cipher
-    suspend fun completeBiometricUnlock(cipher: Cipher)
-}
+class BiometricKeyInvalidatedException(
+    message: String = "Biometric key permanently invalidated — re-enrolment required"
+) : RuntimeException(message)

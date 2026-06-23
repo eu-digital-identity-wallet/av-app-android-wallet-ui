@@ -55,6 +55,8 @@ sealed class CommonScreens {
         parameters = "?biometricConfig={biometricConfig}"
     )
 
+    data object BiometricLoginSuccessful : Screen("BIOMETRIC_LOGIN_SUCCESSFUL")
+
     data object BiometricSetup : Screen("BIOMETRIC_SETUP")
 
     data object QuickPin :
@@ -107,7 +109,6 @@ sealed class LandingScreens {
 sealed class ModuleRoute(val route: String) : NavigatableItem {
     data object StartupModule : ModuleRoute("STARTUP_MODULE")
     data object CommonModule : ModuleRoute("COMMON_MODULE")
-    data object DashboardModule : ModuleRoute("DASHBOARD_MODULE")
     data object PresentationModule : ModuleRoute("PRESENTATION_MODULE")
     data object IssuanceModule : ModuleRoute("ISSUANCE_MODULE")
     data object LandingModule : ModuleRoute("LANDING_MODULE")

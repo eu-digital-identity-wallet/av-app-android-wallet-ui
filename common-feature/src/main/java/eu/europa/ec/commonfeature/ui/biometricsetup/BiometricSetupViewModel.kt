@@ -17,15 +17,19 @@
 package eu.europa.ec.commonfeature.ui.biometricsetup
 
 import android.content.Context
-import eu.europa.ec.authenticationlogic.controller.authentication.BiometricsAuthenticate
+import androidx.lifecycle.viewModelScope
+import eu.europa.ec.authenticationlogic.controller.authentication.BiometricVaultResult
 import eu.europa.ec.authenticationlogic.controller.authentication.BiometricsAvailability
 import eu.europa.ec.commonfeature.interactor.BiometricInteractor
+import eu.europa.ec.resourceslogic.R
+import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.component.content.ScreenNavigateAction
 import eu.europa.ec.uilogic.mvi.MviViewModel
 import eu.europa.ec.uilogic.mvi.ViewEvent
 import eu.europa.ec.uilogic.mvi.ViewSideEffect
 import eu.europa.ec.uilogic.mvi.ViewState
 import eu.europa.ec.uilogic.navigation.OnboardingScreens
+import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
 
 sealed class Event : ViewEvent {
@@ -38,7 +42,7 @@ data class State(
     val isLoading: Boolean = false,
     val isBiometricsAvailable: Boolean = false,
     val enrolled: Boolean = false,
-    val biometricsError: String? = null
+    val biometricsError: String? = null,
 ) : ViewState {
     val action: ScreenNavigateAction = ScreenNavigateAction.BACKABLE
 }
@@ -51,7 +55,8 @@ sealed class Effect : ViewSideEffect {
 
 @KoinViewModel
 class BiometricSetupViewModel(
-    private val biometricInteractor: BiometricInteractor
+    private val biometricInteractor: BiometricInteractor,
+    private val resourceProvider: ResourceProvider,
 ) : MviViewModel<Event, State, Effect>() {
 
     override fun setInitialState(): State {
@@ -68,7 +73,7 @@ class BiometricSetupViewModel(
                 clearError()
                 if (viewState.value.isBiometricsAvailable) {
                     if (viewState.value.enrolled) {
-                        authenticate(event.context)
+                        enrollBiometric(event.context)
                     } else {
                         biometricInteractor.launchBiometricSystemScreen()
                     }
@@ -82,15 +87,13 @@ class BiometricSetupViewModel(
         }
     }
 
-    private fun authenticate(context: Context) {
-        biometricInteractor.authenticateWithBiometrics(
-            context = context,
-            notifyOnAuthenticationFailure = true
-        ) {
-            when (it) {
-                is BiometricsAuthenticate.Success -> authenticationSuccess()
-                BiometricsAuthenticate.Cancelled -> clearError()
-                is BiometricsAuthenticate.Failed -> showError("Failed " + it.errorMessage)
+    private fun enrollBiometric(context: Context) {
+        viewModelScope.launch {
+            when (val result = biometricInteractor.enrollBiometricVault(context)) {
+                is BiometricVaultResult.Success -> authenticationSuccess()
+                is BiometricVaultResult.Cancelled -> clearError()
+                is BiometricVaultResult.Failed -> showError(result.errorMessage)
+                is BiometricVaultResult.KeyInvalidated -> showError(resourceProvider.getString(R.string.biometric_key_invalidated))
             }
         }
     }
@@ -146,7 +149,6 @@ class BiometricSetupViewModel(
         biometricInteractor.storeBiometricsUsageDecision(true)
         navigateToNextScreen()
     }
-
 
     private fun navigateToNextScreen() {
         setEffect {
