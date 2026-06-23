@@ -20,7 +20,7 @@ import com.nimbusds.jose.shaded.gson.Gson
 import eu.europa.ec.businesslogic.provider.UuidProvider
 import eu.europa.ec.eudi.wallet.transactionLogging.TransactionLog
 import eu.europa.ec.eudi.wallet.transactionLogging.TransactionLogger
-import eu.europa.ec.storagelogic.dao.TransactionLogDao
+import eu.europa.ec.storagelogic.storage.DatabaseManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -31,7 +31,7 @@ import eu.europa.ec.storagelogic.model.TransactionLog as TransactionStorage
 interface WalletCoreTransactionLogController : TransactionLogger
 
 class WalletCoreTransactionLogControllerImpl(
-    private val transactionLogDao: TransactionLogDao,
+    private val databaseManager: DatabaseManager,
     private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO),
     private val uuidProvider: UuidProvider
 ) : WalletCoreTransactionLogController {
@@ -40,7 +40,7 @@ class WalletCoreTransactionLogControllerImpl(
     override fun log(transaction: TransactionLog) {
         scope.launch {
             val json = Gson().toJson(transaction)
-            transactionLogDao.store(
+            databaseManager.transactionLogDao().store(
                 TransactionStorage(
                     identifier = uuidProvider.provideUuid(),
                     value = json

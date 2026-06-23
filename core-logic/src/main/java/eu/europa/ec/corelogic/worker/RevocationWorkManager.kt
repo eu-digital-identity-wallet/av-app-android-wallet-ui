@@ -28,8 +28,8 @@ import eu.europa.ec.corelogic.util.CoreActions
 import eu.europa.ec.corelogic.util.CoreActions.REVOCATION_IDS_DETAILS_EXTRA
 import eu.europa.ec.eudi.statium.Status
 import eu.europa.ec.eudi.wallet.document.IssuedDocument
-import eu.europa.ec.storagelogic.dao.RevokedDocumentDao
 import eu.europa.ec.storagelogic.model.RevokedDocument
+import eu.europa.ec.storagelogic.storage.DatabaseManager
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -62,7 +62,7 @@ class RevocationWorkManager(
 ) : CoroutineWorker(appContext, workerParams), KoinComponent {
 
     private val vaultKeyProvider: VaultKeyProvider by inject()
-    private val revokedDocumentDao: RevokedDocumentDao by inject()
+    private val databaseManager: DatabaseManager by inject()
     private val walletCoreDocumentsController: WalletCoreDocumentsController by inject()
 
     companion object {
@@ -123,7 +123,7 @@ class RevocationWorkManager(
 
     @Throws(IllegalArgumentException::class)
     private suspend fun storeRevokedDocuments(revokedDocuments: List<IssuedDocument>) {
-        revokedDocumentDao.storeAll(
+        databaseManager.revokedDocumentDao().storeAll(
             revokedDocuments.map { RevokedDocument(identifier = it.id) }
         )
     }
@@ -131,7 +131,7 @@ class RevocationWorkManager(
     @Throws(IllegalArgumentException::class)
     private suspend fun removeRevokedDocumentsFromStorage(ids: List<String>) {
         ids.forEach {
-            revokedDocumentDao.delete(it)
+            databaseManager.revokedDocumentDao().delete(it)
         }
     }
 

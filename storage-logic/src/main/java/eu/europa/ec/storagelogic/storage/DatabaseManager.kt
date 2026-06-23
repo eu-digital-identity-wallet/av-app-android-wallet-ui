@@ -19,6 +19,9 @@ package eu.europa.ec.storagelogic.storage
 import android.content.Context
 import androidx.room.Room
 import eu.europa.ec.authenticationlogic.provider.VaultKeyProvider
+import eu.europa.ec.storagelogic.dao.BookmarkDao
+import eu.europa.ec.storagelogic.dao.RevokedDocumentDao
+import eu.europa.ec.storagelogic.dao.TransactionLogDao
 import eu.europa.ec.storagelogic.service.DatabaseService
 import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
 
@@ -52,6 +55,12 @@ class DatabaseManager(
         db = instance
         return instance
     }
+
+    fun bookmarkDao(): BookmarkDao = getDatabase().bookmarkDao()
+
+    fun revokedDocumentDao(): RevokedDocumentDao = getDatabase().revokedDocumentDao()
+
+    fun transactionLogDao(): TransactionLogDao = getDatabase().transactionLogDao()
 
     @Synchronized
     fun close() {

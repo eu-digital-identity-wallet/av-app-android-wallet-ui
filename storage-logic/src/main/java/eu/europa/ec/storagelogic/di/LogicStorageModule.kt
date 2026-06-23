@@ -18,10 +18,6 @@ package eu.europa.ec.storagelogic.di
 
 import android.content.Context
 import eu.europa.ec.authenticationlogic.provider.VaultKeyProvider
-import eu.europa.ec.storagelogic.dao.BookmarkDao
-import eu.europa.ec.storagelogic.dao.RevokedDocumentDao
-import eu.europa.ec.storagelogic.dao.TransactionLogDao
-import eu.europa.ec.storagelogic.service.DatabaseService
 import eu.europa.ec.storagelogic.storage.DatabaseManager
 import org.koin.core.annotation.ComponentScan
 import org.koin.core.annotation.Module
@@ -36,17 +32,3 @@ fun provideDatabaseManager(
     context: Context,
     vaultKeyProvider: VaultKeyProvider,
 ): DatabaseManager = DatabaseManager(context, vaultKeyProvider)
-
-@Single
-fun provideAppDatabase(manager: DatabaseManager): DatabaseService = manager.getDatabase()
-
-@Single
-fun provideBookmarkDao(service: DatabaseService): BookmarkDao = service.bookmarkDao()
-
-@Single
-fun provideRevokedDocumentDao(service: DatabaseService): RevokedDocumentDao =
-    service.revokedDocumentDao()
-
-@Single
-fun provideTransactionLogDao(service: DatabaseService): TransactionLogDao =
-    service.transactionLogDao()

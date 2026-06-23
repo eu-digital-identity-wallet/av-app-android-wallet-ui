@@ -52,7 +52,7 @@ import eu.europa.ec.eudi.wallet.issue.openid4vci.OfferResult
 import eu.europa.ec.eudi.wallet.issue.openid4vci.OpenId4VciManager
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
-import eu.europa.ec.storagelogic.dao.RevokedDocumentDao
+import eu.europa.ec.storagelogic.storage.DatabaseManager
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.ProducerScope
@@ -216,7 +216,7 @@ class WalletCoreDocumentsControllerImpl(
     private val resourceProvider: ResourceProvider,
     private val eudiWallet: EudiWallet,
     private val walletCoreConfig: WalletCoreConfig,
-    private val revokedDocumentDao: RevokedDocumentDao,
+    private val databaseManager: DatabaseManager,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : WalletCoreDocumentsController {
 
@@ -411,7 +411,7 @@ class WalletCoreDocumentsControllerImpl(
         eudiWallet.deleteDocumentById(documentId = documentId)
             .kotlinResult
             .onSuccess {
-                revokedDocumentDao.delete(documentId)
+                databaseManager.revokedDocumentDao().delete(documentId)
                 emit(DeleteDocumentPartialState.Success)
             }
             .onFailure {
@@ -661,10 +661,10 @@ class WalletCoreDocumentsControllerImpl(
     }
 
     override suspend fun getRevokedDocumentIds(): List<String> =
-        revokedDocumentDao.retrieveAll().map { it.identifier }
+        databaseManager.revokedDocumentDao().retrieveAll().map { it.identifier }
 
     override suspend fun isDocumentRevoked(id: String): Boolean =
-        revokedDocumentDao.retrieve(id) != null
+        databaseManager.revokedDocumentDao().retrieve(id) != null
 
     override suspend fun resolveDocumentStatus(document: IssuedDocument): Result<Status> =
         eudiWallet.resolveStatus(document)

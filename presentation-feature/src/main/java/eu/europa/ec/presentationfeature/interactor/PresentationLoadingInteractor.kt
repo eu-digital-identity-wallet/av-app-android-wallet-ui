@@ -21,13 +21,19 @@ import android.content.Intent
 import eu.europa.ec.authenticationlogic.controller.authentication.BiometricsAvailability
 import eu.europa.ec.authenticationlogic.controller.authentication.DeviceAuthenticationResult
 import eu.europa.ec.authenticationlogic.model.BiometricCrypto
+import eu.europa.ec.businesslogic.extension.safeAsync
+import eu.europa.ec.businesslogic.extension.toErrorType
 import eu.europa.ec.businesslogic.model.ErrorType
 import eu.europa.ec.commonfeature.interactor.DeviceAuthenticationInteractor
 import eu.europa.ec.corelogic.controller.SendRequestedDocumentsPartialState
+import eu.europa.ec.corelogic.controller.WalletCoreDocumentsController
 import eu.europa.ec.corelogic.controller.WalletCorePartialState
 import eu.europa.ec.corelogic.controller.WalletCorePresentationController
 import eu.europa.ec.corelogic.model.AuthenticationData
+import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.mapNotNull
 import java.net.URI
 
@@ -67,10 +73,34 @@ interface PresentationLoadingInteractor {
 
 class PresentationLoadingInteractorImpl(
     private val walletCorePresentationController: WalletCorePresentationController,
+    private val walletCoreDocumentsController: WalletCoreDocumentsController,
     private val deviceAuthenticationInteractor: DeviceAuthenticationInteractor,
+    private val resourceProvider: ResourceProvider,
 ) : PresentationLoadingInteractor {
 
     override fun observeResponse(): Flow<PresentationLoadingObserveResponsePartialState> =
+        flow {
+            val revokedIds = walletCoreDocumentsController.getRevokedDocumentIds()
+            val selectedRevoked = walletCorePresentationController.disclosedDocuments
+                ?.any { it.documentId in revokedIds } == true
+            if (selectedRevoked) {
+                emit(
+                    PresentationLoadingObserveResponsePartialState.Failure(
+                        error = resourceProvider.genericErrorMessage(),
+                    )
+                )
+                return@flow
+            }
+
+            emitAll(observeSentDocumentsResponse())
+        }.safeAsync {
+            PresentationLoadingObserveResponsePartialState.Failure(
+                error = it.localizedMessage ?: resourceProvider.genericErrorMessage(),
+                errorType = it.toErrorType(),
+            )
+        }
+
+    private fun observeSentDocumentsResponse(): Flow<PresentationLoadingObserveResponsePartialState> =
         walletCorePresentationController.observeSentDocumentsRequest().mapNotNull { response ->
             when (response) {
                 is WalletCorePartialState.Failure -> PresentationLoadingObserveResponsePartialState.Failure(

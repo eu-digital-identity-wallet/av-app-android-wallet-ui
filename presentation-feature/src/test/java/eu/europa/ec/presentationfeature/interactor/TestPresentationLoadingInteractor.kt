@@ -21,9 +21,11 @@ import eu.europa.ec.authenticationlogic.controller.authentication.BiometricsAvai
 import eu.europa.ec.authenticationlogic.controller.authentication.DeviceAuthenticationResult
 import eu.europa.ec.authenticationlogic.model.BiometricCrypto
 import eu.europa.ec.commonfeature.interactor.DeviceAuthenticationInteractor
+import eu.europa.ec.corelogic.controller.WalletCoreDocumentsController
 import eu.europa.ec.corelogic.controller.WalletCorePartialState
 import eu.europa.ec.corelogic.controller.WalletCorePresentationController
 import eu.europa.ec.corelogic.model.AuthenticationData
+import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.testfeature.util.mockedNotifyOnAuthenticationFailure
 import eu.europa.ec.testfeature.util.mockedPlainFailureMessage
 import eu.europa.ec.testlogic.extension.runFlowTest
@@ -53,7 +55,13 @@ class TestPresentationLoadingInteractor {
     private lateinit var walletCorePresentationController: WalletCorePresentationController
 
     @Mock
+    private lateinit var walletCoreDocumentsController: WalletCoreDocumentsController
+
+    @Mock
     private lateinit var deviceAuthenticationInteractor: DeviceAuthenticationInteractor
+
+    @Mock
+    private lateinit var resourceProvider: ResourceProvider
 
     @Mock
     private lateinit var context: Context
@@ -73,7 +81,9 @@ class TestPresentationLoadingInteractor {
 
         interactor = PresentationLoadingInteractorImpl(
             walletCorePresentationController = walletCorePresentationController,
-            deviceAuthenticationInteractor = deviceAuthenticationInteractor
+            walletCoreDocumentsController = walletCoreDocumentsController,
+            deviceAuthenticationInteractor = deviceAuthenticationInteractor,
+            resourceProvider = resourceProvider
         )
 
         crypto = BiometricCrypto(cryptoObject = null)
