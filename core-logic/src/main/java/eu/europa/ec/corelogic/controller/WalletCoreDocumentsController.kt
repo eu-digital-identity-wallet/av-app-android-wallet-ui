@@ -678,8 +678,8 @@ class WalletCoreDocumentsControllerImpl(
             val manager = openId4VciManagers[issuerId]
             require(manager != null) { documentErrorMessage }
 
-            manager.issueDocumentByConfigurationIdentifier(
-                credentialConfigurationId = configId,
+            manager.issueDocumentByConfigurationIdentifiers(
+                credentialConfigurationIds = listOf(configId),
                 onIssueEvent = issuanceCallback()
             )
 

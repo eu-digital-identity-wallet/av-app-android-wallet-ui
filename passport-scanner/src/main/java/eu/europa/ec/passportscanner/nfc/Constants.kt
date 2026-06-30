@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 European Commission
+ * Copyright (c) 2026 European Commission
  *
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
  * Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
@@ -14,24 +14,6 @@
  * governing permissions and limitations under the Licence.
  */
 
-package eu.europa.ec.businesslogic.extension
+package eu.europa.ec.passportscanner.nfc
 
-import android.content.Intent
-import android.os.Build
-import android.os.Parcelable
-import androidx.annotation.CheckResult
-
-@CheckResult
-inline fun <reified T : Parcelable> Intent?.getParcelableArrayListExtra(
-    action: String
-): List<T>? {
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        this?.getParcelableArrayListExtra(
-            action,
-            T::class.java
-        )
-    } else {
-        @Suppress("DEPRECATION")
-        this?.getParcelableArrayListExtra(action)
-    }?.filterNotNull()
-}
+internal const val MAX_BLOCKSIZE = 224

@@ -34,7 +34,9 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.content.IntentCompat
 import androidx.core.net.toUri
+import androidx.core.os.BundleCompat
 import androidx.fragment.app.Fragment
 import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.passportscanner.R
@@ -44,18 +46,16 @@ import eu.europa.ec.passportscanner.nfc.passport.Passport
 import eu.europa.ec.passportscanner.utils.KeyStoreUtils
 import eu.europa.ec.resourceslogic.R.string
 import io.reactivex.disposables.CompositeDisposable
-import net.sf.scuba.smartcards.CardServiceException
-import net.sf.scuba.smartcards.ISO7816
-import org.jmrtd.AccessDeniedException
-import org.jmrtd.BACDeniedException
-import org.jmrtd.MRTDTrustStore
-import org.jmrtd.PACEException
-import org.jmrtd.lds.icao.MRZInfo
-import org.koin.android.ext.android.inject
-import org.spongycastle.jce.provider.BouncyCastleProvider
 import java.io.IOException
 import java.security.MessageDigest
 import java.security.Security
+import net.sf.scuba.smartcards.CardServiceException
+import net.sf.scuba.smartcards.ISO7816
+import org.jmrtd.CardServiceProtocolException
+import org.jmrtd.MRTDTrustStore
+import org.jmrtd.lds.icao.MRZInfo
+import org.koin.android.ext.android.inject
+import org.spongycastle.jce.provider.BouncyCastleProvider
 
 class NFCFragment : Fragment() {
 
@@ -70,10 +70,9 @@ class NFCFragment : Fragment() {
     private var mHandler = Handler(Looper.getMainLooper())
     private var disposable = CompositeDisposable()
     private var progressAnimator: ObjectAnimator? = null
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         return inflater.inflate(R.layout.fragment_nfc, container, false)
     }
@@ -81,8 +80,9 @@ class NFCFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val arguments = arguments
-        if (arguments?.containsKey(IntentData.KEY_MRZ_INFO) == true) {
-            mrzInfo = arguments.getSerializable(IntentData.KEY_MRZ_INFO) as MRZInfo?
+        val args = arguments
+        if (args?.containsKey(IntentData.KEY_MRZ_INFO) == true) {
+            mrzInfo = BundleCompat.getSerializable(args, IntentData.KEY_MRZ_INFO, MRZInfo::class.java)
         }
         textViewNfcTitle = view.findViewById(R.id.tv_nfc_title)
         textViewNfcBody = view.findViewById(R.id.tv_nfc_body)
@@ -99,7 +99,8 @@ class NFCFragment : Fragment() {
         if (intent == null || intent.extras == null) {
             return
         }
-        val tag = intent.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG) ?: return
+        val tag =
+            IntentCompat.getParcelableExtra(intent, NfcAdapter.EXTRA_TAG, Tag::class.java) ?: return
 
         val cscaBytes = requireContext().assets.open("csca.ks").use { it.readBytes() }
         if (!verifyCscaIntegrity(cscaBytes)) {
@@ -136,7 +137,7 @@ class NFCFragment : Fragment() {
                     this@NFCFragment.onPassportRead(passport)
                 }
 
-                override fun onAccessDeniedException(exception: AccessDeniedException) {
+                override fun onCardServiceProtocolException(exception: CardServiceProtocolException) {
                     Toast.makeText(
                         context,
                         getString(string.warning_authentication_failed),
@@ -147,18 +148,8 @@ class NFCFragment : Fragment() {
                     this@NFCFragment.onCardException(exception)
                 }
 
-                override fun onBACDeniedException(exception: BACDeniedException) {
-                    Toast.makeText(context, getString(string.warning_authentication_failed), Toast.LENGTH_SHORT).show()
-                    this@NFCFragment.onCardException(exception)
-                }
-
-                override fun onPACEException(exception: PACEException) {
-                    Toast.makeText(context, getString(string.warning_authentication_failed), Toast.LENGTH_SHORT).show()
-                    this@NFCFragment.onCardException(exception)
-                }
-
                 override fun onCardException(exception: CardServiceException) {
-                   if (exception.cause.isTagLostReason()) {
+                    if (exception.cause.isTagLostReason()) {
                         this@NFCFragment.onNFCTagLost()
                         return
                     }
@@ -174,7 +165,8 @@ class NFCFragment : Fragment() {
                         }
 
                         else -> {
-                            Toast.makeText(context, getString(string.warning_authentication_failed), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, getString(string.warning_authentication_failed), Toast.LENGTH_SHORT)
+                                .show()
                         }
                     }
                     this@NFCFragment.onCardException(exception)
@@ -187,7 +179,6 @@ class NFCFragment : Fragment() {
             })
 
         disposable.add(subscribe)
-
     }
 
     override fun onAttach(context: Context) {
@@ -360,5 +351,5 @@ class NFCFragment : Fragment() {
 
 private fun Throwable?.isTagLostReason(): Boolean {
     val isTransceiveFailedCause = this?.message?.contains("Transceive failed", true) ?: false
-    return this is TagLostException || (this is IOException  && isTransceiveFailedCause )
+    return this is TagLostException || (this is IOException && isTransceiveFailedCause)
 }

@@ -87,6 +87,7 @@ class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener {
     }
 
     public override fun onNewIntent(intent: Intent) {
+        @Suppress("DEPRECATION")
         if (NfcAdapter.ACTION_TAG_DISCOVERED == intent.action || NfcAdapter.ACTION_TECH_DISCOVERED == intent.action) {
             // drop NFC events
             handleIntent(intent)
@@ -129,7 +130,7 @@ class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener {
     override fun onEnableNfc() {
         if (nfcAdapter != null) {
             if (nfcAdapter?.isEnabled == false) {
-                showWirelessSettings()
+                showNfcSettings()
             }
             pendingIntent?.let {
                 nfcAdapter?.enableForegroundDispatch(this@NFCActivity, it, null, null)
@@ -177,9 +178,9 @@ class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener {
         }
     }
 
-    private fun showWirelessSettings() {
+    private fun showNfcSettings() {
         Toast.makeText(this, getString(string.warning_enable_nfc), Toast.LENGTH_SHORT).show()
-        val intent = Intent(Settings.ACTION_WIRELESS_SETTINGS)
+        val intent = Intent(Settings.ACTION_NFC_SETTINGS)
         startActivity(intent)
     }
 }

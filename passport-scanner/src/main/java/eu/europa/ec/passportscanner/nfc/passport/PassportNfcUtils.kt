@@ -20,12 +20,6 @@ package eu.europa.ec.passportscanner.nfc.passport
 import android.graphics.Bitmap
 import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.passportscanner.utils.ImageUtils
-import org.jmrtd.cert.CVCPrincipal
-import org.jmrtd.cert.CardVerifiableCertificate
-import org.jmrtd.lds.icao.DG2File
-import org.jmrtd.lds.icao.DG5File
-import org.jmrtd.lds.iso19794.FaceImageInfo
-import org.spongycastle.jce.provider.BouncyCastleProvider
 import java.io.ByteArrayInputStream
 import java.io.DataInputStream
 import java.io.IOException
@@ -45,9 +39,15 @@ import java.security.cert.PKIXCertPathBuilderResult
 import java.security.cert.TrustAnchor
 import java.security.cert.X509CertSelector
 import java.security.cert.X509Certificate
-import java.util.Arrays
 import java.util.Collections
 import javax.security.auth.x500.X500Principal
+import org.jmrtd.cert.CVCPrincipal
+import org.jmrtd.cert.CardVerifiableCertificate
+import org.jmrtd.lds.icao.DG2File
+import org.jmrtd.lds.icao.DG5File
+import org.jmrtd.lds.iso19794.FaceImageInfo
+import org.jmrtd.lds.iso19794.FaceInfo
+import org.spongycastle.jce.provider.BouncyCastleProvider
 
 object PassportNfcUtils {
 
@@ -62,8 +62,7 @@ object PassportNfcUtils {
     @Throws(IOException::class)
     fun retrieveFaceImage(dg2File: DG2File, logController: LogController): Bitmap {
         val allFaceImageInfos = ArrayList<FaceImageInfo>()
-        val faceInfos = dg2File.faceInfos
-        for (faceInfo in faceInfos) {
+        dg2File.subRecords.filterIsInstance<FaceInfo>().forEach { faceInfo ->
             allFaceImageInfos.addAll(faceInfo.faceImageInfos)
         }
 
@@ -82,7 +81,7 @@ object PassportNfcUtils {
     data class RawImageData(
         val imageBytes: ByteArray,
         val mimeType: String,
-        val imageLength: Int
+        val imageLength: Int,
     ) {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -108,8 +107,7 @@ object PassportNfcUtils {
     @Throws(IOException::class)
     fun retrieveFaceImageRaw(dg2File: DG2File): RawImageData {
         val allFaceImageInfos = ArrayList<FaceImageInfo>()
-        val faceInfos = dg2File.faceInfos
-        for (faceInfo in faceInfos) {
+        dg2File.subRecords.filterIsInstance<FaceInfo>().forEach { faceInfo ->
             allFaceImageInfos.addAll(faceInfo.faceImageInfos)
         }
 
@@ -157,7 +155,6 @@ object PassportNfcUtils {
         return ImageUtils.decodeImage(byteArrayInputStream, imageLength, mimeType, logController)
     }
 
-
     @Throws(GeneralSecurityException::class)
     fun getEACCredentials(
         caReference: CVCPrincipal,
@@ -185,13 +182,13 @@ object PassportNfcUtils {
     private fun getEACCredentials(
         caReference: CVCPrincipal?,
         cvcaStore: KeyStore,
-        logController: LogController
+        logController: LogController,
     ): EACCredentials? {
         if (caReference == null) {
             throw IllegalArgumentException("CA reference cannot be null")
         }
 
-        var privateKey: PrivateKey? = null
+        var privateKey: PrivateKey?
         var chain: Array<Certificate>? = null
 
         val aliases = Collections.list(cvcaStore.aliases())
@@ -220,7 +217,7 @@ object PassportNfcUtils {
                 return EACCredentials(privateKey, chain!!)
             }
             logController.d(TAG) {
-                "null chain or key for entry $alias: chain = ${Arrays.toString(chain)}"
+                "null chain or key for entry $alias: chain = ${chain.contentToString()}"
             }
             continue
         }

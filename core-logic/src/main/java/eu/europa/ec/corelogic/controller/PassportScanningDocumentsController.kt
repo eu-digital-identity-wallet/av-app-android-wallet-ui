@@ -20,7 +20,6 @@ import eu.europa.ec.authenticationlogic.controller.authentication.DeviceAuthenti
 import eu.europa.ec.authenticationlogic.model.BiometricCrypto
 import eu.europa.ec.businesslogic.extension.safeAsync
 import eu.europa.ec.businesslogic.extension.toErrorType
-import eu.europa.ec.businesslogic.model.ErrorType
 import eu.europa.ec.corelogic.config.WalletCoreConfig
 import eu.europa.ec.corelogic.extension.documentIdentifier
 import eu.europa.ec.corelogic.extension.getLocalizedDisplayName
@@ -38,6 +37,7 @@ import eu.europa.ec.eudi.wallet.issue.openid4vci.IssueEvent
 import eu.europa.ec.eudi.wallet.issue.openid4vci.OpenId4VciManager
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
+import java.util.Locale
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.ProducerScope
@@ -48,7 +48,6 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.Locale
 
 /**
  * Controller for passport scanning document issuance operations.
@@ -227,8 +226,8 @@ class PassportScanningDocumentsControllerImpl(
                 return@callbackFlow
             }
 
-            manager.issueDocumentByConfigurationIdentifier(
-                credentialConfigurationId = configId,
+            manager.issueDocumentByConfigurationIdentifiers(
+                credentialConfigurationIds = listOf(configId),
                 onIssueEvent = issuanceCallback()
             )
 

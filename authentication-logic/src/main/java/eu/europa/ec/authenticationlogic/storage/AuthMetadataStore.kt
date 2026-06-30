@@ -22,17 +22,18 @@ import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import com.google.crypto.tink.Aead
 import com.google.crypto.tink.KeyTemplate
+import com.google.crypto.tink.RegistryConfiguration
 import com.google.crypto.tink.aead.AeadConfig
 import com.google.crypto.tink.aead.AesGcmParameters
 import com.google.crypto.tink.integration.android.AndroidKeysetManager
 import eu.europa.ec.businesslogic.controller.log.LogController
+import java.io.File
+import java.nio.ByteBuffer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import java.io.File
-import java.nio.ByteBuffer
 
 class AuthMetadataStore(
     context: Context,
@@ -74,10 +75,10 @@ class AuthMetadataStore(
                 val aead = AndroidKeysetManager.Builder()
                     .withSharedPref(context, "tink_auth_keyset", "tink_auth_keyset_prefs")
                     .withKeyTemplate(keyTemplate)
-                    .withMasterKeyUri("android-keystore://$META_KEY_ALIAS")
+                    .withMasterKeyUri("android-keystore://${META_KEY_ALIAS}")
                     .build()
                     .keysetHandle
-                    .getPrimitive(Aead::class.java)
+                    .getPrimitive(RegistryConfiguration.get(), Aead::class.java)
                 val blobStore = DataStoreFactory.create(
                     corruptionHandler = ReplaceFileCorruptionHandler { ByteArray(0) },
                     serializer = TinkAeadSerializer(aead),
