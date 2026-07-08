@@ -25,6 +25,7 @@ import eu.europa.ec.businesslogic.provider.UuidProvider
 import eu.europa.ec.commonfeature.config.PresentationMode.DcApi as DcApiPresentationMode
 import eu.europa.ec.commonfeature.config.RequestUriConfig
 import eu.europa.ec.commonfeature.config.toDomainConfig
+import eu.europa.ec.commonfeature.ui.request.model.DocumentPayloadDomain
 import eu.europa.ec.commonfeature.ui.request.model.RequestDocumentItemUi
 import eu.europa.ec.commonfeature.ui.request.transformer.RequestTransformer
 import eu.europa.ec.corelogic.config.WalletCoreConfig
@@ -114,41 +115,7 @@ class PresentationRequestInteractorImpl(
                             verifierIsTrusted = response.verifierIsTrusted,
                         )
                     } else {
-                        val documentsDomain = RequestTransformer.transformToDomainItems(
-                            storageDocuments = walletCoreDocumentsController.getAllIssuedDocuments(),
-                            requestDocuments = response.requestData,
-                            resourceProvider = resourceProvider,
-                            uuidProvider = uuidProvider
-                        ).getOrThrow()
-                            .let { documents ->
-                                // The revoked-documents list lives in the vault-encrypted database. When the app
-                                // is resumed from background (e.g. via the OpenID4VP deeplink) the vault is locked,
-                                // so reading it here would fail. In that case we defer revocation enforcement to the
-                                // loading step, which runs after the user authenticates and the vault is unlocked.
-                                if (vaultKeyProvider.isUnlocked()) {
-                                    documents.filterNot {
-                                        walletCoreDocumentsController.isDocumentRevoked(it.docId)
-                                    }
-                                } else {
-                                    documents
-                                }
-                            }
-
-                        if (documentsDomain.isNotEmpty()) {
-                            Success(
-                                verifierName = response.verifierName,
-                                verifierIsTrusted = response.verifierIsTrusted,
-                                requestDocuments = RequestTransformer.transformToUiItems(
-                                    documentsDomain = documentsDomain,
-                                    resourceProvider = resourceProvider,
-                                )
-                            )
-                        } else {
-                            NoData(
-                                verifierName = response.verifierName,
-                                verifierIsTrusted = response.verifierIsTrusted,
-                            )
-                        }
+                        calculateRequestDocuments(response)
                     }
                 }
 
@@ -171,6 +138,49 @@ class PresentationRequestInteractorImpl(
                 errorType = it.toErrorType(),
             )
         }
+
+    private suspend fun calculateRequestDocuments(response: RequestReceived): PresentationRequestInteractorPartialState {
+        val documentsDomain = extractDocuments(response)
+
+        return if (documentsDomain.isNotEmpty()) {
+            Success(
+                verifierName = response.verifierName,
+                verifierIsTrusted = response.verifierIsTrusted,
+                requestDocuments = RequestTransformer.transformToUiItems(
+                    documentsDomain = documentsDomain,
+                    resourceProvider = resourceProvider,
+                )
+            )
+        } else {
+            NoData(
+                verifierName = response.verifierName,
+                verifierIsTrusted = response.verifierIsTrusted,
+            )
+        }
+    }
+
+    private suspend fun extractDocuments(response: RequestReceived): List<DocumentPayloadDomain> {
+        val documentsDomain = RequestTransformer.transformToDomainItems(
+            storageDocuments = walletCoreDocumentsController.getAllIssuedDocuments(),
+            requestDocuments = response.requestData,
+            resourceProvider = resourceProvider,
+            uuidProvider = uuidProvider
+        ).getOrThrow()
+            .let { documents ->
+                // The revoked-documents list lives in the vault-encrypted database. When the app
+                // is resumed from background (e.g. via the OpenID4VP deeplink) the vault is locked,
+                // so reading it here would fail. In that case we defer revocation enforcement to the
+                // loading step, which runs after the user authenticates and the vault is unlocked.
+                if (vaultKeyProvider.isUnlocked()) {
+                    documents.filterNot {
+                        walletCoreDocumentsController.isDocumentRevoked(it.docId)
+                    }
+                } else {
+                    documents
+                }
+            }
+        return documentsDomain
+    }
 
     override fun stopPresentation() {
         walletCorePresentationController.stopPresentation()

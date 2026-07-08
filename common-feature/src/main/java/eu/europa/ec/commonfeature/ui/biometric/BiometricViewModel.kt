@@ -272,8 +272,7 @@ class BiometricViewModel(
 
     private fun authenticate(context: Context) {
         viewModelScope.launch {
-            val result = biometricInteractor.unlockWithBiometrics(context)
-            when (result) {
+            when (val result = biometricInteractor.unlockWithBiometrics(context)) {
                 is BiometricVaultResult.Success -> authenticationSuccess()
                 is BiometricVaultResult.KeyInvalidated -> {
                     setState {
@@ -285,7 +284,7 @@ class BiometricViewModel(
                         )
                     }
                 }
-                is BiometricVaultResult.Cancelled -> { }
+                is BiometricVaultResult.Cancelled -> { setState { copy(error= null) } }
                 is BiometricVaultResult.Failed -> {
                     setState {
                         copy(

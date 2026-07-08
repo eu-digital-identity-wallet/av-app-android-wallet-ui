@@ -32,7 +32,6 @@ import java.security.SecureRandom
 import java.security.Security
 import java.security.Signature
 import java.security.cert.Certificate
-import java.security.cert.CertificateException
 import java.security.cert.X509Certificate
 import java.security.spec.MGF1ParameterSpec
 import java.security.spec.PSSParameterSpec
@@ -119,29 +118,6 @@ private constructor(private val logController: LogController) {
         set(docSigningPrivateKey) {
             field = docSigningPrivateKey
             updateCOMSODFile(null)
-        }
-
-    /**
-     * Gets the CVCA certificate.
-     *
-     * @return a CV certificate or null
-     */
-    /**
-     * Sets the CVCA certificate.
-     *
-     * @param cvCertificate the CV certificate
-     */
-    var cvCertificate: CardVerifiableCertificate? = null
-        set(cert) {
-            field = cert
-            try {
-                val holderRef = cert?.holderReference?.name ?: return
-                val cvcaFile =
-                    CVCAFile(PassportService.EF_CVCA, holderRef)
-                putFile(PassportService.EF_CVCA, cvcaFile.encoded)
-            } catch (ce: CertificateException) {
-                logController.e(TAG, ce) { "Certificate exception" }
-            }
         }
 
     private var service: PassportService? = null
@@ -474,29 +450,6 @@ private constructor(private val logController: LogController) {
     }
 
     /**
-     * Inserts a file into this document, and updates EF_COM and EF_SOd accordingly.
-     *
-     * @param fid the FID of the new file
-     * @param bytes the contents of the new file
-     */
-    private fun putFile(fid: Short, bytes: ByteArray?) {
-        if (bytes == null) {
-            return
-        }
-        try {
-            //lds.add(fid, new ByteArrayInputStream(bytes), bytes.length);
-            // FIXME: is this necessary?
-            if (fid != PassportService.EF_COM && fid != PassportService.EF_SOD && fid != PassportService.EF_CVCA) {
-                updateCOMSODFile(null)
-            }
-        } catch (ioe: Exception) {
-            logController.e(TAG, ioe) { "Failed to insert file" }
-        }
-
-        verificationStatus.setAll(VerificationStatus.Verdict.UNKNOWN, "Unknown") // FIXME: why all?
-    }
-
-    /**
      * Updates EF_COM and EF_SOd using a new document signing certificate.
      *
      * @param newCertificate a certificate
@@ -614,8 +567,8 @@ private constructor(private val logController: LogController) {
             }
 
             /* Get trust anchors. */
-            val cscaStores = trustManager?.cscaStores
-            if (cscaStores == null || cscaStores.size <= 0) {
+            val cscaStores = trustManager?.cscaStores?.toList()
+            if (cscaStores.isNullOrEmpty()) {
                 logController.w(TAG) { "No CSCA certificate stores found." }
                 verificationStatus.setCS(
                     VerificationStatus.Verdict.FAILED,
@@ -623,8 +576,8 @@ private constructor(private val logController: LogController) {
                     chain
                 )
             }
-            val cscaTrustAnchors = trustManager?.cscaAnchors
-            if (cscaTrustAnchors == null || cscaTrustAnchors.size <= 0) {
+            val cscaTrustAnchors = trustManager?.cscaAnchors?.toSet()
+            if (cscaTrustAnchors.isNullOrEmpty()) {
                 logController.w(TAG) { "No CSCA trust anchors found." }
                 verificationStatus.setCS(
                     VerificationStatus.Verdict.FAILED,
