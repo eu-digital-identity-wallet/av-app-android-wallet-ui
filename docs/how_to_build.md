@@ -11,7 +11,7 @@ This guide aims to assist developers in building the Android Wallet application.
 
 ## Prerequisites
 
-* **Java Development Kit (JDK):** JDK 8 or higher is required to compile Java or Kotlin code for Android
+* **Java Development Kit (JDK):** JDK 17 or higher is required (the project targets Java/JVM 17; Gradle test tasks use a JDK 21 launcher). Android Studio bundles a suitable JDK.
 * **Android Studio:** The official IDE for Android development, which includes essential tools like the Android SDK, build tools, and an emulator
 * **Android SDK Tools:** These provide libraries, debuggers, and other utilities needed for building Android apps
 * **Gradle:** The build automation system used to compile, package, and manage dependencies for your app
@@ -49,18 +49,19 @@ To run the App on a device, firstly you must connect your device with the Androi
 ### Running with remote services
 If you wish to test the application with the Issuer and Verifier services provided by the Toolbox, you can utilize the online services that are publicly available. The configuration below is already predefined within the app for this purpose.
 
-These are the contents of the ConfigWalletCoreImpl file (dev flavor), and you don't need to change anything:
+These are the contents of the `WalletCoreConfigImpl` file (dev flavor, at
+`core-logic/src/dev/java/eu/europa/ec/corelogic/config/WalletCoreConfigImpl.kt`), and you don't need to change anything:
 ```Kotlin
 override val vciConfig: List<OpenId4VciManager.Config>
     get() = listOf(
-       OpenId4VciManager.Config.Builder()
-      .withIssuerUrl(issuerUrl = "https://issuer.dev.ageverification.dev/")
-      .withClientId(clientId = "wallet-dev")
-      .withAuthFlowRedirectionURI(BuildConfig.ISSUE_AUTHORIZATION_DEEPLINK)
-          .withParUsage(OpenId4VciManager.Config.ParUsage.NEVER)
-          .withUseDPoPIfSupported(false)
-      .build()
-)
+        OpenId4VciManager.Config.Builder()
+            .withIssuerUrl(issuerUrl = "https://test.issuer.dev.ageverification.dev")
+            .withClientAuthenticationType(OpenId4VciManager.ClientAuthenticationType.AttestationBased)
+            .withAuthFlowRedirectionURI(BuildConfig.ISSUE_AUTHORIZATION_DEEPLINK)
+            .withParUsage(OpenId4VciManager.Config.ParUsage.NEVER)
+            .withDPopConfig(DPopConfig.Default)
+            .build()
+    )
 ```
 
 ### Running with local services
@@ -72,46 +73,49 @@ For detailed instructions on how to set up each of these components, please refe
 * [Web Verifier Endpoint](https://github.com/eu-digital-identity-wallet/eudi-srv-web-verifier-endpoint-23220-4-kt)
 
 After this, and assuming you are now running everything locally,
-you need to change the contents of the ConfigWalletCoreImpl file, from:
+you need to change the contents of the `WalletCoreConfigImpl` file, from:
 ```Kotlin
 override val vciConfig: List<OpenId4VciManager.Config>
     get() = listOf(
-       OpenId4VciManager.Config.Builder()
-      .withIssuerUrl(issuerUrl = "https://issuer.dev.ageverification.dev/")
-      .withClientId(clientId = "wallet-dev")
-      .withAuthFlowRedirectionURI(BuildConfig.ISSUE_AUTHORIZATION_DEEPLINK)
-          .withParUsage(OpenId4VciManager.Config.ParUsage.NEVER)
-          .withUseDPoPIfSupported(false)
-      .build()
-)
+        OpenId4VciManager.Config.Builder()
+            .withIssuerUrl(issuerUrl = "https://test.issuer.dev.ageverification.dev")
+            .withClientAuthenticationType(OpenId4VciManager.ClientAuthenticationType.AttestationBased)
+            .withAuthFlowRedirectionURI(BuildConfig.ISSUE_AUTHORIZATION_DEEPLINK)
+            .withParUsage(OpenId4VciManager.Config.ParUsage.NEVER)
+            .withDPopConfig(DPopConfig.Default)
+            .build()
+    )
 ```
 with this:
 ```Kotlin
 override val vciConfig: List<OpenId4VciManager.Config>
     get() = listOf(
-       OpenId4VciManager.Config.Builder()
-      .withIssuerUrl(issuerUrl = "local_IP_address_of_issuer")
-      .withClientId(clientId = "wallet-dev")
-      .withAuthFlowRedirectionURI(BuildConfig.ISSUE_AUTHORIZATION_DEEPLINK)
-          .withParUsage(OpenId4VciManager.Config.ParUsage.NEVER)
-          .withUseDPoPIfSupported(false)
-      .build()
-)
+        OpenId4VciManager.Config.Builder()
+            .withIssuerUrl(issuerUrl = "local_IP_address_of_issuer")
+            .withClientAuthenticationType(OpenId4VciManager.ClientAuthenticationType.AttestationBased)
+            .withAuthFlowRedirectionURI(BuildConfig.ISSUE_AUTHORIZATION_DEEPLINK)
+            .withParUsage(OpenId4VciManager.Config.ParUsage.NEVER)
+            .withDPopConfig(DPopConfig.Default)
+            .build()
+    )
 ```
 
 for example:
 ```Kotlin
 override val vciConfig: List<OpenId4VciManager.Config>
     get() = listOf(
-       OpenId4VciManager.Config.Builder()
-      .withIssuerUrl(issuerUrl = "https://10.0.2.2")
-      .withClientId(clientId = "wallet-dev")
-      .withAuthFlowRedirectionURI(BuildConfig.ISSUE_AUTHORIZATION_DEEPLINK)
-          .withParUsage(OpenId4VciManager.Config.ParUsage.NEVER)
-          .withUseDPoPIfSupported(false)
-      .build()
-)
+        OpenId4VciManager.Config.Builder()
+            .withIssuerUrl(issuerUrl = "https://10.0.2.2")
+            .withClientAuthenticationType(OpenId4VciManager.ClientAuthenticationType.AttestationBased)
+            .withAuthFlowRedirectionURI(BuildConfig.ISSUE_AUTHORIZATION_DEEPLINK)
+            .withParUsage(OpenId4VciManager.Config.ParUsage.NEVER)
+            .withDPopConfig(DPopConfig.Default)
+            .build()
+    )
 ```
+
+> **Note:** If you also use the passport-scanning flow locally, point the separate
+> `passportScanningIssuerConfig` issuer URL at your local passport-scanning issuer in the same file.
 ## Why 10.0.2.2?
 
 When using the Android emulator, 10.0.2.2 is a special alias that routes to localhost on your development machine.
