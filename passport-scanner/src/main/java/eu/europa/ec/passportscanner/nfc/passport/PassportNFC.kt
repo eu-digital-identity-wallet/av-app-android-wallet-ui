@@ -1004,10 +1004,10 @@ private constructor(private val logController: LogController) {
                 }
             } catch (e: Exception) {
                 if (e is InvalidAlgorithmParameterException) {
-                    logController.w(TAG) { "findSaltRsaPss: Invalid param with salt value: $i. ${e.message}" }
+                    logController.w(TAG) { "findSaltRsaPss: Invalid param with salt value: $i (${e.javaClass.simpleName})" }
                     continue
                 } else {
-                    logController.e(TAG) { "findSaltRSA_PSS: ${e.message}" }
+                    logController.e(TAG) { "findSaltRSA_PSS: signature verification failed (${e.javaClass.simpleName})" }
                 }
             }
         }
