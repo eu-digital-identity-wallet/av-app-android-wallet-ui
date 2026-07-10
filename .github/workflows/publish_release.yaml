@@ -65,14 +65,21 @@ jobs:
       - name: Read version from version file and set as TAG_NAME
         run: |
           TAG_NAME=$(grep '^VERSION_NAME=' version.properties | cut -d'=' -f2-)
+          VERSION_CODE=$(grep '^VERSION_CODE=' version.properties | cut -d'=' -f2-)
           echo "TAG_NAME=$TAG_NAME"
+          echo "VERSION_CODE=$VERSION_CODE"
           echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
+          echo "VERSION_CODE=$VERSION_CODE" >> $GITHUB_ENV
 
       - name: Build DEMO release APK
         run: ./gradlew assembleDemoRelease
+        env:
+          VERSION_CODE: ${{ env.VERSION_CODE }}
 
       - name: Build DEMO release Bundle (AAB)
         run: ./gradlew bundleDemoRelease
+        env:
+          VERSION_CODE: ${{ env.VERSION_CODE }}
 
       - name: Create Tag with version
         run: |
