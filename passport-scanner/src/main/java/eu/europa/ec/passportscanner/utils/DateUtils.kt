@@ -45,7 +45,7 @@ object DateUtils {
         dateString: String?,
         fromPattern: String = "yyMMdd",
         toPattern: String = "MM/dd/yyyy",
-        locale: Locale? = Locale("en"),
+        locale: Locale? = Locale.ENGLISH,
         threshold: Int? = null,
         logController: LogController
     ): String? {

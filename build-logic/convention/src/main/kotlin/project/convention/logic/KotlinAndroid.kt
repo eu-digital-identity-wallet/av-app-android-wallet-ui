@@ -26,7 +26,6 @@ import org.gradle.jvm.toolchain.JavaToolchainService
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.getByType
-import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -38,7 +37,7 @@ internal fun Project.configureKotlinAndroid(
     commonExtension: CommonExtension,
 ) {
     commonExtension.apply {
-        compileSdk = 36
+        compileSdk = 37
 
         defaultConfig.minSdk = 29
 
@@ -94,8 +93,7 @@ private fun Project.configureKotlin() {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
 
-            val warningsAsErrors: String? by project
-            allWarningsAsErrors.set(warningsAsErrors.toBoolean())
+            allWarningsAsErrors.set(true)
             freeCompilerArgs.addAll(
                 "-opt-in=kotlin.RequiresOptIn",
                 "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",

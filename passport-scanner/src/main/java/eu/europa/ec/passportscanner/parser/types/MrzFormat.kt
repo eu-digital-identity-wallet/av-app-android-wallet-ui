@@ -56,7 +56,7 @@ enum class MrzFormat(
      */
     fun newRecord(): MrzRecord {
         try {
-            return recordClass.newInstance()
+            return recordClass.getDeclaredConstructor().newInstance()
         } catch (ex: Exception) {
             throw RuntimeException(ex)
         }

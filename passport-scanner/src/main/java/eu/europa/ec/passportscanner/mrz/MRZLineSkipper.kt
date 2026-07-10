@@ -164,7 +164,7 @@ class MRZLineSkipper(
                 null
             }
         } catch (e: Exception) {
-            logController.d(TAG) { "Parse failed: ${e.message}" }
+            logController.d(TAG) { "Parse failed (${e.javaClass.simpleName})" }
             null
         }
     }

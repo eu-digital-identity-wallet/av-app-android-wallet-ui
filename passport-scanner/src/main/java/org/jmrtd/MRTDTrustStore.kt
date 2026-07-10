@@ -32,6 +32,7 @@ import java.security.cert.Certificate
 import java.security.cert.TrustAnchor
 import java.security.cert.X509CertSelector
 import java.security.cert.X509Certificate
+import org.bouncycastle.jce.provider.BouncyCastleProvider
 
 /**
  * Provides lookup for certificates, keys, CRLs used in
@@ -54,33 +55,6 @@ class MRTDTrustStore
     var cscaStores: MutableList<CertStore>? = ArrayList(),
     var cvcaStores: MutableList<KeyStore>? = ArrayList()
 ) {
-
-    /**
-     * Gets the root certificates for document validation.
-     *
-     * @return the cscaAnchors
-     */
-    fun getCSCAAnchors(): Set<TrustAnchor>? {
-        return cscaAnchors
-    }
-
-    /**
-     * Gets the certificates used in document validation.
-     *
-     * @return the cscaStores
-     */
-    fun getCSCAStores(): List<CertStore>? {
-        return cscaStores
-    }
-
-    /**
-     * Gets the certificates used for access to EAC protected data groups.
-     *
-     * @return the cvcaStores
-     */
-    fun getCVCAStores(): List<KeyStore>? {
-        return cvcaStores
-    }
 
     /**
      * Adds root certificates for document validation.
@@ -118,7 +92,7 @@ class MRTDTrustStore
     companion object {
 
         init {
-            Security.insertProviderAt(org.spongycastle.jce.provider.BouncyCastleProvider(), 1)
+            Security.insertProviderAt(BouncyCastleProvider(), 1)
         }
 
         private val SELF_SIGNED_X509_CERT_SELECTOR = object : X509CertSelector() {

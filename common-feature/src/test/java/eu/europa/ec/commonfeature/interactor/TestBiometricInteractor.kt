@@ -44,7 +44,7 @@ import org.robolectric.annotation.Config
 import javax.crypto.Cipher
 
 @RunWith(RobolectricTestRunner::class)
-@Config(application = TestApplication::class)
+@Config(application = TestApplication::class, sdk = [36])
 class TestBiometricInteractor {
 
     @get:Rule

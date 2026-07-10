@@ -126,6 +126,8 @@
 -keep class eu.europa.ec.commonfeature.config.** { *; }
 -keep class eu.europa.ec.onboardingfeature.config.** { *; }
 -keep class eu.europa.ec.uilogic.config.** { *; }
+-keep class eu.europa.ec.uilogic.navigation.** { *; }
+-keep class eu.europa.ec.uilogic.component.** { *; }
 
 # Keep DocumentId for serialization
 -keep class eu.europa.ec.eudi.wallet.document.DocumentExtensions { *; }
@@ -218,3 +220,32 @@
     native <methods>;
     *;
 }
+
+# ML Kit Text Recognition rules
+-keep class com.google.mlkit.** { *; }
+-keep class com.google.android.gms.internal.mlkit_vision_** { *; }
+-keep class com.google.android.gms.internal.mlkit_common.** { *; }
+-keep class com.google.android.libraries.vision.visionkit.** { *; }
+-keep class com.google.android.gms.dynamite.descriptors.com.google.mlkit.dynamite.** { *; }
+-keep class com.google.android.gms.common.internal.safeparcel.SafeParcelable {
+    public static final *** CREATOR;
+}
+-keep public class com.google.android.gms.common.internal.ReflectedParcelable
+-keep public class * extends com.google.android.gms.common.internal.ReflectedParcelable
+-keep public class * implements com.google.android.gms.common.internal.ReflectedParcelable
+
+-keep class com.google.android.gms.common.annotation.KeepName { *; }
+-keepnames class * {
+    @com.google.android.gms.common.annotation.KeepName *;
+}
+-keepclassmembernames class * {
+    @com.google.android.gms.common.annotation.KeepName *;
+}
+
+-dontwarn com.google.android.gms.**
+-dontwarn com.google.mlkit.**
+
+# MRZ parser instantiates record classes via reflection
+# (MrzFormat.newRecord -> recordClass.getDeclaredConstructor().newInstance())
+-keep class eu.europa.ec.passportscanner.parser.MrzRecord { <init>(...); }
+-keep class eu.europa.ec.passportscanner.parser.records.** { <init>(...); <fields>; }

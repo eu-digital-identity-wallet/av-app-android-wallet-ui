@@ -25,16 +25,34 @@ interface WalletCoreConfig {
     // 2. Wallet Provider Host
     val walletProviderHost: String
 
-    // 3. Trusted certificates
+    // 3. Trusted certificates / EudiWallet configuration
     val config: EudiWalletConfig
+
+    // 4. Whether document keys require Android user authentication before creation or use
+    val userAuthenticationRequired: Boolean
+
+    // 5. Predefined set of document categories and their associated identifiers
+    val documentCategories: DocumentCategories
+
+    // 6. Interval at which revocations are checked
+    val revocationInterval: Duration
+
+    // 7. Document issuance rules (default rule + per-document overrides)
+    val documentIssuanceConfig: DocumentIssuanceConfig
+
+    // 8. Passport scanning issuer (separate endpoint for age verification documents)
+    val passportScanningIssuerConfig: OpenId4VciManager.Config?
+
+    // 9. Face match SDK model sources and thresholds
+    val faceMatchConfig: FaceMatchConfig
 }
 ```
 
 You configure these properties **per flavor** by providing a `WalletCoreConfigImpl` for each build
 variant:
 
-* `core-logic/src/demo/config/WalletCoreConfigImpl.kt`
-* `core-logic/src/dev/config/WalletCoreConfigImpl.kt`
+* `core-logic/src/demo/java/eu/europa/ec/corelogic/config/WalletCoreConfigImpl.kt`
+* `core-logic/src/dev/java/eu/europa/ec/corelogic/config/WalletCoreConfigImpl.kt`
 
 Each flavor can use different issuer URLs, wallet provider hosts, and trust stores.
 
@@ -46,7 +64,7 @@ Each flavor can use different issuer URLs, wallet provider hosts, and trust stor
     override val vciConfig: List<OpenId4VciManager.Config>
         get() = listOf(
            OpenId4VciManager.Config.Builder()
-          .withIssuerUrl(issuerUrl = "https://issuer.eudiw.dev")
+          .withIssuerUrl(issuerUrl = "https://test.issuer.dev.ageverification.dev")
           .withClientAuthenticationType(OpenId4VciManager.ClientAuthenticationType.AttestationBased)
           .withAuthFlowRedirectionURI(BuildConfig.ISSUE_AUTHORIZATION_DEEPLINK)
           .withParUsage(OpenId4VciManager.Config.ParUsage.IF_SUPPORTED)
@@ -63,7 +81,7 @@ Each flavor can use different issuer URLs, wallet provider hosts, and trust stor
 
     ```kotlin
     override val walletProviderHost: String
-        get() = "https://wallet-provider.eudiw.dev"
+        get() = "https://wallet-provider.ageverification.dev"
     ```
 
    Again, set a different value per flavor in the corresponding `WalletCoreConfigImpl`.
@@ -74,7 +92,7 @@ Each flavor can use different issuer URLs, wallet provider hosts, and trust stor
 
     ```kotlin
     _config = EudiWalletConfig {
-       configureReaderTrustStore(context, R.raw.eudi_pid_issuer_ut)
+       configureReaderTrustStore(context, R.raw.av_issuer_ca01)
     }
     ```
 
@@ -117,42 +135,57 @@ flows.
 If you want to adjust any schema, you can alter the *AndroidLibraryConventionPlugin* inside the build-logic module.
 
 ```kotlin
+val walletScheme = "av"
+val walletHost = "*"
+
 val eudiOpenId4VpScheme = "eudi-openid4vp"
-val eudiOpenid4VpHost = "*"
+val eudiOpenid4VpHost = "authorize"
 
 val mdocOpenId4VpScheme = "mdoc-openid4vp"
-val mdocOpenid4VpHost = "*"
+val mdocOpenid4VpHost = "authorize"
 
 val openId4VpScheme = "openid4vp"
-val openid4VpHost = "*"
+val openid4VpHost = "authorize"
 
 val avspScheme = "avsp"
-val avspHost = "*"
+val avspHost = "present"
+
+val avScheme = "av"
+val avHost = "*"
 
 val credentialOfferScheme = "openid-credential-offer"
-val credentialOfferHost = "*"
+val credentialOfferHost = "credential_offer"
+
+val openId4VciAuthorizationScheme = "eu.europa.ec.av"
+val openId4VciAuthorizationHost = "authorization"
 ```
 
 Let's assume you want to change the credential offer schema to custom-my-offer:// the *AndroidLibraryConventionPlugin* should look like this:
 
 ```kotlin
+val walletScheme = "av"
+val walletHost = "*"
+
 val eudiOpenId4VpScheme = "eudi-openid4vp"
-val eudiOpenid4VpHost = "*"
+val eudiOpenid4VpHost = "authorize"
 
 val mdocOpenId4VpScheme = "mdoc-openid4vp"
-val mdocOpenid4VpHost = "*"
+val mdocOpenid4VpHost = "authorize"
 
 val openId4VpScheme = "openid4vp"
-val openid4VpHost = "*"
+val openid4VpHost = "authorize"
 
 val avspScheme = "avsp"
-val avspHost = "*"
+val avspHost = "present"
+
+val avScheme = "av"
+val avHost = "*"
 
 val credentialOfferScheme = "custom-my-offer"
-val credentialOfferHost = "*"
+val credentialOfferHost = "credential_offer"
 
-val credentialOfferHaipScheme = "haip-vci"
-val credentialOfferHaipHost = "*"
+val openId4VciAuthorizationScheme = "eu.europa.ec.av"
+val openId4VciAuthorizationHost = "authorization"
 ```
 
 In case of an additive change, e.g., adding an extra credential offer schema, you must adjust the following.
@@ -161,10 +194,7 @@ AndroidLibraryConventionPlugin:
 
 ```kotlin
 val credentialOfferScheme = "openid-credential-offer"
-val credentialOfferHost = "*"
-
-val credentialOfferHaipScheme = "haip-vci"
-val credentialOfferHaipHost = "*"
+val credentialOfferHost = "credential_offer"
 
 val myOwnCredentialOfferScheme = "custom-my-offer"
 val myOwnCredentialOfferHost = "*"
@@ -174,15 +204,12 @@ val myOwnCredentialOfferHost = "*"
 // Manifest placeholders used for OpenId4VCI
 manifestPlaceholders["credentialOfferHost"] = credentialOfferHost
 manifestPlaceholders["credentialOfferScheme"] = credentialOfferScheme
-manifestPlaceholders["credentialOfferHaipHost"] = credentialOfferHaipHost
-manifestPlaceholders["credentialOfferHaipScheme"] = credentialOfferHaipScheme
 manifestPlaceholders["myOwnCredentialOfferHost"] = myOwnCredentialOfferHost
 manifestPlaceholders["myOwnCredentialOfferScheme"] = myOwnCredentialOfferScheme
 ```
 
 ```kotlin
 addConfigField("CREDENTIAL_OFFER_SCHEME", credentialOfferScheme)
-addConfigField("CREDENTIAL_OFFER_HAIP_SCHEME", credentialOfferHaipScheme)
 addConfigField("MY_OWN_CREDENTIAL_OFFER_SCHEME", myOwnCredentialOfferScheme)
 ```
 
@@ -198,18 +225,6 @@ Android Manifest (inside assembly-logic module):
     <data
         android:host="${credentialOfferHost}"
         android:scheme="${credentialOfferScheme}" />
-
-</intent-filter>
-
-<intent-filter>
-    <action android:name="android.intent.action.VIEW" />
-    
-    <category android:name="android.intent.category.DEFAULT" />
-    <category android:name="android.intent.category.BROWSABLE" />
-    
-    <data
-        android:host="${credentialOfferHaipHost}"
-        android:scheme="${credentialOfferHaipScheme}" />
 
 </intent-filter>
 
@@ -235,16 +250,14 @@ enum class DeepLinkType(val schemas: List<String>, val host: String? = null) {
         schemas = listOf(
             BuildConfig.OPENID4VP_SCHEME,
             BuildConfig.EUDI_OPENID4VP_SCHEME,
-            BuildConfig.MDOC_OPENID4VP_SCHEME, 
+            BuildConfig.MDOC_OPENID4VP_SCHEME,
             BuildConfig.AVSP_SCHEME,
-            BuildConfig.AV_SCHEME,
-            BuildConfig.MY_OWN_CREDENTIAL_OFFER_SCHEME
+            BuildConfig.AV_SCHEME
         )
     ),
     CREDENTIAL_OFFER(
         schemas = listOf(
             BuildConfig.CREDENTIAL_OFFER_SCHEME,
-            BuildConfig.CREDENTIAL_OFFER_HAIP_SCHEME,
             BuildConfig.MY_OWN_CREDENTIAL_OFFER_SCHEME
         )
     ),
@@ -252,10 +265,12 @@ enum class DeepLinkType(val schemas: List<String>, val host: String? = null) {
         schemas = listOf(BuildConfig.ISSUE_AUTHORIZATION_SCHEME),
         host = BuildConfig.ISSUE_AUTHORIZATION_HOST
     ),
-    DYNAMIC_PRESENTATION(
+    EXTERNAL(
         emptyList()
     ),
-    EXTERNAL(emptyList())
+    DYNAMIC_PRESENTATION(
+        emptyList()
+    );
 }
 ```
 
@@ -269,6 +284,7 @@ configureOpenId4Vp {
          BuildConfig.EUDI_OPENID4VP_SCHEME,
          BuildConfig.MDOC_OPENID4VP_SCHEME,
          BuildConfig.AVSP_SCHEME,
+         BuildConfig.AV_SCHEME,
          BuildConfig.YOUR_OWN_OPENID4VP_SCHEME
       )
    )
@@ -284,68 +300,29 @@ If you want to add or adjust the displayed scoped documents, you must modify the
 
 ### Passport Scanning Issuer Configuration
 
-The application supports multiple issuers for different credential types. By convention, if the
-`vciConfig` list contains multiple issuers, the **second issuer (index 1)** is used for passport
-scanning flows. This allows age verification documents to be issued through a dedicated endpoint
-after passport scanning.
+The application uses a **dedicated** `passportScanningIssuerConfig` property (declared on
+`WalletCoreConfig`) to issue age verification documents after a passport scan. This is a separate
+`OpenId4VciManager.Config` from the regular `vciConfig` entry — it is **not** the second element of
+the `vciConfig` list.
 
-The configuration is flavor-specific and defined in src/demo/config/WalletCoreConfigImpl and
-src/dev/config/WalletCoreConfigImpl.
+The configuration is flavor-specific and defined in
+`core-logic/src/demo/java/eu/europa/ec/corelogic/config/WalletCoreConfigImpl` and
+`core-logic/src/dev/java/eu/europa/ec/corelogic/config/WalletCoreConfigImpl`.
 
-**Dev Flavor Configuration:**
-
-```Kotlin
-override val vciConfig: List<OpenId4VciManager.Config>
-    get() = listOf(
-        // First issuer - for regular credentials
-        OpenId4VciManager.Config.Builder()
-            .withIssuerUrl(issuerUrl = "https://dev.issuer.eudiw.dev")
-            .withClientId(clientId = "wallet-dev")
-            .withAuthFlowRedirectionURI(BuildConfig.ISSUE_AUTHORIZATION_DEEPLINK)
-            .withParUsage(OpenId4VciManager.Config.ParUsage.NEVER)
-            .withUseDPoPIfSupported(false)
-            .build(),
-        // Second issuer - for passport scanning credentials
-        OpenId4VciManager.Config.Builder()
-            .withIssuerUrl(issuerUrl = "https://issuer.dev.ageverification.dev")
-            .withClientId(clientId = "wallet-dev")
-            .withAuthFlowRedirectionURI(BuildConfig.ISSUE_AUTHORIZATION_DEEPLINK)
-            .withParUsage(OpenId4VciManager.Config.ParUsage.NEVER)
-            .withUseDPoPIfSupported(false)
-            .build()
-    )
-```
-
-**Demo Flavor Configuration:**
+**Example (Dev / Demo flavor):**
 
 ```Kotlin
-override val vciConfig: List<OpenId4VciManager.Config>
-    get() = listOf(
-        // First issuer - for regular credentials
-        OpenId4VciManager.Config.Builder()
-            .withIssuerUrl(issuerUrl = "https://issuer.ageverification.dev")
-            .withClientAuthenticationType(
-                OpenId4VciManager.ClientAuthenticationType.None(
-                    clientId = "wallet-dev"
-                )
-            )
-            .withAuthFlowRedirectionURI(BuildConfig.ISSUE_AUTHORIZATION_DEEPLINK)
-            .withParUsage(OpenId4VciManager.Config.ParUsage.NEVER)
-            .withDPoPUsage(OpenId4VciManager.Config.DPoPUsage.Disabled)
-            .build(),
-        // Second issuer - for passport scanning credentials
-        OpenId4VciManager.Config.Builder()
-            .withIssuerUrl(issuerUrl = "https://issuer.dev.ageverification.dev")
-            .withClientAuthenticationType(
-                OpenId4VciManager.ClientAuthenticationType.None(
-                    clientId = "wallet-dev"
-                )
-            )
-            .withAuthFlowRedirectionURI(BuildConfig.ISSUE_AUTHORIZATION_DEEPLINK)
-            .withParUsage(OpenId4VciManager.Config.ParUsage.NEVER)
-            .withDPoPUsage(OpenId4VciManager.Config.DPoPUsage.Disabled)
-            .build()
-    )
+/**
+ * Configuration for the passport scanning issuer.
+ */
+override val passportScanningIssuerConfig: OpenId4VciManager.Config =
+    OpenId4VciManager.Config.Builder()
+        .withIssuerUrl(issuerUrl = "https://passport.issuer.dev.ageverification.dev")
+        .withClientAuthenticationType(OpenId4VciManager.ClientAuthenticationType.AttestationBased)
+        .withAuthFlowRedirectionURI(BuildConfig.ISSUE_AUTHORIZATION_DEEPLINK)
+        .withParUsage(OpenId4VciManager.Config.ParUsage.NEVER)
+        .withDPoPUsage(OpenId4VciManager.Config.DPoPUsage.Disabled)
+        .build()
 ```
 
 The passport scanning issuer configuration is optional. If the `vciConfig` list contains only one
@@ -364,42 +341,63 @@ The application uses AI models for face liveness detection and face matching dur
 verification flows. These models are configured via the `faceMatchConfig` property in the
 *WalletCoreConfig* interface.
 
-The configuration is flavor-specific and defined in src/demo/config/WalletCoreConfigImpl and
-src/dev/config/WalletCoreConfigImpl.
+The configuration is flavor-specific and defined in
+`core-logic/src/demo/java/eu/europa/ec/corelogic/config/WalletCoreConfigImpl` and
+`core-logic/src/dev/java/eu/europa/ec/corelogic/config/WalletCoreConfigImpl`.
 
 **Configuration Structure:**
 
+Model sources are modeled by the `FaceMatchModelSource` sealed interface — a model is either an
+asset bundled in the APK or a remote URL that is verified against a pinned SHA-256 digest. A
+configuration cannot supply a remote URL without also pinning its hash; downloads whose hash does
+not match are discarded.
+
 ```Kotlin
+sealed interface FaceMatchModelSource {
+    /** Model shipped inside the APK as an asset file. */
+    data class Asset(val filename: String) : FaceMatchModelSource
+
+    /**
+     * Model fetched from [url] (must be https) and verified against [sha256Hex]
+     * (case-insensitive hex digest). Downloads whose hash does not match are discarded.
+     */
+    data class Remote(val url: String, val sha256Hex: String) : FaceMatchModelSource
+}
+
 data class FaceMatchConfig(
-    val faceDetectorModel: String,        // Model for detecting faces in images
-    val embeddingExtractorModel: String,  // Model for extracting face embeddings
-    val livenessModel0: String,           // First liveness detection model
-    val livenessModel1: String,           // Second liveness detection model
+    val faceDetectorModel: FaceMatchModelSource,
+    val embeddingExtractorModel: FaceMatchModelSource,
+    val livenessModel0: FaceMatchModelSource,
+    val livenessModel1: FaceMatchModelSource,
     val livenessThreshold: Double,        // Threshold for liveness detection (0.0-1.0)
+    /** Minimum cosine-similarity score to accept as the same subject. Recommended to be >= 0.8. */
     val matchingThreshold: Double,        // Threshold for face matching (0.0-1.0)
 )
 ```
 
-**Example Configuration:**
+**Example Configuration (Dev / Demo flavor):**
 
 ```Kotlin
 override val faceMatchConfig: FaceMatchConfig = FaceMatchConfig(
-    faceDetectorModel = "https://github.com/your-org/models/releases/download/v1.0/face_detector.tflite",
-    embeddingExtractorModel = "https://github.com/your-org/models/releases/download/v1.0/embedding_extractor.tflite",
-    livenessModel0 = "https://github.com/your-org/models/releases/download/v1.0/liveness_model_0.tflite",
-    livenessModel1 = "https://github.com/your-org/models/releases/download/v1.0/liveness_model_1.tflite",
-    livenessThreshold = 0.85,  // 85% confidence for liveness
-    matchingThreshold = 0.75,  // 75% confidence for face matching
+    faceDetectorModel = FaceMatchModelSource.Asset("mediapipe_long.onnx"),
+    embeddingExtractorModel = FaceMatchModelSource.Remote(
+        url = "https://github.com/eu-digital-identity-wallet/av-app-android-wallet-ui/releases/download/2025.10-2/glintr100.onnx",
+        sha256Hex = "a7933ea5330113b01c9b60351d8f4c33003f145d8470ac5f0e52ee2effe25c60",
+    ),
+    livenessModel0 = FaceMatchModelSource.Asset("silentface40.onnx"),
+    livenessModel1 = FaceMatchModelSource.Asset("silentface27.onnx"),
+    livenessThreshold = 0.972017,
+    matchingThreshold = 0.5,
 )
 ```
 
-**Model Path Options:**
+**Model Source Options:**
 
-The model paths can be specified as:
+The model sources can be specified as:
 
-- Remote URLs (HTTP/HTTPS) for downloading models at runtime
-- Local asset paths (e.g., `file:///android_asset/models/face_detector.tflite`)
-- Local file paths on device storage
+- `FaceMatchModelSource.Asset(filename)` — model bundled in the APK assets
+- `FaceMatchModelSource.Remote(url, sha256Hex)` — model downloaded over HTTPS at runtime and
+  verified against the pinned SHA-256 digest
 
 **Threshold Configuration:**
 
@@ -414,6 +412,8 @@ The model paths can be specified as:
 >
 > The models referenced in the default configuration are currently hosted on GitHub Releases for
 > development and testing purposes only. **This is NOT recommended for production environments.**
+> Remote model sources must always be paired with a pinned `sha256Hex` so a tampered or
+> misissued download is rejected.
 
 ## Batch Document Issuance Configuration
 
@@ -510,38 +510,94 @@ interface PinStorageProvider {
 
 Implementation Example:
 
+The default implementation is `PinStorageProviderImpl` (in the `authentication-logic` module). It
+does **not** store a raw PIN hash. Instead it derives a per-PIN key with **Argon2**
+(`Argon2KeyDerivation`), uses that key to AES-GCM-encrypt a random 32-byte *vault key*, and persists
+the wrapped vault key plus the Argon2 parameters (m, t, parallelism) and salt in an `AuthMetadata`
+record. On validation the PIN is re-derived through Argon2, the vault key is unwrapped with
+AES-GCM (which doubles as an authenticity check), and the vault key is handed to the
+`VaultKeyProvider` on success. PIN material and derived keys are zeroed after use.
+
 ```kotlin
-class PrefsPinStorageProvider(
-    private val prefsController: PrefsController,
+class PinStorageProviderImpl(
+    private val authMetadataStore: AuthMetadataStore,
     private val clock: ElapsedRealtimeClock,
     private val bootIdProvider: BootIdProvider,
+    private val vaultKeyProvider: VaultKeyProvider,
 ) : PinStorageProvider {
 
-    override fun hasPin(): Boolean {
-        return prefsController.getString(KEY_PIN_HASH, "").isNotEmpty()
-    }
-
     override fun setPin(pin: String) {
-        val salt = generateSalt()
-        val hash = hashPin(pin, salt)
-        prefsController.setString(KEY_PIN_HASH, hash.toHexString())
-        prefsController.setString(KEY_PIN_SALT, salt.toHexString())
-        resetFailedAttempts()
+        val pinChars = pin.toCharArray()
+        try {
+            val pinSalt = ByteArray(Argon2KeyDerivation.SALT_LEN)
+                .also { SecureRandom().nextBytes(it) }
+            val kPin = Argon2KeyDerivation.derive(pinChars, pinSalt)
+
+            // ...create or rotate a 32-byte vault key, wrap it with kPin via AES-GCM...
+            val (wrappedVaultIv, wrappedVault) = aesGcmEncrypt(kPin, kVault, pinSalt)
+            kPin.fill(0)
+
+            runBlocking {
+                authMetadataStore.write(
+                    AuthMetadata(
+                        version = 0x01,
+                        kdfAlgo = KDF_ALGO,
+                        kdfM = Argon2KeyDerivation.M_COST_KIB,
+                        kdfT = Argon2KeyDerivation.T_COST,
+                        kdfP = Argon2KeyDerivation.PARALLELISM,
+                        pinSalt = pinSalt,
+                        wrappedVaultIv = wrappedVaultIv,
+                        wrappedVault = wrappedVault,
+                        bootId = bootIdProvider.currentBootId(),
+                    )
+                )
+            }
+        } finally {
+            pinChars.fill('\u0000')
+        }
     }
 
     override fun isPinValid(pin: String): Boolean {
-        val storedHashHex = prefsController.getString(KEY_PIN_HASH, "")
-        val saltHex = prefsController.getString(KEY_PIN_SALT, "")
-        if (storedHashHex.isEmpty() || saltHex.isEmpty()) return false
-
-        val salt = saltHex.hexToByteArray()
-        val computedHash = hashPin(pin, salt)
-        return MessageDigest.isEqual(computedHash, storedHashHex.hexToByteArray())
+        val meta = readWithReanchor() ?: return false
+        if (isLockedOutByMeta(meta)) return false
+        val pinChars = pin.toCharArray()
+        return try {
+            val kPin = Argon2KeyDerivation.derive(
+                pin = pinChars, salt = meta.pinSalt,
+                mCostKib = meta.kdfM, tCost = meta.kdfT, parallelism = meta.kdfP,
+            )
+            val kVault = try {
+                aesGcmDecrypt(kPin, meta.wrappedVault, meta.wrappedVaultIv, meta.pinSalt)
+            } catch (_: Exception) {
+                null
+            } finally {
+                kPin.fill(0)
+            }
+            if (kVault != null) {
+                vaultKeyProvider.unlock(kVault)
+                kVault.fill(0)
+                true
+            } else {
+                false
+            }
+        } finally {
+            pinChars.fill('\u0000')
+        }
     }
+
+    // ...failed-attempt counters and reboot-aware lockout (see setLockoutForDuration /
+    //    getLockoutUntil / isCurrentlyLockedOut)...
 }
 ```
 
-The default implementation uses PBKDF2 with HMAC-SHA256 for PIN hashing with a random salt, constant-time comparison to prevent timing attacks, and reboot-aware lockout via `ElapsedRealtimeClock` and `BootIdProvider`.
+The default implementation uses **Argon2** for PIN-key derivation with a random salt, AES-GCM to
+wrap a random vault key (which doubles as an authenticity check on validation), zeroing of
+sensitive byte arrays after use, and reboot-aware lockout via `ElapsedRealtimeClock` and
+`BootIdProvider`.
+
+> **⚠️ Note:** PBKDF2 is intentionally **not** used in this project. A `checkNoPbkdf2` Gradle task
+> (`build.gradle.kts`) fails the build if the literal `PBKDF2` appears in `authentication-logic`.
+> Do not reintroduce PBKDF2-based PIN hashing.
 
 Config Example:
 
@@ -562,12 +618,14 @@ Config Construction via Koin DI Example:
 ```kotlin
 @Single
 fun provideStorageConfig(
-    prefsController: PrefsController,
+    authMetadataStore: AuthMetadataStore,
     clock: ElapsedRealtimeClock,
     bootIdProvider: BootIdProvider,
+    vaultKeyProvider: VaultKeyProvider,
+    biometryStorageProvider: BiometryStorageProvider,
 ): StorageConfig = StorageConfigImpl(
-    pinImpl = PrefsPinStorageProvider(prefsController, clock, bootIdProvider),
-    biometryImpl = PrefsBiometryStorageProvider(prefsController)
+    pinImpl = PinStorageProviderImpl(authMetadataStore, clock, bootIdProvider, vaultKeyProvider),
+    biometryImpl = biometryStorageProvider
 )
 ```
 

@@ -18,15 +18,16 @@ package eu.europa.ec.authenticationlogic.storage
 
 import androidx.datastore.core.CorruptionException
 import com.google.crypto.tink.Aead
+import com.google.crypto.tink.KeysetHandle
+import com.google.crypto.tink.RegistryConfiguration
 import com.google.crypto.tink.aead.AeadConfig
 import com.google.crypto.tink.aead.AesGcmParameters
-import com.google.crypto.tink.KeysetHandle
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
 
 class TestTinkAeadSerializer {
 
@@ -42,8 +43,8 @@ class TestTinkAeadSerializer {
             .setTagSizeBytes(16)
             .setVariant(AesGcmParameters.Variant.NO_PREFIX)
             .build()
-        val handle = KeysetHandle.generateNew(parameters)
-        aead = handle.getPrimitive(Aead::class.java)
+        aead = KeysetHandle.generateNew(parameters)
+            .getPrimitive(RegistryConfiguration.get(), Aead::class.java)
         serializer = TinkAeadSerializer(aead)
     }
 

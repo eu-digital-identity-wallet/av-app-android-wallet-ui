@@ -80,21 +80,21 @@ class MrzDate : Serializable, Comparable<MrzDate?> {
         return true
     }
 
-    override fun equals(obj: Any?): Boolean {
-        if (obj == null) {
+    override fun equals(other: Any?): Boolean {
+        if (other == null) {
             return false
         }
-        if (javaClass != obj.javaClass) {
+        if (javaClass != other.javaClass) {
             return false
         }
-        val other = obj as MrzDate
-        if (this.year != other.year) {
+        val that = other as MrzDate
+        if (this.year != that.year) {
             return false
         }
-        if (this.month != other.month) {
+        if (this.month != that.month) {
             return false
         }
-        return this.day == other.day
+        return this.day == that.day
     }
 
     override fun hashCode(): Int {
@@ -105,10 +105,10 @@ class MrzDate : Serializable, Comparable<MrzDate?> {
         return hash
     }
 
-    override fun compareTo(o: MrzDate?): Int {
-        if (o == null) {
+    override fun compareTo(other: MrzDate?): Int {
+        if (other == null) {
             return 1
         }
-        return year * 10000 + month * 100 + day.compareTo(o.year * 10000 + o.month * 100 + o.day)
+        return year * 10000 + month * 100 + day.compareTo(other.year * 10000 + other.month * 100 + other.day)
     }
 }

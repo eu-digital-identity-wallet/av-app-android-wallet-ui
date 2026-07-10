@@ -58,17 +58,17 @@ open class PKDCertStoreParameters @JvmOverloads constructor(
         return "PKDCertStoreParameters [$serverName:$port/$baseDN]"
     }
 
-    override fun equals(otherObj: Any?): Boolean {
-        if (otherObj == null) {
+    override fun equals(other: Any?): Boolean {
+        if (other == null) {
             return false
         }
-        if (otherObj === this) {
+        if (other === this) {
             return true
         }
-        if (this.javaClass != otherObj.javaClass) {
+        if (this.javaClass != other.javaClass) {
             return false
         }
-        val otherParams = otherObj as PKDCertStoreParameters?
+        val otherParams = other as PKDCertStoreParameters?
         return (otherParams!!.serverName == this.serverName
                 && otherParams.port == this.port
                 && otherParams.baseDN == this.baseDN)
