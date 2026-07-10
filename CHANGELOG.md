@@ -28,6 +28,17 @@
 - Replaced raw exception-message logging with generic messages plus the
   exception type in the passport-scanner NFC/MRZ paths
 - Updated the configuration and how-to-build documentation
+- Added ProGuard/R8 keep rules for ML Kit Text Recognition, Google Play Services
+  SafeParcelable/KeepName, and MRZ parser record classes (reflection-backed), and
+  extended the UI logic keeps to `navigation` and `component` packages to resolve
+  R8 `MissingClass` problems in release builds
+- Replaced SpongyCastle with BouncyCastle as the JCE provider in the
+  passport-scanner (JMRTD security provider, MRTD trust store, and keystore utils)
+  and removed the unused SpongyCastle provider and trust-store getters
+
+### Removed
+
+- SpongyCastle provider usage in the passport-scanner
 
 ### Fixed
 
@@ -35,6 +46,9 @@
 - SonarQube severity issues, including disabling cleartext traffic
   (`usesCleartextTraffic="false"`) for older Android versions and clearing the
   biometric error on cancel
+- MRZ analyzer crash from invalid crop dimensions caused by the viewfinder
+  height calculation producing negative/zero crop bounds; crop coordinates are now
+  bounds-checked and coerced before bitmap creation
 
 ## 2026.06-3
 
