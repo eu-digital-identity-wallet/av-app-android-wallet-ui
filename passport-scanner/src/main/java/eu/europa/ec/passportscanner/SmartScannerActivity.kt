@@ -47,12 +47,15 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.MeteringPointFactory
 import androidx.camera.core.Preview
+import androidx.camera.core.resolutionselector.ResolutionSelector
+import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.core.SurfaceOrientedMeteringPointFactory
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.constraintlayout.widget.Guideline
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.IntentCompat
 import com.google.android.material.snackbar.Snackbar
 import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.passportscanner.mrz.MRZAnalyzer.Companion.GUIDE_HEIGHT_IN_PX
@@ -64,11 +67,10 @@ import eu.europa.ec.passportscanner.scanner.config.Orientation
 import eu.europa.ec.passportscanner.scanner.config.ScannerOptions
 import eu.europa.ec.passportscanner.utils.CameraUtils.isLedFlashAvailable
 import eu.europa.ec.passportscanner.utils.extension.toPx
-import org.koin.android.ext.android.inject
 import eu.europa.ec.resourceslogic.R.string
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-
+import org.koin.android.ext.android.inject
 
 class SmartScannerActivity : BaseActivity(), OnClickListener {
 
@@ -153,7 +155,8 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
         // Scanner setup from intent
         hideActionBar()
         // Use scanner options directly if no scanner type is called
-        val options: ScannerOptions? = intent.getParcelableExtra(SCANNER_OPTIONS)
+        val options: ScannerOptions? =
+            IntentCompat.getParcelableExtra(intent, SCANNER_OPTIONS, ScannerOptions::class.java)
         options?.let {
             logController.d(TAG) { "scannerOptions: $it" }
             scannerOptions = options
@@ -211,12 +214,20 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
                 // Used to bind the lifecycle of cameras to the lifecycle owner
                 cameraProvider = cameraProviderFuture.get()
                 // Preview
+                val resolutionSelector640x480 = ResolutionSelector.Builder()
+                    .setResolutionStrategy(
+                        ResolutionStrategy(
+                            resolution,
+                            ResolutionStrategy.FALLBACK_RULE_CLOSEST_LOWER_THEN_HIGHER
+                        )
+                    )
+                    .build()
                 preview = Preview.Builder()
-                    .setTargetResolution(resolution)
+                    .setResolutionSelector(resolutionSelector640x480)
                     .setTargetRotation(rotation)
                     .build()
                 val imageAnalysisBuilder = ImageAnalysis.Builder()
-                    .setTargetResolution(resolution)
+                    .setResolutionSelector(resolutionSelector640x480)
                     .setTargetRotation(rotation)
                     .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
 
@@ -237,8 +248,16 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
                     }
 
                 // Create configuration object for the image capture use case
+                val resolutionSelector1080x1920 = ResolutionSelector.Builder()
+                    .setResolutionStrategy(
+                        ResolutionStrategy(
+                            Size(1080, 1920),
+                            ResolutionStrategy.FALLBACK_RULE_CLOSEST_LOWER_THEN_HIGHER
+                        )
+                    )
+                    .build()
                 imageCapture = ImageCapture.Builder()
-                    .setTargetResolution(Size(1080, 1920))
+                    .setResolutionSelector(resolutionSelector1080x1920)
                     .setTargetRotation(Surface.ROTATION_0)
                     .setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)
                     .build()
@@ -306,7 +325,6 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
                             }
                         }
                     }
-
                 } catch (exc: Exception) {
                     logController.e(TAG, exc) { "Use case binding failed" }
                 }
@@ -341,11 +359,12 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
-        grantResults: IntArray
+        grantResults: IntArray,
     ) {
         when (requestCode) {
             REQUEST_CODE_PERMISSIONS_VERSION_R,
-            REQUEST_CODE_PERMISSIONS -> {
+            REQUEST_CODE_PERMISSIONS,
+                -> {
                 if (allPermissionsGranted()) {
                     setupConfiguration()
                 } else {
@@ -376,7 +395,7 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
 
     override fun onClick(view: View) {
         when (view.id) {
-            R.id.close_button -> onBackPressed()
+            R.id.close_button -> onBackPressedDispatcher.onBackPressed()
             R.id.flash_button -> {
                 flashButton?.let {
                     if (it.isSelected) {

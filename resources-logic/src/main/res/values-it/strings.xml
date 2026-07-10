@@ -27,6 +27,7 @@
     <string name="biometric_prompt_title">Autenticazione biometrica</string>
     <string name="biometric_setup_description">Usa la tua impronta digitale o il riconoscimento facciale per accedere all\'app &quot;%s&quot;.</string>
     <string name="biometric_setup_enable">Avvia la configurazione</string>
+    <string name="biometric_setup_required_error">L\'autenticazione biometrica è necessaria per usare questa app.</string>
     <string name="biometric_setup_skip">Salta</string>
     <string name="biometric_setup_title">Accesso biometrico</string>
     <string name="biometric_unknown_error">Si è verificato un errore durante l\'inizializzazione dell\'autenticazione biometrica. Riprova.</string>

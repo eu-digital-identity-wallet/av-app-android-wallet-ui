@@ -70,6 +70,8 @@ internal class WalletCoreConfigImpl(
                         R.raw.av_issuer_ca01
                     )
 
+                    // Don't configure DoNotEnforce in a real application this is just for test purposes for the
+                    // reference implementation
                     configureReaderAuthPolicy(ReaderAuthPolicy.DoNotEnforce)
 
                     configureDCAPI {

@@ -63,6 +63,12 @@ interface WalletCoreConfig {
     val config: EudiWalletConfig
 
     /**
+     * Whether document keys require Android user authentication before creation or use.
+     */
+    val userAuthenticationRequired: Boolean
+        get() = config.userAuthenticationRequired
+
+    /**
      * List of Configurations for Verifiable Credentials Issuance (VCI).
      */
     val vciConfig: List<OpenId4VciManager.Config>

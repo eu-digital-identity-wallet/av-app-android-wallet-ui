@@ -21,8 +21,8 @@ import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.testfeature.util.mockedGenericErrorMessage
 import junit.framework.TestCase.assertEquals
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
+import kotlin.time.Clock
+import kotlin.time.Instant
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -30,7 +30,6 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
 
-@OptIn(kotlin.time.ExperimentalTime::class)
 class TestDocumentIdentificationInteractor {
 
     @Mock

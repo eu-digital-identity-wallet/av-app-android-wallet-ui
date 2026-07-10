@@ -27,6 +27,7 @@
     <string name="biometric_prompt_title">Biometrisk godkendelse</string>
     <string name="biometric_setup_description">Brug dit fingeraftryk eller ansigtsgenkendelse til at logge ind på appen &quot;%s&quot;</string>
     <string name="biometric_setup_enable">Start installation</string>
+    <string name="biometric_setup_required_error">Biometrisk godkendelse er påkrævet for at bruge denne app.</string>
     <string name="biometric_setup_skip">Spring over</string>
     <string name="biometric_setup_title">Biometrisk adgang</string>
     <string name="biometric_unknown_error">Noget gik galt ved initialisering af biometrisk godkendelse. Prøv igen</string>

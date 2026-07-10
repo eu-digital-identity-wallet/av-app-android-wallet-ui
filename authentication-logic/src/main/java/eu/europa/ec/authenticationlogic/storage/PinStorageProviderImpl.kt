@@ -40,7 +40,6 @@ class PinStorageProviderImpl(
     }
 
     override fun hasPin(): Boolean = runBlocking { authMetadataStore.read() != null }
-
     override fun setPin(pin: String) {
         val pinChars = pin.toCharArray()
         try {
@@ -50,9 +49,7 @@ class PinStorageProviderImpl(
 
             val existing = runBlocking { authMetadataStore.read() }
 
-            if (existing != null && !vaultKeyProvider.isUnlocked()) {
-                throw IllegalStateException("Vault must be unlocked to change the PIN")
-            }
+            check(!(existing != null && !vaultKeyProvider.isUnlocked())) { "Vault must be unlocked to change the PIN" }
 
             val kVault: ByteArray = if (existing != null) {
                 vaultKeyProvider.getVaultKey()!!
@@ -127,7 +124,6 @@ class PinStorageProviderImpl(
     }
 
     override fun getFailedAttempts(): Int = readWithReanchor()?.failedAttempts ?: 0
-
     override fun incrementFailedAttempts(): Int {
         val meta = readWithReanchor() ?: return 1
         val next = meta.failedAttempts + 1

@@ -23,11 +23,15 @@ import eu.europa.ec.commonfeature.config.BiometricMode
 import eu.europa.ec.commonfeature.config.BiometricUiConfig
 import eu.europa.ec.commonfeature.config.OnBackNavigationConfig
 import eu.europa.ec.commonfeature.config.RequestUriConfig
-import eu.europa.ec.commonfeature.ui.request.Event
+import eu.europa.ec.commonfeature.ui.request.Event.DoWork
+import eu.europa.ec.commonfeature.ui.request.Event.Pop
 import eu.europa.ec.commonfeature.ui.request.RequestViewModel
 import eu.europa.ec.commonfeature.ui.request.model.RequestDocumentItemUi
 import eu.europa.ec.presentationfeature.interactor.PresentationRequestInteractor
-import eu.europa.ec.presentationfeature.interactor.PresentationRequestInteractorPartialState
+import eu.europa.ec.presentationfeature.interactor.PresentationRequestInteractorPartialState.Disconnect
+import eu.europa.ec.presentationfeature.interactor.PresentationRequestInteractorPartialState.Failure
+import eu.europa.ec.presentationfeature.interactor.PresentationRequestInteractorPartialState.NoData
+import eu.europa.ec.presentationfeature.interactor.PresentationRequestInteractorPartialState.Success
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.component.RelyingPartyDataUi
@@ -66,6 +70,14 @@ class PresentationRequestViewModel(
     }
 
     override fun getNextScreen(): String {
+        return if (interactor.shouldUseAppAuthenticationBeforePresentation()) {
+            getAppAuthenticationScreen()
+        } else {
+            PresentationScreens.PresentationLoading.screenRoute
+        }
+    }
+
+    private fun getAppAuthenticationScreen(): String {
         return generateComposableNavigationLink(
             screen = CommonScreens.Biometric,
             arguments = generateComposableArguments(
@@ -115,7 +127,7 @@ class PresentationRequestViewModel(
         viewModelJob = viewModelScope.launch {
             interactor.getRequestDocuments().collect { response ->
                 when (response) {
-                    is PresentationRequestInteractorPartialState.Failure -> {
+                    is Failure -> {
                         setState {
                             copy(
                                 isLoading = false,
@@ -123,14 +135,14 @@ class PresentationRequestViewModel(
                                     errorMessage = response.error,
                                     resourceProvider = resourceProvider,
                                     errorType = response.errorType,
-                                    onRetry = { setEvent(Event.DoWork) },
-                                    onCancel = { setEvent(Event.Pop) },
+                                    onRetry = { setEvent(DoWork) },
+                                    onCancel = { setEvent(Pop) },
                                 )
                             )
                         }
                     }
 
-                    is PresentationRequestInteractorPartialState.Success -> {
+                    is Success -> {
                         updateData(response.requestDocuments)
 
                         val updatedHeaderConfig = viewState.value.headerConfig.copy(
@@ -150,11 +162,11 @@ class PresentationRequestViewModel(
                         }
                     }
 
-                    is PresentationRequestInteractorPartialState.Disconnect -> {
-                        setEvent(Event.Pop)
+                    is Disconnect -> {
+                        setEvent(Pop)
                     }
 
-                    is PresentationRequestInteractorPartialState.NoData -> {
+                    is NoData -> {
                         val updatedHeaderConfig = viewState.value.headerConfig.copy(
                             relyingPartyData = getRelyingPartyData(
                                 name = response.verifierName,

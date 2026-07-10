@@ -27,6 +27,7 @@
     <string name="biometric_prompt_title">Biometrische Authentifizierung</string>
     <string name="biometric_setup_description">Melden Sie sich mit Ihrem Fingerabdruck oder Ihrer Gesichtserkennung bei der App &quot;%s&quot; an.</string>
     <string name="biometric_setup_enable">Einrichtung starten</string>
+    <string name="biometric_setup_required_error">Biometrische Authentifizierung ist erforderlich, um diese App zu verwenden.</string>
     <string name="biometric_setup_skip">Überspringen</string>
     <string name="biometric_setup_title">Biometrischer Zugriff</string>
     <string name="biometric_unknown_error">Bei der Initialisierung der biometrischen Authentifizierung ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>

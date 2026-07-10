@@ -26,6 +26,8 @@ import android.os.Parcelable
 import net.sf.scuba.util.Hex
 import org.jmrtd.protocol.EACCAResult
 import org.jmrtd.protocol.EACTAResult
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
@@ -310,30 +312,30 @@ class VerificationStatus : Parcelable {
 
         if (`in`.readInt() == 1) {
             triedBACEntries = ArrayList()
-            `in`.readList(triedBACEntries as ArrayList<BACKey>, BACKey::class.java.classLoader)
+            `in`.readList(triedBACEntries as ArrayList<BACKey>, BACKey::class.java.classLoader, BACKey::class.java)
         }
 
         if (`in`.readInt() == 1) {
             hashResults = TreeMap()
             val size = `in`.readInt()
-            (0 until size).forEach { i ->
-                val key = `in`.readInt()
-                val value = `in`.readSerializable() as HashMatchResult
-                hashResults!![key] = value
-            }
+                (0 until size).forEach { i ->
+                    val key = `in`.readInt()
+                    val value = `in`.readSerializableCompat<HashMatchResult>()
+                    hashResults!![key] = value
+                }
         }
 
         if (`in`.readInt() == 1) {
             certificateChain = ArrayList()
-            `in`.readList(certificateChain as ArrayList<Certificate>, Certificate::class.java.classLoader)
+            `in`.readList(certificateChain as ArrayList<Certificate>, Certificate::class.java.classLoader, Certificate::class.java)
         }
 
         if (`in`.readInt() == 1) {
-            eacResult = `in`.readSerializable() as EACTAResult
+            eacResult = `in`.readSerializableCompat<EACTAResult>()
         }
 
         if (`in`.readInt() == 1) {
-            caResult = `in`.readSerializable() as EACCAResult
+            caResult = `in`.readSerializableCompat<EACCAResult>()
         }
     }
 
@@ -416,7 +418,7 @@ class VerificationStatus : Parcelable {
             dest.writeInt(hashResults!!.size)
             for ((key, value) in hashResults!!) {
                 dest.writeInt(key)
-                dest.writeSerializable(value)
+                dest.writeSerializableCompat(value)
             }
         }
 
@@ -428,12 +430,12 @@ class VerificationStatus : Parcelable {
 
         dest.writeInt(if (eacResult != null) 1 else 0)
         if (eacResult != null) {
-            dest.writeSerializable(eacResult)
+            dest.writeSerializableCompat(eacResult as Serializable)
         }
 
         dest.writeInt(if (caResult != null) 1 else 0)
         if (caResult != null) {
-            dest.writeSerializable(caResult)
+            dest.writeSerializableCompat(caResult as Serializable)
         }
     }
 
@@ -558,6 +560,20 @@ class VerificationStatus : Parcelable {
 
             override fun newArray(size: Int): Array<VerificationStatus?> {
                 return arrayOfNulls(size)
+            }
+        }
+
+        private fun Parcel.writeSerializableCompat(obj: Serializable) {
+            val baos = ByteArrayOutputStream()
+            ObjectOutputStream(baos).use { it.writeObject(obj) }
+            writeByteArray(baos.toByteArray())
+        }
+
+        private inline fun <reified T : Serializable> Parcel.readSerializableCompat(): T {
+            val bytes = createByteArray()!!
+            ObjectInputStream(ByteArrayInputStream(bytes)).use {
+                @Suppress("UNCHECKED_CAST")
+                return it.readObject() as T
             }
         }
     }

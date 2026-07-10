@@ -1,5 +1,55 @@
 # Changelog
 
+## 2026.07-1
+
+### Added
+
+- `userAuthenticationRequired` Wallet Core config option that drives app
+  authentication before credential presentation, and skips it when the wallet
+  enforces biometric authentication on its keys
+- Error feedback when biometrics are unavailable or not enrolled during
+  mandatory biometric setup (`biometric_setup_required_error`), with da/de/fr/it
+  translations
+- CI check in `pull_request_pipeline.yaml` forbidding raw exception-message
+  interpolation (`${e.message}`) in the passport/issuance paths
+  (LOG-PII-PASSPORT-01) to prevent logging MRZ/document-number PII
+- Documented the SCRN-CAPTURE-PASSPORT-01 finding (`FLAG_SECURE` missing on the
+  passport capture Activities) with the required implementer action in the
+  production hardening guide
+
+### Changed
+
+- Updated dependencies: AGP 9.0.1 → 9.2.1, Kotlin 2.3.0 → 2.3.20, Compose BOM
+  2026.02.00 → 2026.06.00, Gradle 9.3.1 → 9.6.0, Koin 4.1.1 → 4.2.2, Ktor
+  3.4.0 → 3.5.0, Coil 3.3.0 → 3.5.0, and others (navigation, lifecycle, core,
+  camera, protobuf, material)
+- Removed legacy support and now treat all compilation warnings as errors;
+  removed `android.enableR8.fullMode=false`
+- Replaced raw exception-message logging with generic messages plus the
+  exception type in the passport-scanner NFC/MRZ paths
+- Updated the configuration and how-to-build documentation
+- Added ProGuard/R8 keep rules for ML Kit Text Recognition, Google Play Services
+  SafeParcelable/KeepName, and MRZ parser record classes (reflection-backed), and
+  extended the UI logic keeps to `navigation` and `component` packages to resolve
+  R8 `MissingClass` problems in release builds
+- Replaced SpongyCastle with BouncyCastle as the JCE provider in the
+  passport-scanner (JMRTD security provider, MRTD trust store, and keystore utils)
+  and removed the unused SpongyCastle provider and trust-store getters
+
+### Removed
+
+- SpongyCastle provider usage in the passport-scanner
+
+### Fixed
+
+- Splash screen footer hiding behind the system navigation bar
+- SonarQube severity issues, including disabling cleartext traffic
+  (`usesCleartextTraffic="false"`) for older Android versions and clearing the
+  biometric error on cancel
+- MRZ analyzer crash from invalid crop dimensions caused by the viewfinder
+  height calculation producing negative/zero crop bounds; crop coordinates are now
+  bounds-checked and coerced before bitmap creation
+
 ## 2026.06-3
 
 ### Changed

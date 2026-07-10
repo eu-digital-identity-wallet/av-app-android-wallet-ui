@@ -20,6 +20,7 @@ package eu.europa.ec.passportscanner.nfc.details
 import android.nfc.Tag
 import android.nfc.tech.IsoDep
 import eu.europa.ec.businesslogic.controller.log.LogController
+import eu.europa.ec.passportscanner.nfc.MAX_BLOCKSIZE
 import eu.europa.ec.passportscanner.nfc.passport.Passport
 import eu.europa.ec.passportscanner.nfc.passport.PassportNFC
 import eu.europa.ec.passportscanner.nfc.passport.PassportNfcUtils
@@ -27,17 +28,16 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import java.security.Security
 import net.sf.scuba.smartcards.CardService
 import net.sf.scuba.smartcards.CardServiceException
-import org.jmrtd.AccessDeniedException
-import org.jmrtd.BACDeniedException
+import org.bouncycastle.jce.provider.BouncyCastleProvider
+import org.jmrtd.CardServiceProtocolException
 import org.jmrtd.MRTDTrustStore
-import org.jmrtd.PACEException
 import org.jmrtd.PassportService
 import org.jmrtd.VerificationStatus
 import org.jmrtd.lds.icao.DG1File
 import org.jmrtd.lds.icao.MRZInfo
-import java.security.Security
 
 class NFCDocumentTag(private val logController: LogController) {
 
@@ -45,7 +45,7 @@ class NFCDocumentTag(private val logController: LogController) {
         tag: Tag,
         mrzInfo: MRZInfo,
         mrtdTrustStore: MRTDTrustStore,
-        passportCallback: PassportCallback
+        passportCallback: PassportCallback,
     ): Disposable {
         return Single.fromCallable {
             var passport: Passport? = null
@@ -56,7 +56,7 @@ class NFCDocumentTag(private val logController: LogController) {
                 val nfc = IsoDep.get(tag)
                 nfc.timeout = 5 * 1000 //5 seconds timeout
                 val cs = CardService.getInstance(nfc)
-                ps = PassportService(cs, 256, 224, false, true)
+                ps = PassportService(cs, 256, MAX_BLOCKSIZE, false, true)
                 ps.open()
 
                 val passportNFC = PassportNFC(ps, mrtdTrustStore, mrzInfo, logController)
@@ -110,7 +110,6 @@ class NFCDocumentTag(private val logController: LogController) {
                         //Don't do anything
                         logController.w(TAG, e) { "Cannot read portrait image" }
                     }
-
                 }
 
                 val dg11 = passportNFC.dg11File
@@ -125,7 +124,6 @@ class NFCDocumentTag(private val logController: LogController) {
                 } else {
                     logController.e(TAG) { "DG11 is null" }
                 }
-
             } catch (e: Exception) {
                 //TODO EAC
                 cardServiceException = e
@@ -146,17 +144,18 @@ class NFCDocumentTag(private val logController: LogController) {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ passportDTO ->
                 if (passportDTO.cardServiceException != null) {
-                    val cardServiceException = passportDTO.cardServiceException
-                    if (cardServiceException is AccessDeniedException) {
-                        passportCallback.onAccessDeniedException(cardServiceException)
-                    } else if (cardServiceException is BACDeniedException) {
-                        passportCallback.onBACDeniedException(cardServiceException)
-                    } else if (cardServiceException is PACEException) {
-                        passportCallback.onPACEException(cardServiceException)
-                    } else if (cardServiceException is CardServiceException) {
-                        passportCallback.onCardException(cardServiceException)
-                    } else {
-                        passportCallback.onGeneralException(cardServiceException)
+                    when (val cardServiceException = passportDTO.cardServiceException) {
+                        is CardServiceProtocolException -> {
+                            passportCallback.onCardServiceProtocolException(cardServiceException)
+                        }
+
+                        is CardServiceException -> {
+                            passportCallback.onCardException(cardServiceException)
+                        }
+
+                        else -> {
+                            passportCallback.onGeneralException(cardServiceException)
+                        }
                     }
                 } else {
                     passportCallback.onPassportRead(passportDTO.passport)
@@ -171,16 +170,14 @@ class NFCDocumentTag(private val logController: LogController) {
 
     data class PassportDTO(
         val passport: Passport? = null,
-        val cardServiceException: Exception? = null
+        val cardServiceException: Exception? = null,
     )
 
     interface PassportCallback {
         fun onPassportReadStart()
         fun onPassportReadFinish()
         fun onPassportRead(passport: Passport?)
-        fun onAccessDeniedException(exception: AccessDeniedException)
-        fun onBACDeniedException(exception: BACDeniedException)
-        fun onPACEException(exception: PACEException)
+        fun onCardServiceProtocolException(exception: CardServiceProtocolException)
         fun onCardException(exception: CardServiceException)
         fun onGeneralException(exception: Exception?)
     }
@@ -189,7 +186,7 @@ class NFCDocumentTag(private val logController: LogController) {
         private val TAG = NFCDocumentTag::class.java.simpleName
 
         init {
-            Security.insertProviderAt(org.spongycastle.jce.provider.BouncyCastleProvider(), 1)
+            Security.insertProviderAt(BouncyCastleProvider(), 1)
         }
     }
 }

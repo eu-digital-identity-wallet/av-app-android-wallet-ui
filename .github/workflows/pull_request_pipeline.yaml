@@ -140,6 +140,40 @@ jobs:
           print(f"csca.ks integrity constant is up-to-date ({actual[:16]}...)")
           EOF
 
+      - name: Check no raw exception-message interpolation in passport paths
+        run: |
+          python3 - <<'EOF'
+          import os, re, sys
+
+          # LOG-PII-PASSPORT-01: third-party exception messages may contain PII
+          # (MRZ fields, document numbers). Log a generic message + exception
+          # type only, never the raw message. See docs/production-hardening-guide-v3.8.md Part 7.
+          PATTERN = re.compile(r'\$\{[A-Za-z_]+\.message\}')
+          TARGETS = [
+              "passport-scanner/src/main/java/eu/europa/ec/passportscanner/nfc",
+              "passport-scanner/src/main/java/eu/europa/ec/passportscanner/mrz",
+              "issuance-feature/src/main",
+          ]
+          violations = []
+          for root in TARGETS:
+              for dirpath, _, files in os.walk(root):
+                  for f in files:
+                      if not f.endswith(".kt"):
+                          continue
+                      path = os.path.join(dirpath, f)
+                      with open(path, encoding="utf-8") as fh:
+                          for i, line in enumerate(fh, 1):
+                              if PATTERN.search(line):
+                                  violations.append(f"{path}:{i}: {line.strip()}")
+          if violations:
+              print("ERROR: raw exception-message interpolation forbidden in passport/issuance paths (LOG-PII-PASSPORT-01).")
+              print("Use a generic constant message + exception type (e.javaClass.simpleName), not \${<var>.message}.")
+              for v in violations:
+                  print("  " + v)
+              sys.exit(1)
+          print(f"No raw exception-message interpolation found (checked {len(TARGETS)} roots).")
+          EOF
+
       - name: Run lint check
         run: ./gradlew lint
 

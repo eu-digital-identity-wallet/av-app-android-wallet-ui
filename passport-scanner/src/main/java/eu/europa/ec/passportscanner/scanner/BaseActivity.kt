@@ -24,7 +24,5 @@ abstract class BaseActivity : AppCompatActivity() {
     fun hideActionBar() {
         supportActionBar?.hide()
         supportActionBar?.setDisplayShowTitleEnabled(false)
-        actionBar?.hide()
-        actionBar?.setDisplayShowTitleEnabled(false)
     }
 }

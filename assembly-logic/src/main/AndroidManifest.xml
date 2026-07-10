@@ -39,9 +39,10 @@
         android:label="${appName}${appNameSuffix}"
         android:largeHeap="true"
         android:networkSecurityConfig="@xml/network_security_config"
-        android:supportsRtl="true"
-        android:theme="@style/Theme.EUDIWallet"
-        tools:targetApi="34">
+            android:supportsRtl="true"
+            android:theme="@style/Theme.EUDIWallet"
+            android:usesCleartextTraffic="false"
+            tools:targetApi="34">
 
         <provider
             android:name="androidx.core.content.FileProvider"

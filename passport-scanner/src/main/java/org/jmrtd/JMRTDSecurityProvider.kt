@@ -23,6 +23,7 @@ package org.jmrtd
 
 import java.security.Provider
 import java.security.Security
+import org.bouncycastle.jce.provider.BouncyCastleProvider
 
 /**
  * Security provider for JMRTD specific implementations.
@@ -94,15 +95,12 @@ class JMRTDSecurityProvider private constructor() :
 
     companion object {
         private val BC_PROVIDER by lazy {
-            org.bouncycastle.jce.provider.BouncyCastleProvider()
-        }
-        private val SC_PROVIDER by lazy {
-            org.spongycastle.jce.provider.BouncyCastleProvider()
+            BouncyCastleProvider()
         }
         val instance: Provider = JMRTDSecurityProvider()
 
         init {
-            Security.insertProviderAt(org.spongycastle.jce.provider.BouncyCastleProvider(), 1)
+            Security.insertProviderAt(BouncyCastleProvider(), 1)
         }
 
         /**
@@ -113,16 +111,6 @@ class JMRTDSecurityProvider private constructor() :
         val bouncyCastleProvider: Provider
             get() {
                 return BC_PROVIDER
-            }
-
-        /**
-         * Gets the SC provider, if present.
-         *
-         * @return the SC provider, the BC provider, or `null`
-         */
-        val spongyCastleProvider: Provider
-            get() {
-                return SC_PROVIDER
             }
     }
 }
