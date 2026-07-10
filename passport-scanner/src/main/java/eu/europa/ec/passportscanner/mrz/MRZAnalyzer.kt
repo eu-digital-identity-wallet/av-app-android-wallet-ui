@@ -125,45 +125,53 @@ abstract class MRZAnalyzer(
 
             val rectGuide = activity.findViewById<ImageView>(R.id.scanner_overlay)
             val viewFinder = activity.findViewById<View>(R.id.view_finder)
-            var inputBitmap: Bitmap
+
+            if (rectGuide == null || viewFinder == null || viewFinder.width == 0 || viewFinder.height == 0) {
+                imageProxy.close()
+                return
+            }
+
             var rotatedBF = BitmapUtils.rotateImage(bf, rotation)
 
-            // try to cropped forcefully
+            // Crop preview area to match viewfinder aspect ratio
+            val imageToViewRatio = rotatedBF.width.toFloat() / viewFinder.width.toFloat()
+            val cropHeight = viewFinder.height * imageToViewRatio
+            val cropTop = ((rotatedBF.height - cropHeight) / 2).coerceAtLeast(0f).toInt()
+            val finalCropHeight = cropHeight.toInt().coerceAtMost(rotatedBF.height - cropTop)
 
-            // Crop preview area
-            val cropHeight = if (rotatedBF.width < viewFinder.width) {
-                // if preview area larger than analysing image
-                val koeff = rotatedBF.width.toFloat() / viewFinder!!.width.toFloat()
-                viewFinder.height.toFloat() * koeff
-            } else {
-                // if preview area smaller than analysing image
-                val prc =
-                    100 - (viewFinder.width.toFloat() / (rotatedBF.width.toFloat() / 100f))
-                viewFinder.height + ((viewFinder.height.toFloat() / 100f) * prc)
+            if (finalCropHeight <= 0) {
+                imageProxy.close()
+                return
             }
-            val cropTop = (rotatedBF.height / 2) - (cropHeight / 2)
+
             rotatedBF = Bitmap.createBitmap(
                 rotatedBF,
                 0,
-                if (cropTop < 0) 0 else cropTop.toInt(),// fix crash
+                cropTop,
                 rotatedBF.width,
-                cropHeight.toInt()
+                finalCropHeight
             )
 
             // Crop MRZ area
-            val imageToViewRatio = rotatedBF.width.toFloat() / viewFinder.width.toFloat()
             val mrzCropX = (25 - 16).toPx * imageToViewRatio
             val mrzCropY = (viewFinder.height - 30.toPx - rectGuide.height) * imageToViewRatio
             val mrzCropWidth = rectGuide.width * imageToViewRatio
             val mrzCropHeight = rectGuide.height * imageToViewRatio
-            inputBitmap = Bitmap.createBitmap(
+
+            // Ensure safe cropping for MRZ area within the already cropped rotatedBF
+            val safeMrzX = mrzCropX.toInt().coerceIn(0, (rotatedBF.width - 1).coerceAtLeast(0))
+            val safeMrzY = mrzCropY.toInt().coerceIn(0, (rotatedBF.height - 1).coerceAtLeast(0))
+            val safeMrzWidth = mrzCropWidth.toInt().coerceIn(1, (rotatedBF.width - safeMrzX).coerceAtLeast(1))
+            val safeMrzHeight = mrzCropHeight.toInt().coerceIn(1, (rotatedBF.height - safeMrzY).coerceAtLeast(1))
+
+            val inputBitmap = Bitmap.createBitmap(
                 rotatedBF,
-                mrzCropX.toInt(),
-                mrzCropY.toInt(),
-                mrzCropWidth.toInt(),
-                mrzCropHeight.toInt()
+                safeMrzX,
+                safeMrzY,
+                safeMrzWidth,
+                safeMrzHeight
             )
-            var inputRot: Int = 0
+            val inputRot = 0
 
             // Pass image to an ML Kit Vision API
             logController.d("${SmartScannerActivity.TAG}/SmartScanner") { "MRZ MLKit: start" }
@@ -171,7 +179,6 @@ abstract class MRZAnalyzer(
             val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
 
             recognizer.process(image)
-
                 .addOnSuccessListener { visionText ->
                     val blocks = visionText.textBlocks
 
@@ -212,12 +219,12 @@ abstract class MRZAnalyzer(
                     try {
                         val cleanMRZ = MRZCleaner.clean(rawFullRead, logController, skipReconstruction = true)
                         processResult(result = cleanMRZ, bitmap = bf, rotation = rotation)
-                    } catch (e: Exception) {
+                    } catch (_: Exception) {
                         logController.d("${SmartScannerActivity.TAG}/SmartScanner") { "MRZ parsing failed" }
                     }
                     imageProxy.close()
                 }
-                .addOnFailureListener { e ->
+                .addOnFailureListener { _ ->
                     logController.d("${SmartScannerActivity.TAG}/SmartScanner") { "Camera analysis failed" }
                     imageProxy.close()
                 }

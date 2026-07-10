@@ -17,21 +17,23 @@
  */
 package eu.europa.ec.passportscanner.utils
 
-import java.io.*
+import java.io.InputStream
 import java.security.KeyStore
 import java.security.Security
-import java.security.cert.*
+import java.security.cert.CertStore
+import java.security.cert.Certificate
+import java.security.cert.CollectionCertStoreParameters
 import kotlin.collections.ArrayList
-
+import org.bouncycastle.jce.provider.BouncyCastleProvider
 
 class KeyStoreUtils {
 
     fun readKeystoreFromFile(cscaInputStream: InputStream, password: String):KeyStore?{
         try{
-            val keyStore: KeyStore = KeyStore.getInstance("PKCS12")
+            val keyStore: KeyStore = KeyStore.getInstance("PKCS12", BouncyCastleProvider())
             keyStore.load(cscaInputStream, password.toCharArray())
             return keyStore
-        }catch (e:java.lang.Exception) {
+        }catch (_:java.lang.Exception) {
             return null
         }
     }
@@ -46,14 +48,14 @@ class KeyStoreUtils {
         return list
     }
 
-    fun toCertStore(type:String="Collection", keyStore: KeyStore):CertStore{
+    fun toCertStore(type:String="Collection", keyStore: KeyStore): CertStore {
         return CertStore.getInstance(type, CollectionCertStoreParameters(toList(keyStore)))
     }
 
 
     companion object{
         init {
-            Security.insertProviderAt(org.spongycastle.jce.provider.BouncyCastleProvider(), 1)
+            Security.insertProviderAt(BouncyCastleProvider(), 1)
         }
     }
 }

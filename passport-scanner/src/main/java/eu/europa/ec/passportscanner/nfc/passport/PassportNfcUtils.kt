@@ -47,7 +47,7 @@ import org.jmrtd.lds.icao.DG2File
 import org.jmrtd.lds.icao.DG5File
 import org.jmrtd.lds.iso19794.FaceImageInfo
 import org.jmrtd.lds.iso19794.FaceInfo
-import org.spongycastle.jce.provider.BouncyCastleProvider
+import org.bouncycastle.jce.provider.BouncyCastleProvider
 
 object PassportNfcUtils {
 
@@ -56,7 +56,9 @@ object PassportNfcUtils {
     private const val IS_PKIX_REVOCATION_CHECKING_ENABLED = false
 
     init {
-        Security.addProvider(BouncyCastleProvider())
+        if (Security.getProvider("BC") == null) {
+            Security.addProvider(BouncyCastleProvider())
+        }
     }
 
     @Throws(IOException::class)
@@ -256,7 +258,7 @@ object PassportNfcUtils {
                 CollectionCertStoreParameters(setOf(docSigningCertificate as Certificate))
             val docStore = CertStore.getInstance("Collection", docStoreParams)
 
-            val builder = CertPathBuilder.getInstance("PKIX", "SC")
+            val builder = CertPathBuilder.getInstance("PKIX", "BC")
             val buildParams = PKIXBuilderParameters(cscaTrustAnchors, selector)
             buildParams.addCertStore(docStore)
             for (trustStore in cscaStores) {

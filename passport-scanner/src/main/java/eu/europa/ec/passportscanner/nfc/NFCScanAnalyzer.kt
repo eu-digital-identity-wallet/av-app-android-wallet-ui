@@ -37,11 +37,7 @@ open class NFCScanAnalyzer(
 
     override fun processResult(result: String, bitmap: Bitmap, rotation: Int) {
         // Validate the MRZ is parseable (but don't store the parsed result)
-        val mrzRecord: MrzRecord? = MRZCleaner.parseAndClean(result, logController)
-
-        if (mrzRecord == null) {
-            return
-        }
+        val mrzRecord: MrzRecord = MRZCleaner.parseAndClean(result, logController) ?: return
 
         logController.d(SmartScannerActivity.TAG) { "MRZ parsed successfully (format: ${mrzRecord.format})" }
 

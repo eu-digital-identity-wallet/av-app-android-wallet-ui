@@ -55,7 +55,7 @@ import org.jmrtd.CardServiceProtocolException
 import org.jmrtd.MRTDTrustStore
 import org.jmrtd.lds.icao.MRZInfo
 import org.koin.android.ext.android.inject
-import org.spongycastle.jce.provider.BouncyCastleProvider
+import org.bouncycastle.jce.provider.BouncyCastleProvider
 
 class NFCFragment : Fragment() {
 

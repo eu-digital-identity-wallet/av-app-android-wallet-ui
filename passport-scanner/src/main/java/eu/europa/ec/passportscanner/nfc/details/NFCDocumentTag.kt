@@ -31,6 +31,7 @@ import io.reactivex.schedulers.Schedulers
 import java.security.Security
 import net.sf.scuba.smartcards.CardService
 import net.sf.scuba.smartcards.CardServiceException
+import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.jmrtd.CardServiceProtocolException
 import org.jmrtd.MRTDTrustStore
 import org.jmrtd.PassportService
@@ -185,7 +186,7 @@ class NFCDocumentTag(private val logController: LogController) {
         private val TAG = NFCDocumentTag::class.java.simpleName
 
         init {
-            Security.insertProviderAt(org.spongycastle.jce.provider.BouncyCastleProvider(), 1)
+            Security.insertProviderAt(BouncyCastleProvider(), 1)
         }
     }
 }
