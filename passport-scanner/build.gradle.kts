@@ -51,7 +51,6 @@ dependencies {
     // Core Android dependencies
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.legacy.support.v4)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.material)
 

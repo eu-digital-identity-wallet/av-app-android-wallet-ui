@@ -335,10 +335,7 @@ val ColorScheme.divider: Color
         Color(ThemeColors.eudiw_theme_light_divider)
     }
 
-val ColorScheme.elevated : Color
-    @Composable get() = if (isSystemInDarkTheme()) {
-        // FIXME: Since we support only light mode, applying the light colors in dark mode
-        Color(ThemeColors.eudiw_theme_light_elevated) //Color(ThemeColors.eudiw_theme_dark_elevated)
-    } else {
-        Color(ThemeColors.eudiw_theme_light_elevated)
-    }
+// FIXME: Since we support only light mode, applying the light colors in dark mode
+// Color(ThemeColors.eudiw_theme_dark_elevated)
+val ColorScheme.elevated: Color
+    @Composable get() = Color(ThemeColors.eudiw_theme_light_elevated)

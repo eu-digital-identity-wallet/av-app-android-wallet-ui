@@ -18,9 +18,19 @@ package eu.europa.ec.commonfeature.ui.biometricsetup
 
 import android.content.Context
 import androidx.lifecycle.viewModelScope
-import eu.europa.ec.authenticationlogic.controller.authentication.BiometricVaultResult
-import eu.europa.ec.authenticationlogic.controller.authentication.BiometricsAvailability
+import eu.europa.ec.authenticationlogic.controller.authentication.BiometricVaultResult.Cancelled
+import eu.europa.ec.authenticationlogic.controller.authentication.BiometricVaultResult.Failed
+import eu.europa.ec.authenticationlogic.controller.authentication.BiometricVaultResult.KeyInvalidated
+import eu.europa.ec.authenticationlogic.controller.authentication.BiometricVaultResult.Success
+import eu.europa.ec.authenticationlogic.controller.authentication.BiometricsAvailability.CanAuthenticate
+import eu.europa.ec.authenticationlogic.controller.authentication.BiometricsAvailability.Failure
+import eu.europa.ec.authenticationlogic.controller.authentication.BiometricsAvailability.NonEnrolled
 import eu.europa.ec.commonfeature.interactor.BiometricInteractor
+import eu.europa.ec.commonfeature.ui.biometricsetup.Effect.Navigation.SwitchScreen
+import eu.europa.ec.commonfeature.ui.biometricsetup.Event.NextButtonPressed
+import eu.europa.ec.commonfeature.ui.biometricsetup.Event.ScreenResumed
+import eu.europa.ec.commonfeature.ui.biometricsetup.Event.SkipButtonPressed
+import eu.europa.ec.corelogic.config.WalletCoreConfig
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.component.content.ScreenNavigateAction
@@ -43,6 +53,7 @@ data class State(
     val isBiometricsAvailable: Boolean = false,
     val enrolled: Boolean = false,
     val biometricsError: String? = null,
+    val isSetupMandatory: Boolean = false,
 ) : ViewState {
     val action: ScreenNavigateAction = ScreenNavigateAction.BACKABLE
 }
@@ -57,19 +68,22 @@ sealed class Effect : ViewSideEffect {
 class BiometricSetupViewModel(
     private val biometricInteractor: BiometricInteractor,
     private val resourceProvider: ResourceProvider,
+    private val walletCoreConfig: WalletCoreConfig,
 ) : MviViewModel<Event, State, Effect>() {
 
     override fun setInitialState(): State {
-        return State()
+        return State(
+            isSetupMandatory = walletCoreConfig.userAuthenticationRequired
+        )
     }
 
     override fun handleEvents(event: Event) {
         when (event) {
-            is Event.ScreenResumed -> {
+            is ScreenResumed -> {
                 checkBiometricsAvailability()
             }
 
-            is Event.NextButtonPressed -> {
+            is NextButtonPressed -> {
                 clearError()
                 if (viewState.value.isBiometricsAvailable) {
                     if (viewState.value.enrolled) {
@@ -80,7 +94,10 @@ class BiometricSetupViewModel(
                 }
             }
 
-            is Event.SkipButtonPressed -> {
+            is SkipButtonPressed -> {
+                if (viewState.value.isSetupMandatory) {
+                    return
+                }
                 biometricInteractor.storeBiometricsUsageDecision(false)
                 navigateToNextScreen()
             }
@@ -90,10 +107,10 @@ class BiometricSetupViewModel(
     private fun enrollBiometric(context: Context) {
         viewModelScope.launch {
             when (val result = biometricInteractor.enrollBiometricVault(context)) {
-                is BiometricVaultResult.Success -> authenticationSuccess()
-                is BiometricVaultResult.Cancelled -> clearError()
-                is BiometricVaultResult.Failed -> showError(result.errorMessage)
-                is BiometricVaultResult.KeyInvalidated -> showError(resourceProvider.getString(R.string.biometric_key_invalidated))
+                is Success -> authenticationSuccess()
+                is Cancelled -> clearError()
+                is Failed -> showError(result.errorMessage)
+                is KeyInvalidated -> showError(resourceProvider.getString(R.string.biometric_key_invalidated))
             }
         }
     }
@@ -102,7 +119,7 @@ class BiometricSetupViewModel(
         setState { copy(isLoading = true) }
         biometricInteractor.getBiometricsAvailability { availability ->
             when (availability) {
-                is BiometricsAvailability.CanAuthenticate -> {
+                is CanAuthenticate -> {
                     setState {
                         copy(
                             isLoading = false,
@@ -113,7 +130,7 @@ class BiometricSetupViewModel(
                     }
                 }
 
-                is BiometricsAvailability.NonEnrolled -> {
+                is NonEnrolled -> {
                     setState {
                         copy(
                             isLoading = false,
@@ -124,12 +141,17 @@ class BiometricSetupViewModel(
                     }
                 }
 
-                is BiometricsAvailability.Failure -> {
+                is Failure -> {
+                    val errorMessage = if (viewState.value.isSetupMandatory) {
+                        resourceProvider.getString(R.string.biometric_setup_required_error)
+                    } else {
+                        availability.errorMessage
+                    }
                     setState {
                         copy(
                             isLoading = false,
                             isBiometricsAvailable = false,
-                            biometricsError = availability.errorMessage
+                            biometricsError = errorMessage
                         )
                     }
                 }
@@ -152,7 +174,7 @@ class BiometricSetupViewModel(
 
     private fun navigateToNextScreen() {
         setEffect {
-            Effect.Navigation.SwitchScreen(OnboardingScreens.Enrollment.screenRoute)
+            SwitchScreen(OnboardingScreens.Enrollment.screenRoute)
         }
     }
 }

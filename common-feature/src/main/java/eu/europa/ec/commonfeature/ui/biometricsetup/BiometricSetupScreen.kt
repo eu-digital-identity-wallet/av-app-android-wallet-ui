@@ -30,10 +30,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.Lifecycle.Event.ON_RESUME
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import eu.europa.ec.commonfeature.ui.biometricsetup.Effect.Navigation
+import eu.europa.ec.commonfeature.ui.biometricsetup.Effect.Navigation.SwitchScreen
+import eu.europa.ec.commonfeature.ui.biometricsetup.Event.NextButtonPressed
+import eu.europa.ec.commonfeature.ui.biometricsetup.Event.ScreenResumed
+import eu.europa.ec.commonfeature.ui.biometricsetup.Event.SkipButtonPressed
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.uilogic.component.TopStepBar
 import eu.europa.ec.uilogic.component.content.ContentScreen
@@ -69,9 +74,18 @@ fun BiometricSetupScreen(navController: NavController, viewModel: BiometricSetup
     ContentScreen(
         isLoading = state.isLoading,
         navigatableAction = ScreenNavigateAction.NONE,
-        onBack = { viewModel.setEvent(Event.SkipButtonPressed) },
+        onBack = {
+            if (!state.isSetupMandatory) {
+                viewModel.setEvent(SkipButtonPressed)
+            }
+        },
         stickyBottom = { paddingValues ->
-            ActionButtons(viewModel, paddingValues, state.isBiometricsAvailable)
+            ActionButtons(
+                viewModel = viewModel,
+                paddingValues = paddingValues,
+                biometricsAvailable = state.isBiometricsAvailable,
+                setupMandatory = state.isSetupMandatory,
+            )
         }) { paddingValues ->
         Content(
             title = title,
@@ -92,18 +106,29 @@ fun BiometricSetupScreen(navController: NavController, viewModel: BiometricSetup
 private fun ActionButtons(
     viewModel: BiometricSetupViewModel,
     paddingValues: PaddingValues,
-    biometricsAvailable: Boolean
+    biometricsAvailable: Boolean,
+    setupMandatory: Boolean,
 ) {
     val context = LocalContext.current
-    val buttons = StickyBottomType.TwoButtons(
-        primaryButtonConfig = ButtonConfig(
-            type = ButtonType.SECONDARY,
-            onClick = { viewModel.setEvent(Event.SkipButtonPressed) }),
-        secondaryButtonConfig = ButtonConfig(
-            type = ButtonType.PRIMARY,
-            enabled = biometricsAvailable,
-            onClick = { viewModel.setEvent(Event.NextButtonPressed(context)) })
-    )
+    val buttons = if (setupMandatory) {
+        StickyBottomType.OneButton(
+            config = ButtonConfig(
+                type = ButtonType.PRIMARY,
+                enabled = biometricsAvailable,
+                onClick = { viewModel.setEvent(NextButtonPressed(context)) }
+            )
+        )
+    } else {
+        StickyBottomType.TwoButtons(
+            primaryButtonConfig = ButtonConfig(
+                type = ButtonType.SECONDARY,
+                onClick = { viewModel.setEvent(SkipButtonPressed) }),
+            secondaryButtonConfig = ButtonConfig(
+                type = ButtonType.PRIMARY,
+                enabled = biometricsAvailable,
+                onClick = { viewModel.setEvent(NextButtonPressed(context)) })
+        )
+    }
     WrapStickyBottomContent(
         modifier = Modifier
             .fillMaxWidth()
@@ -122,9 +147,9 @@ private fun ActionButtons(
 private fun ObserveScreenResume(viewModel: BiometricSetupViewModel) {
     LifecycleEffect(
         lifecycleOwner = LocalLifecycleOwner.current,
-        lifecycleEvent = Lifecycle.Event.ON_RESUME
+        lifecycleEvent = ON_RESUME
     ) {
-        viewModel.setEvent(Event.ScreenResumed)
+        viewModel.setEvent(ScreenResumed)
     }
 }
 
@@ -134,7 +159,7 @@ private fun Content(
     description: String,
     state: State,
     effectFlow: Flow<Effect>,
-    onNavigationRequested: (Effect.Navigation) -> Unit,
+    onNavigationRequested: (Navigation) -> Unit,
     paddingValues: PaddingValues
 ) {
     Column(
@@ -166,7 +191,7 @@ private fun Content(
     LaunchedEffect(Unit) {
         effectFlow.onEach { effect ->
             when (effect) {
-                is Effect.Navigation -> onNavigationRequested(effect)
+                is Navigation -> onNavigationRequested(effect)
             }
         }.collect()
     }
@@ -186,10 +211,10 @@ private fun ErrorText(error: String) {
 
 private fun handleNavigationEffect(
     navController: NavController,
-    navigationEffect: Effect.Navigation,
+    navigationEffect: Navigation,
 ) {
     when (navigationEffect) {
-        is Effect.Navigation.SwitchScreen -> {
+        is SwitchScreen -> {
             navController.navigate(navigationEffect.screen) {
                 popUpTo(CommonScreens.BiometricSetup.screenRoute) { inclusive = true }
             }

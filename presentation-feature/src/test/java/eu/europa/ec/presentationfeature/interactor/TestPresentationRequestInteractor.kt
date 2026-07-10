@@ -19,14 +19,27 @@ package eu.europa.ec.presentationfeature.interactor
 import eu.europa.ec.businesslogic.model.ErrorType
 import eu.europa.ec.authenticationlogic.provider.VaultKeyProvider
 import eu.europa.ec.businesslogic.provider.UuidProvider
-import eu.europa.ec.commonfeature.config.PresentationMode
+import eu.europa.ec.commonfeature.config.PresentationMode.Ble
 import eu.europa.ec.commonfeature.config.RequestUriConfig
 import eu.europa.ec.commonfeature.config.toDomainConfig
 import eu.europa.ec.commonfeature.ui.request.transformer.RequestTransformer
+import eu.europa.ec.corelogic.config.WalletCoreConfig
 import eu.europa.ec.corelogic.controller.TransferEventPartialState
+import eu.europa.ec.corelogic.controller.TransferEventPartialState.Connected
+import eu.europa.ec.corelogic.controller.TransferEventPartialState.Connecting
+import eu.europa.ec.corelogic.controller.TransferEventPartialState.Disconnected
+import eu.europa.ec.corelogic.controller.TransferEventPartialState.Error
+import eu.europa.ec.corelogic.controller.TransferEventPartialState.QrEngagementReady
+import eu.europa.ec.corelogic.controller.TransferEventPartialState.Redirect
+import eu.europa.ec.corelogic.controller.TransferEventPartialState.RequestReceived
+import eu.europa.ec.corelogic.controller.TransferEventPartialState.ResponseSent
 import eu.europa.ec.corelogic.controller.WalletCoreDocumentsController
 import eu.europa.ec.corelogic.controller.WalletCorePresentationController
 import eu.europa.ec.eudi.wallet.document.IssuedDocument
+import eu.europa.ec.presentationfeature.interactor.PresentationRequestInteractorPartialState.Disconnect
+import eu.europa.ec.presentationfeature.interactor.PresentationRequestInteractorPartialState.Failure
+import eu.europa.ec.presentationfeature.interactor.PresentationRequestInteractorPartialState.NoData
+import eu.europa.ec.presentationfeature.interactor.PresentationRequestInteractorPartialState.Success
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.navigation.helper.DcApiIntentHolder
 import eu.europa.ec.testfeature.util.StringResourceProviderMocker.mockTransformToUiItemsStrings
@@ -85,6 +98,9 @@ class TestPresentationRequestInteractor {
     @Mock
     private lateinit var vaultKeyProvider: VaultKeyProvider
 
+    @Mock
+    private lateinit var walletCoreConfig: WalletCoreConfig
+
     private lateinit var interactor: PresentationRequestInteractor
 
     private lateinit var closeable: AutoCloseable
@@ -100,6 +116,7 @@ class TestPresentationRequestInteractor {
             uuidProvider = uuidProvider,
             dcApiIntentHolder = dcApiIntentHolder,
             vaultKeyProvider = vaultKeyProvider,
+            walletCoreConfig = walletCoreConfig,
         )
 
         whenever(resourceProvider.genericErrorMessage()).thenReturn(mockedGenericErrorMessage)
@@ -125,12 +142,12 @@ class TestPresentationRequestInteractor {
         coroutineRule.runTest {
             // Given
             mockWalletCorePresentationControllerEventEmission(
-                event = TransferEventPartialState.Disconnected
+                event = Disconnected
             )
 
             // When
             interactor.getRequestDocuments().runFlowTest {
-                val expectedResult = PresentationRequestInteractorPartialState.Disconnect
+                val expectedResult = Disconnect
 
                 // Then
                 assertEquals(expectedResult, awaitItem())
@@ -153,7 +170,7 @@ class TestPresentationRequestInteractor {
         coroutineRule.runTest {
             // Given
             mockWalletCorePresentationControllerEventEmission(
-                event = TransferEventPartialState.RequestReceived(
+                event = RequestReceived(
                     requestData = emptyList(),
                     verifierName = mockedVerifierName,
                     verifierIsTrusted = mockedVerifierIsTrusted
@@ -162,7 +179,7 @@ class TestPresentationRequestInteractor {
 
             // When
             interactor.getRequestDocuments().runFlowTest {
-                val expectedResult = PresentationRequestInteractorPartialState.NoData(
+                val expectedResult = NoData(
                     verifierName = mockedVerifierName,
                     verifierIsTrusted = mockedVerifierIsTrusted
                 )
@@ -184,14 +201,14 @@ class TestPresentationRequestInteractor {
         coroutineRule.runTest {
             // Given
             mockWalletCorePresentationControllerEventEmission(
-                event = TransferEventPartialState.Error(
+                event = Error(
                     error = mockedPlainFailureMessage
                 )
             )
 
             // When
             interactor.getRequestDocuments().runFlowTest {
-                val expectedResult = PresentationRequestInteractorPartialState.Failure(
+                val expectedResult = Failure(
                     error = mockedPlainFailureMessage
                 )
 
@@ -215,7 +232,7 @@ class TestPresentationRequestInteractor {
         coroutineRule.runTest {
             // Given
             mockWalletCorePresentationControllerEventEmission(
-                event = TransferEventPartialState.RequestReceived(
+                event = RequestReceived(
                     requestData = listOf(
                         mockedValidMdlWithBasicFieldsRequestDocument
                     ),
@@ -229,7 +246,7 @@ class TestPresentationRequestInteractor {
             // When
             interactor.getRequestDocuments().runFlowTest {
                 val expectedResult =
-                    PresentationRequestInteractorPartialState.Failure(error = mockedGenericErrorMessage)
+                    Failure(error = mockedGenericErrorMessage)
 
                 // Then
                 assertEquals(expectedResult, awaitItem())
@@ -266,7 +283,7 @@ class TestPresentationRequestInteractor {
                 resourceProvider = resourceProvider,
             )
             mockWalletCorePresentationControllerEventEmission(
-                event = TransferEventPartialState.RequestReceived(
+                event = RequestReceived(
                     requestData = listOf(
                         mockedValidPidWithBasicFieldsRequestDocument,
                         mockedValidMdlWithBasicFieldsRequestDocument
@@ -292,7 +309,7 @@ class TestPresentationRequestInteractor {
                         uuidProvider = uuidProvider
                     )
 
-                    val expectedResult = PresentationRequestInteractorPartialState.Success(
+                    val expectedResult = Success(
                         verifierName = mockedVerifierName,
                         verifierIsTrusted = mockedVerifierIsTrusted,
                         requestDocuments = RequestTransformer.transformToUiItems(
@@ -323,7 +340,7 @@ class TestPresentationRequestInteractor {
         coroutineRule.runTest {
             // When
             mockWalletCorePresentationControllerEventEmission(
-                event = TransferEventPartialState.RequestReceived(
+                event = RequestReceived(
                     requestData = listOf(
                         mockedValidMdlWithBasicFieldsRequestDocument
                     ),
@@ -335,7 +352,7 @@ class TestPresentationRequestInteractor {
                 .thenThrow(mockedExceptionWithMessage)
 
             interactor.getRequestDocuments().runFlowTest {
-                val expectedResult = PresentationRequestInteractorPartialState.Failure(
+                val expectedResult = Failure(
                     error = mockedExceptionWithMessage.localizedMessage!!
                 )
                 assertEquals(expectedResult, awaitItem())
@@ -375,7 +392,7 @@ class TestPresentationRequestInteractor {
         coroutineRule.runTest {
             // Given
             mockWalletCorePresentationControllerEventEmission(
-                event = TransferEventPartialState.Connecting
+                event = Connecting
             )
 
             // When
@@ -397,7 +414,7 @@ class TestPresentationRequestInteractor {
         coroutineRule.runTest {
             // Given
             mockWalletCorePresentationControllerEventEmission(
-                event = TransferEventPartialState.Error(
+                event = Error(
                     error = mockedPlainFailureMessage,
                     errorType = ErrorType.NO_CONNECTION,
                 )
@@ -405,7 +422,7 @@ class TestPresentationRequestInteractor {
 
             // When
             interactor.getRequestDocuments().runFlowTest {
-                val expectedResult = PresentationRequestInteractorPartialState.Failure(
+                val expectedResult = Failure(
                     error = mockedPlainFailureMessage,
                     errorType = ErrorType.NO_CONNECTION,
                 )
@@ -429,7 +446,7 @@ class TestPresentationRequestInteractor {
         coroutineRule.runTest {
             // Given
             mockWalletCorePresentationControllerEventEmission(
-                event = TransferEventPartialState.RequestReceived(
+                event = RequestReceived(
                     requestData = listOf(
                         mockedValidMdlWithBasicFieldsRequestDocument
                     ),
@@ -443,7 +460,7 @@ class TestPresentationRequestInteractor {
             // When
             interactor.getRequestDocuments().runFlowTest {
                 val expectedResult =
-                    PresentationRequestInteractorPartialState.Failure(
+                    Failure(
                         error = mockedNetworkExceptionMessage,
                         errorType = ErrorType.NO_CONNECTION,
                     )
@@ -485,7 +502,7 @@ class TestPresentationRequestInteractor {
     fun `Given Case 1, When setConfig is called, Then Case 1 expected result is returned`() {
         // Given
         val requestConfig = RequestUriConfig(
-            PresentationMode.Ble(initiatorRoute = mockedInitiatorRoute)
+            Ble(initiatorRoute = mockedInitiatorRoute)
         )
         // When
         interactor.setConfig(config = requestConfig)
@@ -493,6 +510,32 @@ class TestPresentationRequestInteractor {
         // Then
         verify(walletCorePresentationController, times(1))
             .setConfig(config = requestConfig.toDomainConfig())
+    }
+    //endregion
+
+    //region shouldUseAppAuthenticationBeforePresentation
+    @Test
+    fun `Given wallet user authentication is required, When shouldUseAppAuthenticationBeforePresentation is called, Then returns false`() {
+        // Given
+        whenever(walletCoreConfig.userAuthenticationRequired).thenReturn(true)
+
+        // When
+        val result = interactor.shouldUseAppAuthenticationBeforePresentation()
+
+        // Then
+        assertEquals(false, result)
+    }
+
+    @Test
+    fun `Given wallet user authentication is not required, When shouldUseAppAuthenticationBeforePresentation is called, Then returns true`() {
+        // Given
+        whenever(walletCoreConfig.userAuthenticationRequired).thenReturn(false)
+
+        // When
+        val result = interactor.shouldUseAppAuthenticationBeforePresentation()
+
+        // Then
+        assertEquals(true, result)
     }
     //endregion
 
@@ -518,11 +561,11 @@ class TestPresentationRequestInteractor {
         whenever(walletCorePresentationController.events)
             .thenReturn(
                 flow {
-                    emit(TransferEventPartialState.Connected)
-                    emit(TransferEventPartialState.Connecting)
-                    emit(TransferEventPartialState.QrEngagementReady(""))
-                    emit(TransferEventPartialState.Redirect(uri = URI("")))
-                    emit(TransferEventPartialState.ResponseSent)
+                    emit(Connected)
+                    emit(Connecting)
+                    emit(QrEngagementReady(""))
+                    emit(Redirect(uri = URI("")))
+                    emit(ResponseSent)
                 }.shareIn(coroutineRule.testScope, SharingStarted.Lazily, 2)
             )
     }

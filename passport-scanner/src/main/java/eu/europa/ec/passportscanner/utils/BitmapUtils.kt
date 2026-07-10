@@ -205,8 +205,8 @@ object BitmapUtils {
             myBitmap,
             0,
             0,
-            myBitmap.getWidth(),
-            myBitmap.getHeight(),
+            myBitmap.width,
+            myBitmap.height,
             matrix,
             true
         )

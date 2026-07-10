@@ -125,6 +125,18 @@ Runtime protection raises the cost of tampering, repackaging, instrumentation an
 - **Tamper response policy.** Define what happens on debugger detection, hook detection, repackaging, root/jailbreak signal, emulator signal and app-signature mismatch. For an AV app, the policy can be proportionate: high-confidence tamper may block sensitive operations, while lower-confidence signals may trigger step-up or re-attestation.
 - **Screen-capture defence.** Android release builds should use `FLAG_SECURE` on screens that expose credential material, QR/session secrets or sensitive confirmations. iOS has no equivalent prevention API; use capture detection (`UIScreen.isCaptured` and capture-change notification) and mask or abort flows where exposing AV material would be inappropriate.
 
+### Known finding in this reference implementation — SCRN-CAPTURE-PASSPORT-01 (Medium)
+
+The passport-scanner Activities render live MRZ data (full name, date of birth, document number, nationality) and capture the user's face image for liveness, but do **not** set `FLAG_SECURE`. The affected screens are:
+
+- `passport-scanner/src/main/java/kl/open/fmandroid/CameraActivity.kt` — front-camera face capture (liveness/embedding).
+- `passport-scanner/src/main/java/eu/europa/ec/passportscanner/SmartScannerActivity.kt` — MRZ camera preview.
+- `passport-scanner/src/main/java/eu/europa/ec/passportscanner/nfc/NFCActivity.kt` — NFC readout (document data + face image bytes).
+
+On a hostile device (in scope per the threat model in Part 8), a screen-recording app (`MediaProjection`), a malicious accessibility service, or an over-the-shoulder screenshot can capture full document PII and the user's biometric face image during scanning — a far larger disclosure than the boolean `age_over_NN` attestation the app is designed to protect. The misleading `MainActivity` comment at `assembly-logic/src/main/java/eu/europa/ec/assemblylogic/ui/MainActivity.kt` justifies the global omission with "This wallet displays only age-over-X boolean attestations — no passport images, document numbers, or sensitive PII appear on screen", which is not true of the passport-scanning sub-flow.
+
+**Implementer action required before production distribution:** set `window.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)` in `onCreate` (before `super.onCreate`) on each of the three capture Activities above, or apply it app-wide via the base Activity. Correct the `MainActivity` comment so it no longer implies no sensitive imagery is ever shown; state that `FLAG_SECURE` is not set on `MainActivity` (age-over-X booleans only) but is set on the sensitive capture screens individually. Reference: `SECURITY_AUDIT_2026-07-07.md`; OWASP MASVS-PLATFORM-3.
+
 ## Policy trade-offs
 
 - **Open-source auditability.** Opaque commercial RASP creates an auditable contradiction for an open-source wallet: the public source no longer fully explains the distributed binary. Where this matters, publish a signed statement identifying the vendor, integration scope and classes of protection applied.

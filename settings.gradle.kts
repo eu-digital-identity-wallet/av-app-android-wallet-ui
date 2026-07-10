@@ -15,7 +15,7 @@
  */
 
 pluginManagement {
-    val toolChainResolverVersion: String by extra
+    val toolChainResolverVersion = extra["toolChainResolverVersion"] as String
     plugins {
         id("org.gradle.toolchains.foojay-resolver-convention") version toolChainResolverVersion
     }

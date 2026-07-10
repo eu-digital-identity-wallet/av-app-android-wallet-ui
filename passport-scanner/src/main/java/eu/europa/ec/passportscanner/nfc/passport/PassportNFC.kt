@@ -18,6 +18,29 @@
 package eu.europa.ec.passportscanner.nfc.passport
 
 import eu.europa.ec.businesslogic.controller.log.LogController
+import eu.europa.ec.passportscanner.nfc.MAX_BLOCKSIZE
+import java.io.IOException
+import java.io.InputStream
+import java.math.BigInteger
+import java.security.GeneralSecurityException
+import java.security.InvalidAlgorithmParameterException
+import java.security.KeyStore
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
+import java.security.PrivateKey
+import java.security.SecureRandom
+import java.security.Security
+import java.security.Signature
+import java.security.cert.Certificate
+import java.security.cert.X509Certificate
+import java.security.spec.MGF1ParameterSpec
+import java.security.spec.PSSParameterSpec
+import java.util.Arrays
+import java.util.Collections
+import java.util.Random
+import java.util.TreeMap
+import java.util.TreeSet
+import javax.security.auth.x500.X500Principal
 import net.sf.scuba.smartcards.CardServiceException
 import org.jmrtd.BACKey
 import org.jmrtd.FeatureStatus
@@ -49,30 +72,6 @@ import org.jmrtd.protocol.BACResult
 import org.jmrtd.protocol.EACCAResult
 import org.jmrtd.protocol.EACTAResult
 import org.jmrtd.protocol.PACEResult
-import java.io.IOException
-import java.io.InputStream
-import java.math.BigInteger
-import java.security.GeneralSecurityException
-import java.security.InvalidAlgorithmParameterException
-import java.security.KeyStore
-import java.security.MessageDigest
-import java.security.NoSuchAlgorithmException
-import java.security.PrivateKey
-import java.security.SecureRandom
-import java.security.Security
-import java.security.Signature
-import java.security.cert.Certificate
-import java.security.cert.CertificateException
-import java.security.cert.X509Certificate
-import java.security.spec.MGF1ParameterSpec
-import java.security.spec.PSSParameterSpec
-import java.util.Arrays
-import java.util.Collections
-import java.util.Random
-import java.util.TreeMap
-import java.util.TreeSet
-import javax.security.auth.x500.X500Principal
-
 
 class PassportNFC @Throws(GeneralSecurityException::class)
 private constructor(private val logController: LogController) {
@@ -98,7 +97,6 @@ private constructor(private val logController: LogController) {
      */
     val verificationStatus: VerificationStatus
 
-
     /**
      * Gets the CSCA, CVCA trust store.
      *
@@ -122,34 +120,9 @@ private constructor(private val logController: LogController) {
             updateCOMSODFile(null)
         }
 
-    /**
-     * Gets the CVCA certificate.
-     *
-     * @return a CV certificate or null
-     */
-    /**
-     * Sets the CVCA certificate.
-     *
-     * @param cvCertificate the CV certificate
-     */
-    var cvCertificate: CardVerifiableCertificate? = null
-        set(cert) {
-            field = cert
-            try {
-                val holderRef = cert?.holderReference?.name ?: return
-                val cvcaFile =
-                    CVCAFile(PassportService.EF_CVCA, holderRef)
-                putFile(PassportService.EF_CVCA, cvcaFile.encoded)
-            } catch (ce: CertificateException) {
-                logController.e(TAG, ce) { "Certificate exception" }
-            }
-
-        }
-
     private var service: PassportService? = null
 
     private val random: Random
-
 
     var comFile: COMFile? = null
         private set
@@ -170,15 +143,12 @@ private constructor(private val logController: LogController) {
     var cvcaFile: CVCAFile? = null
         private set
 
-
     init {
         this.features = FeatureStatus()
         this.verificationStatus = VerificationStatus()
 
         this.random = SecureRandom()
-
     }
-
 
     /**
      * Creates a document by reading it from a service.
@@ -195,7 +165,7 @@ private constructor(private val logController: LogController) {
         ps: PassportService?,
         trustManager: MRTDTrustStore,
         mrzInfo: MRZInfo,
-        logController: LogController
+        logController: LogController,
     ) : this(logController) {
         if (ps == null) {
             throw IllegalArgumentException("Service cannot be null")
@@ -213,7 +183,7 @@ private constructor(private val logController: LogController) {
             try {
                 logController.i(TAG) { "Inspecting card access file" }
                 val cardAccessFile =
-                    CardAccessFile(ps.getInputStream(PassportService.EF_CARD_ACCESS))
+                    CardAccessFile(ps.getInputStream(PassportService.EF_CARD_ACCESS, MAX_BLOCKSIZE))
                 val securityInfos = cardAccessFile.securityInfos
                 for (securityInfo in securityInfos) {
                     if (securityInfo is PACEInfo) {
@@ -235,7 +205,6 @@ private constructor(private val logController: LogController) {
                     logController.e(TAG, e) { "PACE failed, falling back to BAC" }
                     isSACSucceeded = false
                 }
-
             }
             (service as PassportService).sendSelectApplet(isSACSucceeded)
         } catch (cse: CardServiceException) {
@@ -248,7 +217,7 @@ private constructor(private val logController: LogController) {
         /* Find out whether this MRTD supports BAC. */
         try {
             /* Attempt to read EF.COM before BAC. */
-            COMFile((service as PassportService).getInputStream(PassportService.EF_COM))
+            COMFile((service as PassportService).getInputStream(PassportService.EF_COM, MAX_BLOCKSIZE))
 
             if (isSACSucceeded) {
                 verificationStatus.setSAC(VerificationStatus.Verdict.SUCCEEDED, "Succeeded")
@@ -300,9 +269,7 @@ private constructor(private val logController: LogController) {
                     triedBACEntries
                 )
             }
-
         }
-
 
         /* Pre-read these files that are always present. */
 
@@ -397,7 +364,6 @@ private constructor(private val logController: LogController) {
             } catch (_: Exception) {
                 verificationStatus.setCA(VerificationStatus.Verdict.FAILED, "CA Failed", null)
             }
-
         }
 
         val hasEAC = features.hasEAC() == Verdict.PRESENT
@@ -484,29 +450,6 @@ private constructor(private val logController: LogController) {
     }
 
     /**
-     * Inserts a file into this document, and updates EF_COM and EF_SOd accordingly.
-     *
-     * @param fid the FID of the new file
-     * @param bytes the contents of the new file
-     */
-    private fun putFile(fid: Short, bytes: ByteArray?) {
-        if (bytes == null) {
-            return
-        }
-        try {
-            //lds.add(fid, new ByteArrayInputStream(bytes), bytes.length);
-            // FIXME: is this necessary?
-            if (fid != PassportService.EF_COM && fid != PassportService.EF_SOD && fid != PassportService.EF_CVCA) {
-                updateCOMSODFile(null)
-            }
-        } catch (ioe: Exception) {
-            logController.e(TAG, ioe) { "Failed to insert file" }
-        }
-
-        verificationStatus.setAll(VerificationStatus.Verdict.UNKNOWN, "Unknown") // FIXME: why all?
-    }
-
-    /**
      * Updates EF_COM and EF_SOd using a new document signing certificate.
      *
      * @param newCertificate a certificate
@@ -545,9 +488,7 @@ private constructor(private val logController: LogController) {
         } catch (e: Exception) {
             logController.e(TAG, e) { "Failed to update EF_COM and EF_SOD" }
         }
-
     }
-
 
     /**
      * Checks the security object's signature.
@@ -583,7 +524,6 @@ private constructor(private val logController: LogController) {
             verificationStatus.setDS(VerificationStatus.Verdict.FAILED, "Unexpected exception")
             return  /* NOTE: Serious enough to not perform other checks, leave method. */
         }
-
     }
 
     /**
@@ -627,8 +567,8 @@ private constructor(private val logController: LogController) {
             }
 
             /* Get trust anchors. */
-            val cscaStores = trustManager?.cscaStores
-            if (cscaStores == null || cscaStores.size <= 0) {
+            val cscaStores = trustManager?.cscaStores?.toList()
+            if (cscaStores.isNullOrEmpty()) {
                 logController.w(TAG) { "No CSCA certificate stores found." }
                 verificationStatus.setCS(
                     VerificationStatus.Verdict.FAILED,
@@ -636,8 +576,8 @@ private constructor(private val logController: LogController) {
                     chain
                 )
             }
-            val cscaTrustAnchors = trustManager?.cscaAnchors
-            if (cscaTrustAnchors == null || cscaTrustAnchors.size <= 0) {
+            val cscaTrustAnchors = trustManager?.cscaAnchors?.toSet()
+            if (cscaTrustAnchors.isNullOrEmpty()) {
                 logController.w(TAG) { "No CSCA trust anchors found." }
                 verificationStatus.setCS(
                     VerificationStatus.Verdict.FAILED,
@@ -703,7 +643,6 @@ private constructor(private val logController: LogController) {
                     chain
                 )
             }
-
         } catch (e: Exception) {
             logController.e(TAG, e) { "Failed to build certificate chain" }
             verificationStatus.setCS(
@@ -712,7 +651,6 @@ private constructor(private val logController: LogController) {
                 EMPTY_CERTIFICATE_CHAIN
             )
         }
-
     }
 
     /**
@@ -763,7 +701,7 @@ private constructor(private val logController: LogController) {
     @Throws(CardServiceException::class, IOException::class)
     fun readEF(service: PassportService, n: Int): ByteArray? {
 
-        val efdgMap = mapOf<Int, Short>(
+        val efdgMap = mapOf(
             1 to PassportService.EF_DG1,
             2 to PassportService.EF_DG2,
             3 to PassportService.EF_DG3,
@@ -779,7 +717,7 @@ private constructor(private val logController: LogController) {
 
         val ef = efdgMap[n] ?: return null
 
-        return service.getInputStream(ef).use { dgInputStream ->
+        return service.getInputStream(ef, MAX_BLOCKSIZE).use { dgInputStream ->
             val buf = ByteArray(dgInputStream.length)
             var qb: Int
             var i = 0
@@ -811,7 +749,7 @@ private constructor(private val logController: LogController) {
      */
     private fun verifyHash(
         dgNumber: Int,
-        hashResults: MutableMap<Int, VerificationStatus.HashMatchResult>
+        hashResults: MutableMap<Int, VerificationStatus.HashMatchResult>,
     ): VerificationStatus.HashMatchResult? {
         val fid = LDSFileUtil.lookupFIDByTag(LDSFileUtil.lookupTagByDataGroupNumber(dgNumber))
         val currentSodFile = sodFile ?: run {
@@ -874,7 +812,6 @@ private constructor(private val logController: LogController) {
                 hashResults[dgNumber] = hashResult
                 return hashResult
             }
-
         } catch (_: Exception) {
             val hashResult = VerificationStatus.HashMatchResult(storedHash, null)
             hashResults[dgNumber] = hashResult
@@ -888,7 +825,7 @@ private constructor(private val logController: LogController) {
 
         /* Compute the hash and compare. */
         try {
-            val computedHash = (digest ?: return null).digest(dgBytes)
+            val computedHash = (digest ?: return null).digest(dgBytes ?: return null)
             val hashResult = VerificationStatus.HashMatchResult(storedHash, computedHash)
             hashResults[dgNumber] = hashResult
 
@@ -911,9 +848,7 @@ private constructor(private val logController: LogController) {
             )
             return hashResult
         }
-
     }
-
 
     @Throws(NoSuchAlgorithmException::class)
     private fun getDigest(digestAlgorithm: String): MessageDigest? {
@@ -960,9 +895,7 @@ private constructor(private val logController: LogController) {
                 return null
             }
         }
-
     }
-
 
     /**
      * Verifies the signature over the contents of the security object.
@@ -1010,7 +943,6 @@ private constructor(private val logController: LogController) {
             return digestBytes.contentEquals(signature)
         }
 
-
         /* For RSA_SA_PSS
          *    1. the default hash is SHA1,
          *    2. The hash id is not encoded in OID
@@ -1046,12 +978,11 @@ private constructor(private val logController: LogController) {
         return sig.verify(signature)
     }
 
-
     private fun findSaltRsaPss(
         digestEncryptionAlgorithm: String,
         docSigningCert: Certificate?,
         eContent: ByteArray,
-        signature: ByteArray
+        signature: ByteArray,
     ): Int {
         //Using brute force
         for (i in 0..512) {
@@ -1073,14 +1004,12 @@ private constructor(private val logController: LogController) {
                 }
             } catch (e: Exception) {
                 if (e is InvalidAlgorithmParameterException) {
-                    logController.w(TAG) { "findSaltRsaPss: Invalid param with salt value: $i. ${e.message}" }
+                    logController.w(TAG) { "findSaltRsaPss: Invalid param with salt value: $i (${e.javaClass.simpleName})" }
                     continue
-                }
-                else {
-                    logController.e(TAG) { "findSaltRSA_PSS: ${e.message}" }
+                } else {
+                    logController.e(TAG) { "findSaltRSA_PSS: signature verification failed (${e.javaClass.simpleName})" }
                 }
             }
-
         }
         return 0//Unable to find it
     }
@@ -1092,7 +1021,7 @@ private constructor(private val logController: LogController) {
         try {
             val bacKey = BACKey(mrzInfo.documentNumber, mrzInfo.dateOfBirth, mrzInfo.dateOfExpiry)
             val paceKeySpec = PACEKeySpec.createMRZKey(bacKey)
-            isCardAccessFile = ps.getInputStream(PassportService.EF_CARD_ACCESS)
+            isCardAccessFile = ps.getInputStream(PassportService.EF_CARD_ACCESS, MAX_BLOCKSIZE)
 
             val cardAccessFile = CardAccessFile(isCardAccessFile)
             val securityInfos = cardAccessFile.securityInfos
@@ -1107,7 +1036,8 @@ private constructor(private val logController: LogController) {
                 paceResult = ps.doPACE(
                     paceKeySpec,
                     paceInfo.objectIdentifier,
-                    PACEInfo.toParameterSpec(paceInfo.parameterId)
+                    PACEInfo.toParameterSpec(paceInfo.parameterId),
+                    null
                 )
             }
         } finally {
@@ -1124,7 +1054,7 @@ private constructor(private val logController: LogController) {
 
     private data class SecurityInfoData(
         val chipAuthenticationInfo: ChipAuthenticationInfo?,
-        val chipAuthenticationPublicKeyInfos: List<ChipAuthenticationPublicKeyInfo>
+        val chipAuthenticationPublicKeyInfos: List<ChipAuthenticationPublicKeyInfo>,
     )
 
     private fun parseSecurityInfos(dg14File: DG14File): SecurityInfoData {
@@ -1137,6 +1067,7 @@ private constructor(private val logController: LogController) {
                     logController.i(TAG) { "doEACCA: found ChipAuthenticationInfo" }
                     chipAuthenticationInfo = securityInfo
                 }
+
                 is ChipAuthenticationPublicKeyInfo -> {
                     logController.i(TAG) { "doEACCA: found ChipAuthenticationPublicKeyInfo" }
                     chipAuthenticationPublicKeyInfos.add(securityInfo)
@@ -1150,7 +1081,7 @@ private constructor(private val logController: LogController) {
     private fun tryAuthenticationWithInfo(
         ps: PassportService,
         chipAuthenticationInfo: ChipAuthenticationInfo,
-        publicKeyInfo: ChipAuthenticationPublicKeyInfo
+        publicKeyInfo: ChipAuthenticationPublicKeyInfo,
     ): EACCAResult? {
         return try {
             val keyid = chipAuthenticationInfo.keyId
@@ -1174,7 +1105,7 @@ private constructor(private val logController: LogController) {
 
     private fun tryECDHAuthentication(
         ps: PassportService,
-        publicKeyInfo: ChipAuthenticationPublicKeyInfo
+        publicKeyInfo: ChipAuthenticationPublicKeyInfo,
     ): EACCAResult? {
         val oidmapECDH = mapOf(
             SecurityInfo.ID_CA_ECDH_3DES_CBC_CBC to "id-CA-ECDH-3DES-CBC-CBC",
@@ -1209,7 +1140,7 @@ private constructor(private val logController: LogController) {
 
     private fun tryDHAuthentication(
         ps: PassportService,
-        publicKeyInfo: ChipAuthenticationPublicKeyInfo
+        publicKeyInfo: ChipAuthenticationPublicKeyInfo,
     ): EACCAResult? {
         val oidmapDH = mapOf(
             SecurityInfo.ID_CA_DH_3DES_CBC_CBC to "id-CA-DH-3DES-CBC-CBC",
@@ -1245,7 +1176,7 @@ private constructor(private val logController: LogController) {
     private fun processPublicKeyInfo(
         ps: PassportService,
         publicKeyInfo: ChipAuthenticationPublicKeyInfo,
-        chipAuthenticationInfo: ChipAuthenticationInfo?
+        chipAuthenticationInfo: ChipAuthenticationInfo?,
     ): EACCAResult? {
         if (chipAuthenticationInfo != null) {
             return tryAuthenticationWithInfo(ps, chipAuthenticationInfo, publicKeyInfo)
@@ -1271,7 +1202,7 @@ private constructor(private val logController: LogController) {
     private fun doEACCA(
         ps: PassportService,
         dg14File: DG14File?,
-        sodFile: SODFile?
+        sodFile: SODFile?,
     ): List<EACCAResult> {
         logController.i(TAG) { "doEACCA entry" }
         if (dg14File == null) {
@@ -1314,7 +1245,7 @@ private constructor(private val logController: LogController) {
         cvcaFile: CVCAFile?,
         paceResult: PACEResult?,
         eaccaResult: EACCAResult?,
-        cvcaKeyStores: List<KeyStore>
+        cvcaKeyStores: List<KeyStore>,
     ): List<EACTAResult> {
         if (cvcaFile == null) {
             throw NullPointerException("CVCAFile is null")
@@ -1323,7 +1254,6 @@ private constructor(private val logController: LogController) {
         if (eaccaResult == null) {
             throw NullPointerException("EACCAResult is null")
         }
-
 
         val eactaResults = ArrayList<EACTAResult>()
         val possibleCVCAReferences = arrayOf(cvcaFile.caReference, cvcaFile.altCAReference)
@@ -1375,14 +1305,12 @@ private constructor(private val logController: LogController) {
         return eactaResults
     }
 
-
     @Throws(CardServiceException::class, IOException::class)
     private fun getComFile(ps: PassportService): COMFile {
-        //COM FILE
         var isComFile: InputStream? = null
         try {
-            isComFile = ps.getInputStream(PassportService.EF_COM)
-            return LDSFileUtil.getLDSFile(PassportService.EF_COM, isComFile) as COMFile
+            isComFile = ps.getInputStream(PassportService.EF_COM, MAX_BLOCKSIZE)
+            return readLDSFile<COMFile>(PassportService.EF_COM, isComFile)
         } finally {
             isComFile?.close()
         }
@@ -1390,11 +1318,10 @@ private constructor(private val logController: LogController) {
 
     @Throws(CardServiceException::class, IOException::class)
     private fun getSodFile(ps: PassportService): SODFile {
-        //SOD FILE
         var isSodFile: InputStream? = null
         try {
-            isSodFile = ps.getInputStream(PassportService.EF_SOD)
-            return LDSFileUtil.getLDSFile(PassportService.EF_SOD, isSodFile) as SODFile
+            isSodFile = ps.getInputStream(PassportService.EF_SOD, MAX_BLOCKSIZE)
+            return readLDSFile<SODFile>(PassportService.EF_SOD, isSodFile)
         } finally {
             isSodFile?.close()
         }
@@ -1402,11 +1329,10 @@ private constructor(private val logController: LogController) {
 
     @Throws(CardServiceException::class, IOException::class)
     private fun getDG1File(ps: PassportService): DG1File {
-        // Basic data
         var isDG1: InputStream? = null
         try {
-            isDG1 = ps.getInputStream(PassportService.EF_DG1)
-            return LDSFileUtil.getLDSFile(PassportService.EF_DG1, isDG1) as DG1File
+            isDG1 = ps.getInputStream(PassportService.EF_DG1, MAX_BLOCKSIZE)
+            return readLDSFile<DG1File>(PassportService.EF_DG1, isDG1)
         } finally {
             isDG1?.close()
         }
@@ -1414,11 +1340,10 @@ private constructor(private val logController: LogController) {
 
     @Throws(CardServiceException::class, IOException::class)
     private fun getDG2File(ps: PassportService): DG2File {
-        // Basic data
         var isDG2: InputStream? = null
         try {
-            isDG2 = ps.getInputStream(PassportService.EF_DG2)
-            return LDSFileUtil.getLDSFile(PassportService.EF_DG2, isDG2) as DG2File
+            isDG2 = ps.getInputStream(PassportService.EF_DG2, MAX_BLOCKSIZE)
+            return readLDSFile<DG2File>(PassportService.EF_DG2, isDG2)
         } finally {
             isDG2?.close()
         }
@@ -1426,11 +1351,10 @@ private constructor(private val logController: LogController) {
 
     @Throws(CardServiceException::class, IOException::class)
     private fun getDG5File(ps: PassportService): DG5File {
-        // Basic data
         var isDG5: InputStream? = null
         try {
-            isDG5 = ps.getInputStream(PassportService.EF_DG5)
-            return LDSFileUtil.getLDSFile(PassportService.EF_DG5, isDG5) as DG5File
+            isDG5 = ps.getInputStream(PassportService.EF_DG5, MAX_BLOCKSIZE)
+            return readLDSFile(PassportService.EF_DG5, isDG5)
         } finally {
             isDG5?.close()
         }
@@ -1438,11 +1362,10 @@ private constructor(private val logController: LogController) {
 
     @Throws(CardServiceException::class, IOException::class)
     private fun getDG11File(ps: PassportService): DG11File {
-        // Basic data
         var isDG11: InputStream? = null
         try {
-            isDG11 = ps.getInputStream(PassportService.EF_DG11)
-            return LDSFileUtil.getLDSFile(PassportService.EF_DG11, isDG11) as DG11File
+            isDG11 = ps.getInputStream(PassportService.EF_DG11, MAX_BLOCKSIZE)
+            return readLDSFile(PassportService.EF_DG11, isDG11)
         } finally {
             isDG11?.close()
         }
@@ -1450,11 +1373,10 @@ private constructor(private val logController: LogController) {
 
     @Throws(CardServiceException::class, IOException::class)
     private fun getDG14File(ps: PassportService): DG14File {
-        // Basic data
         var isDG14: InputStream? = null
         try {
-            isDG14 = ps.getInputStream(PassportService.EF_DG14)
-            return LDSFileUtil.getLDSFile(PassportService.EF_DG14, isDG14) as DG14File
+            isDG14 = ps.getInputStream(PassportService.EF_DG14, MAX_BLOCKSIZE)
+            return readLDSFile<DG14File>(PassportService.EF_DG14, isDG14)
         } finally {
             isDG14?.close()
         }
@@ -1462,11 +1384,10 @@ private constructor(private val logController: LogController) {
 
     @Throws(CardServiceException::class, IOException::class)
     private fun getDG15File(ps: PassportService): DG15File {
-        // Basic data
         var isDG15: InputStream? = null
         try {
-            isDG15 = ps.getInputStream(PassportService.EF_DG15)
-            return LDSFileUtil.getLDSFile(PassportService.EF_DG15, isDG15) as DG15File
+            isDG15 = ps.getInputStream(PassportService.EF_DG15, MAX_BLOCKSIZE)
+            return readLDSFile<DG15File>(PassportService.EF_DG15, isDG15)
         } finally {
             isDG15?.close()
         }
@@ -1474,11 +1395,10 @@ private constructor(private val logController: LogController) {
 
     @Throws(CardServiceException::class, IOException::class)
     private fun getCVCAFile(ps: PassportService): CVCAFile {
-        // Basic data
         var isEF_CVCA: InputStream? = null
         try {
-            isEF_CVCA = ps.getInputStream(PassportService.EF_CVCA)
-            return LDSFileUtil.getLDSFile(PassportService.EF_CVCA, isEF_CVCA) as CVCAFile
+            isEF_CVCA = ps.getInputStream(PassportService.EF_CVCA, MAX_BLOCKSIZE)
+            return readLDSFile<CVCAFile>(PassportService.EF_CVCA, isEF_CVCA)
         } finally {
             isEF_CVCA?.close()
         }
@@ -1496,7 +1416,6 @@ private constructor(private val logController: LogController) {
             } catch (nfe: NumberFormatException) {
                 logController.w(TAG, nfe) { "Could not find DG number for tag" }
             }
-
         }
         return dgNumberList
     }
@@ -1505,9 +1424,19 @@ private constructor(private val logController: LogController) {
 
         private val TAG = PassportNFC::class.java.simpleName
 
-        private val BC_PROVIDER = JMRTDSecurityProvider.spongyCastleProvider
+        private val BC_PROVIDER = JMRTDSecurityProvider.bouncyCastleProvider
 
         private val EMPTY_TRIED_BAC_ENTRY_LIST = emptyList<BACKey>()
         private val EMPTY_CERTIFICATE_CHAIN = emptyList<Certificate>()
+
+        @Suppress("UNCHECKED_CAST")
+        private fun <T> readLDSFile(fid: Short, inputStream: InputStream?): T {
+            return getLDSFileAsAny(fid, inputStream) as T
+        }
     }
 }
+fun getLDSFileAsAny(fid: Short, inputStream: InputStream?): Any {
+    @Suppress("INFERRED_INVISIBLE_RETURN_TYPE_WARNING")
+    return LDSFileUtil.getLDSFile(fid, inputStream)
+}
+
