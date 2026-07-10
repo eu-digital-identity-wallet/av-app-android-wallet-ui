@@ -14,6 +14,7 @@
  * governing permissions and limitations under the Licence.
  */
 
+import java.util.Properties
 import project.convention.logic.AppBuildType
 import project.convention.logic.config.LibraryModule
 import project.convention.logic.getProperty
@@ -43,8 +44,13 @@ android {
 
     defaultConfig {
         applicationId = "com.scytales.av"
-        val ciBuildNumber = System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 1
-        versionCode = ciBuildNumber + 4 // last build in store was 4
+
+        val versionProperties = Properties().apply {
+            load(rootProject.file("version.properties").inputStream())
+        }
+        val explicitVersionCode = System.getenv("VERSION_CODE")?.toIntOrNull()
+            ?: versionProperties.getProperty("VERSION_CODE")?.toIntOrNull()
+        versionCode = explicitVersionCode ?: ((System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 1) + 4)
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
