@@ -67,9 +67,7 @@ In either case open a terminal pointing to the directory you put the sources in.
 
 To test the app, there is an issuer and verifier service available online. This allows you to perform the enrollment directly from within the app or via the online issuer in order to receive a proof of age attestation. With the verifier, you can then present this attestation.
 
-- **Issuer functionality**, to support development and testing, one can access an OID4VCI test/demo service for issuing at: [Age Verification Issuer](https://issuer.ageverification.dev/)
- 
-- **Relying Party functionality:** To support development and testing, one can access a test/demo service for remote presentation at: [Age Verification Verifier](https://verifier.ageverification.dev/)
+A step-by-step guide covering installation, issuing and presenting a proof of age attestation using the online test/demo services is available at [Getting started](https://ageverification.dev/Getting%20started/app_installation/).
 
 ### Videos
 
