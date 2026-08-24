@@ -171,6 +171,8 @@ private fun Content(
             text = stringResource(R.string.onboarding_verification_title),
             textConfig = TextConfig(
                 style = MaterialTheme.typography.titleLarge,
+                maxLines = Int.MAX_VALUE,
+                isHeading = true
             ),
         )
         VSpacer.Large()

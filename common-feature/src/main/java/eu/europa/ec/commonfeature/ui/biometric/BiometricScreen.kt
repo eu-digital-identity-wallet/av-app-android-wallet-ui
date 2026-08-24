@@ -292,7 +292,11 @@ private fun LoginOnAppStartup(
         )
         VSpacer.ExtraLarge()
         WrapText(
-            textConfig = TextConfig(style = MaterialTheme.typography.titleLarge),
+            textConfig = TextConfig(
+                style = MaterialTheme.typography.titleLarge,
+                maxLines = Int.MAX_VALUE,
+                isHeading = true
+            ),
             text = mode.title
         )
 

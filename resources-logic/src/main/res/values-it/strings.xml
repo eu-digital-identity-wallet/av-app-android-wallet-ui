@@ -14,10 +14,15 @@
   ~ governing permissions and limitations under the Licence.
   -->
 <resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="accessibility_page_of_total">Pagina %1$d di %2$d</string>
+    <string name="accessibility_page_of_total_titled">Pagina %1$d di %2$d: %3$s</string>
+    <string name="accessibility_step_current">Passaggio corrente</string>
+    <string name="accessibility_step_of_total">Passaggio %1$d di %2$d: %3$s</string>
     <string name="age_over">Maggiore di %d anni\n</string>
     <string name="age_over_18">Età superiore a 18 anni</string>
     <string name="biometric_confirm_request">Confirm request</string>
     <string name="biometric_default_mode_text_above_pin_field">PIN</string>
+    <string name="biometric_key_invalidated">Chiave biometrica invalidata — è richiesta una nuova registrazione</string>
     <string name="biometric_login_biometrics_enabled_subtitle">Usa i tuoi dati biometrici per accedere all\'applicazione di verifica dell\'età.</string>
     <string name="biometric_login_biometrics_not_enabled_subtitle">Per accedere all\'applicazione di verifica dell\'età, inserisci il tuo PIN.</string>
     <string name="biometric_login_forgot_pin">Hai dimenticato il tuo PIN?</string>
@@ -25,13 +30,12 @@
     <string name="biometric_no_hardware">Il tuo dispositivo non supporta l\'autenticazione biometrica</string>
     <string name="biometric_prompt_subtitle">Accedi con i tuoi dati biometrici</string>
     <string name="biometric_prompt_title">Autenticazione biometrica</string>
-    <string name="biometric_setup_description">Usa la tua impronta digitale o il riconoscimento facciale per accedere all\'app &quot;%s&quot;.</string>
+    <string name="biometric_setup_description">Usa la tua impronta digitale o il riconoscimento facciale per accedere all\'app \"%s\".</string>
     <string name="biometric_setup_enable">Avvia la configurazione</string>
     <string name="biometric_setup_required_error">L\'autenticazione biometrica è necessaria per usare questa app.</string>
     <string name="biometric_setup_skip">Salta</string>
     <string name="biometric_setup_title">Accesso biometrico</string>
     <string name="biometric_unknown_error">Si è verificato un errore durante l\'inizializzazione dell\'autenticazione biometrica. Riprova.</string>
-    <string name="biometric_key_invalidated">Chiave biometrica invalidata — è richiesta una nuova registrazione</string>
     <string name="cd_close_button">Indietro</string>
     <string name="cd_flash_button">Attiva/disattiva il flash della fotocamera</string>
     <string name="confirm_doc_removal_dialog_delete">Sì, elimina</string>
@@ -66,14 +70,16 @@
     <string name="content_description_in_progress_icon">In corso</string>
     <string name="content_description_info_icon">Informazioni</string>
     <string name="content_description_issuer_logo_icon">Logo dell\'emittente</string>
-    <string name="content_description_logo_plain_icon">Icona del logo normale</string>
-    <string name="content_description_logo_text_icon">Icona del logo testuale</string>
+    <string name="content_description_logo_plain_icon">Logo dell\'app Verifica dell\'età</string>
+    <string name="content_description_logo_text_icon">Verifica dell\'età</string>
     <string name="content_description_message_icon">Messaggio</string>
     <string name="content_description_more_vert_icon">Più elementi</string>
     <string name="content_description_national_eid_icon">eID Nazionale</string>
     <string name="content_description_no_connection_icon">Nessuna connessione Internet</string>
     <string name="content_description_open_new_icon">Apri nuovo</string>
     <string name="content_description_over_18_icon">Più di 18</string>
+    <string name="content_description_passport_face_image">Foto dal documento scansionato</string>
+    <string name="content_description_passport_face_image_placeholder">Nessuna foto del documento disponibile</string>
     <string name="content_description_present_document_same_device_icon">Presenta il documento di persona</string>
     <string name="content_description_qr_icon">QR</string>
     <string name="content_description_qr_scanner_icon">Scanner QR</string>

@@ -1,0 +1,7 @@
+{
+  "projectId": "eudi-av",
+  "platform": "android",
+  "android": {
+    "resDir": "resources-logic/src/main/res"
+  }
+}

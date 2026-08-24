@@ -14,10 +14,15 @@
   ~ governing permissions and limitations under the Licence.
   -->
 <resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="accessibility_page_of_total">Page %1$d sur %2$d</string>
+    <string name="accessibility_page_of_total_titled">Page %1$d sur %2$d : %3$s</string>
+    <string name="accessibility_step_current">Étape actuelle</string>
+    <string name="accessibility_step_of_total">Étape %1$d sur %2$d : %3$s</string>
     <string name="age_over">Âgé de plus de %d ans</string>
     <string name="age_over_18">Âge supérieur à 18 ans</string>
     <string name="biometric_confirm_request">Confirm request</string>
     <string name="biometric_default_mode_text_above_pin_field">PIN</string>
+    <string name="biometric_key_invalidated">Clé biométrique invalidée — réenregistrement requis</string>
     <string name="biometric_login_biometrics_enabled_subtitle">Utilisez votre biométrie pour accéder au portefeuille de vérification d\'âge.</string>
     <string name="biometric_login_biometrics_not_enabled_subtitle">Pour accéder au portefeuille de vérification d\'âge, veuillez saisir votre code PIN.</string>
     <string name="biometric_login_forgot_pin">Vous avez oublié votre code PIN ?</string>
@@ -25,13 +30,12 @@
     <string name="biometric_no_hardware">Votre appareil ne prend pas en charge l\'authentification biométrique</string>
     <string name="biometric_prompt_subtitle">Authentifiez-vouz avec l\'utilisation de votre biométrie</string>
     <string name="biometric_prompt_title">Authentification biométrique</string>
-    <string name="biometric_setup_description">Utilisez votre empreinte digitale ou votre reconnaissance faciale pour vous connecter au &quot;%s&quot; App.</string>
+    <string name="biometric_setup_description">Utilisez votre empreinte digitale ou votre reconnaissance faciale pour vous connecter au \"%s\" App.</string>
     <string name="biometric_setup_enable">Démarrer la configuration</string>
     <string name="biometric_setup_required_error">L\'authentification biométrique est requise pour utiliser cette application.</string>
     <string name="biometric_setup_skip">Passer</string>
     <string name="biometric_setup_title">Accès biométrique</string>
     <string name="biometric_unknown_error">Un défaut est apparu lors de l\'initialisation de l\'authentification biométrique. Veuillez réessayer.</string>
-    <string name="biometric_key_invalidated">Clé biométrique invalidée — réenregistrement requis</string>
     <string name="cd_close_button">Retour</string>
     <string name="cd_flash_button">Activer/désactiver le flash de l\'appareil photo</string>
     <string name="confirm_doc_removal_dialog_delete">Oui, supprimer.</string>
@@ -66,14 +70,16 @@
     <string name="content_description_in_progress_icon">En cours</string>
     <string name="content_description_info_icon">Informations</string>
     <string name="content_description_issuer_logo_icon">Logo de l\'émetteur</string>
-    <string name="content_description_logo_plain_icon">Logo simple</string>
-    <string name="content_description_logo_text_icon">Logo avec texte</string>
+    <string name="content_description_logo_plain_icon">Logo de l\'application Vérification de l\'âge</string>
+    <string name="content_description_logo_text_icon">Vérification de l\'âge</string>
     <string name="content_description_message_icon">Message</string>
     <string name="content_description_more_vert_icon">Plus d\'articles</string>
     <string name="content_description_national_eid_icon">eID national</string>
     <string name="content_description_no_connection_icon">Pas de connexion Internet</string>
     <string name="content_description_open_new_icon">Ouvrir nouveau</string>
     <string name="content_description_over_18_icon">Plus de 18 ans</string>
+    <string name="content_description_passport_face_image">Photo de votre document scanné</string>
+    <string name="content_description_passport_face_image_placeholder">Aucune photo de document disponible</string>
     <string name="content_description_present_document_same_device_icon">Présenter le document en personne</string>
     <string name="content_description_qr_icon">QR</string>
     <string name="content_description_qr_scanner_icon">Lecteur QR</string>

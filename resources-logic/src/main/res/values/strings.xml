@@ -14,10 +14,15 @@
   ~ governing permissions and limitations under the Licence.
   -->
 <resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="accessibility_page_of_total">Page %1$d of %2$d</string>
+    <string name="accessibility_page_of_total_titled">Page %1$d of %2$d: %3$s</string>
+    <string name="accessibility_step_current">Current step</string>
+    <string name="accessibility_step_of_total">Step %1$d of %2$d: %3$s</string>
     <string name="age_over">Age over %d</string>
     <string name="age_over_18">Age over 18</string>
     <string name="biometric_confirm_request">Confirm request</string>
     <string name="biometric_default_mode_text_above_pin_field">PIN</string>
+    <string name="biometric_key_invalidated">Biometric key invalidated — re-enrollment required</string>
     <string name="biometric_login_biometrics_enabled_subtitle">Use your biometrics to access the Age Verification Application.</string>
     <string name="biometric_login_biometrics_not_enabled_subtitle">To access the Age Verification Application, please enter your PIN.</string>
     <string name="biometric_login_forgot_pin">Forgot your PIN?</string>
@@ -25,13 +30,12 @@
     <string name="biometric_no_hardware">Your device does not support biometric authentication</string>
     <string name="biometric_prompt_subtitle">Authenticate using your biometrics</string>
     <string name="biometric_prompt_title">Biometric authentication</string>
-    <string name="biometric_setup_description">Use your fingerprint or face recognition to log in to the &quot;%s&quot; app.</string>
+    <string name="biometric_setup_description">Use your fingerprint or face recognition to log in to the \"%s\" app.</string>
     <string name="biometric_setup_enable">Start setup</string>
     <string name="biometric_setup_required_error">Biometric authentication is required to use this app.</string>
     <string name="biometric_setup_skip">Skip</string>
     <string name="biometric_setup_title">Biometric access</string>
     <string name="biometric_unknown_error">Something went wrong initializing biometric authentication. Please try again</string>
-    <string name="biometric_key_invalidated">Biometric key invalidated — re-enrollment required</string>
     <string name="cd_close_button">Back</string>
     <string name="cd_flash_button">Toggle camera flash</string>
     <string name="confirm_doc_removal_dialog_delete">Yes, delete</string>
@@ -49,7 +53,7 @@
     <string name="content_description_arrow_back_icon">Go Back</string>
     <string name="content_description_arrow_down_icon">Arrow down</string>
     <string name="content_description_arrow_right_icon">Arrow right</string>
-    <string name="content_description_arrow_up_icon">Arrow up&lt;</string>
+    <string name="content_description_arrow_up_icon">Arrow up</string>
     <string name="content_description_check_icon">Check</string>
     <string name="content_description_clock_timer_icon">Clock timer</string>
     <string name="content_description_close_icon">Close</string>
@@ -66,14 +70,16 @@
     <string name="content_description_in_progress_icon">In progress</string>
     <string name="content_description_info_icon">Info</string>
     <string name="content_description_issuer_logo_icon">Issuer logo</string>
-    <string name="content_description_logo_plain_icon">Plain Logo icon</string>
-    <string name="content_description_logo_text_icon">Text Logo icon</string>
+    <string name="content_description_logo_plain_icon">Age Verification app logo</string>
+    <string name="content_description_logo_text_icon">Age Verification</string>
     <string name="content_description_message_icon">Message</string>
     <string name="content_description_more_vert_icon">More Items</string>
     <string name="content_description_national_eid_icon">National eID</string>
     <string name="content_description_no_connection_icon">No internet connection</string>
     <string name="content_description_open_new_icon">Open new</string>
     <string name="content_description_over_18_icon">Over 18</string>
+    <string name="content_description_passport_face_image">Photo from your scanned document</string>
+    <string name="content_description_passport_face_image_placeholder">No document photo available</string>
     <string name="content_description_present_document_same_device_icon">Present document in person</string>
     <string name="content_description_qr_icon">QR</string>
     <string name="content_description_qr_scanner_icon">QR Scanner</string>

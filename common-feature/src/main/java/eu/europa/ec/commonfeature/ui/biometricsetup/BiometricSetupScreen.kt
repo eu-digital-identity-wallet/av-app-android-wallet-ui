@@ -172,7 +172,11 @@ private fun Content(
         VSpacer.ExtraLarge()
 
         WrapText(
-            textConfig = TextConfig(style = MaterialTheme.typography.titleLarge, maxLines = 4),
+            textConfig = TextConfig(
+                style = MaterialTheme.typography.titleLarge,
+                maxLines = Int.MAX_VALUE,
+                isHeading = true
+            ),
             text = title
         )
 

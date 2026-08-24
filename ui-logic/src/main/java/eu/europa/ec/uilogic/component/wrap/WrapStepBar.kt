@@ -36,11 +36,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.uilogic.component.preview.PreviewTheme
 import eu.europa.ec.uilogic.component.preview.ThemeModePreviews
 import eu.europa.ec.uilogic.component.utils.SIZE_EXTRA_SMALL
@@ -90,7 +96,8 @@ fun WrapStepBar(currentStep: Int, steps: List<String>, modifier: Modifier = Modi
                 Label(
                     text = text,
                     index = index,
-                    currentStep = currentStep
+                    currentStep = currentStep,
+                    totalSteps = steps.size,
                 )
             }
         }
@@ -160,12 +167,27 @@ private fun calculateStartIndexForTrailingItems(
 
 
 @Composable
-private fun Label(text: String, index: Int, currentStep: Int) {
+private fun Label(text: String, index: Int, currentStep: Int, totalSteps: Int) {
     val isActive = index == currentStep
     val textColor = getColor(isActive, inactiveTextColorAlpha)
+    val label = stringResource(
+        id = R.string.accessibility_step_of_total,
+        index + 1,
+        totalSteps,
+        text
+    )
+    val currentStepState = stringResource(id = R.string.accessibility_step_current)
 
     Text(
-        modifier = Modifier.padding(paddingValues),
+        modifier = Modifier
+            .padding(paddingValues)
+            .semantics {
+                selected = isActive
+                contentDescription = label
+                if (isActive) {
+                    stateDescription = currentStepState
+                }
+            },
         text = text,
         color = textColor,
         style = labelTextStyle,

@@ -193,7 +193,10 @@ fun ConsentAndTosSection(
             modifier = Modifier.fillMaxWidth(),
             text = stringResource(R.string.consent_screen_title),
             textConfig = TextConfig(
-                style = MaterialTheme.typography.titleLarge, textAlign = TextAlign.Start
+                style = MaterialTheme.typography.titleLarge,
+                textAlign = TextAlign.Start,
+                maxLines = Int.MAX_VALUE,
+                isHeading = true
             )
         )
 

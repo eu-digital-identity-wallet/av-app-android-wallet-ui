@@ -138,7 +138,9 @@ private fun Content(paddingValues: PaddingValues, onLinkAction : () -> Unit) {
             textConfig = TextConfig(
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.SemiBold
-                )
+                ),
+                maxLines = Int.MAX_VALUE,
+                isHeading = true
             ),
         )
 

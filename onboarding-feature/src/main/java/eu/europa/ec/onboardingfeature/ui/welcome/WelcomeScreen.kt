@@ -125,7 +125,10 @@ private fun Content(
         TopStepBar(0)
         VSpacer.ExtraLarge()
         WelcomePager(pagerState = pagerState, pages = pages)
-        WrapPageIndicator(pagerState)
+        WrapPageIndicator(
+            pagerState = pagerState,
+            pageTitles = pages.map { stringResource(id = it.title) }
+        )
     }
 
     LaunchedEffect(Unit) {
@@ -187,7 +190,10 @@ private fun singlePage(
             modifier = Modifier.fillMaxWidth(),
             text = stringResource(id = pages[page].title),
             textConfig = TextConfig(
-                style = MaterialTheme.typography.titleLarge, textAlign = TextAlign.Start
+                style = MaterialTheme.typography.titleLarge,
+                textAlign = TextAlign.Start,
+                maxLines = Int.MAX_VALUE,
+                isHeading = true
             )
         )
         VSpacer.Large()

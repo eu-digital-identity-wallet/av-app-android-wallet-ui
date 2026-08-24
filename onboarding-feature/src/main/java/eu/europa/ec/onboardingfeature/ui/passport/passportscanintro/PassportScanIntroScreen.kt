@@ -217,6 +217,8 @@ private fun Content(
             text = stringResource(R.string.passport_scan_intro_title),
             textConfig = TextConfig(
                 style = MaterialTheme.typography.titleLarge,
+                maxLines = Int.MAX_VALUE,
+                isHeading = true
             ),
         )
 

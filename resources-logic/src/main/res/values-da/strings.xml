@@ -14,10 +14,15 @@
   ~ governing permissions and limitations under the Licence.
   -->
 <resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="accessibility_page_of_total">Side %1$d af %2$d</string>
+    <string name="accessibility_page_of_total_titled">Side %1$d af %2$d: %3$s</string>
+    <string name="accessibility_step_current">Aktuelt trin</string>
+    <string name="accessibility_step_of_total">Trin %1$d af %2$d: %3$s</string>
     <string name="age_over">Alder over %d</string>
     <string name="age_over_18">Alder over 18</string>
     <string name="biometric_confirm_request">Confirm request</string>
     <string name="biometric_default_mode_text_above_pin_field">PIN</string>
+    <string name="biometric_key_invalidated">Biometrisk nøgle ugyldiggjort — genregistrering påkrævet</string>
     <string name="biometric_login_biometrics_enabled_subtitle">Brug din biometri for at få adgang til applikationen for aldersverifikationen.</string>
     <string name="biometric_login_biometrics_not_enabled_subtitle">Du skal indtaste din PIN for at få adgang til applikationen for aldersverifikationen.</string>
     <string name="biometric_login_forgot_pin">Glemt din PIN?</string>
@@ -25,13 +30,12 @@
     <string name="biometric_no_hardware">Din enhed understøtter ikke biometrisk godkendelse</string>
     <string name="biometric_prompt_subtitle">Godkend ved hjælp af din biometri</string>
     <string name="biometric_prompt_title">Biometrisk godkendelse</string>
-    <string name="biometric_setup_description">Brug dit fingeraftryk eller ansigtsgenkendelse til at logge ind på appen &quot;%s&quot;</string>
+    <string name="biometric_setup_description">Brug dit fingeraftryk eller ansigtsgenkendelse til at logge ind på appen \"%s\"</string>
     <string name="biometric_setup_enable">Start installation</string>
     <string name="biometric_setup_required_error">Biometrisk godkendelse er påkrævet for at bruge denne app.</string>
     <string name="biometric_setup_skip">Spring over</string>
     <string name="biometric_setup_title">Biometrisk adgang</string>
     <string name="biometric_unknown_error">Noget gik galt ved initialisering af biometrisk godkendelse. Prøv igen</string>
-    <string name="biometric_key_invalidated">Biometrisk nøgle ugyldiggjort — genregistrering påkrævet</string>
     <string name="cd_close_button">Tilbage</string>
     <string name="cd_flash_button">Slå kameraets blitz til/fra</string>
     <string name="confirm_doc_removal_dialog_delete">Ja, slet</string>
@@ -66,14 +70,16 @@
     <string name="content_description_in_progress_icon">I gang</string>
     <string name="content_description_info_icon">Info</string>
     <string name="content_description_issuer_logo_icon">Udstederlogo</string>
-    <string name="content_description_logo_plain_icon">Almindeligt logoikon</string>
-    <string name="content_description_logo_text_icon">Tekstlogoikon</string>
+    <string name="content_description_logo_plain_icon">Logo for appen Aldersverifikation</string>
+    <string name="content_description_logo_text_icon">Aldersverifikation</string>
     <string name="content_description_message_icon">Besked</string>
     <string name="content_description_more_vert_icon">Flere emner</string>
     <string name="content_description_national_eid_icon">Nationalt eID</string>
     <string name="content_description_no_connection_icon">Ingen internetforbindelse</string>
     <string name="content_description_open_new_icon">Åbn nyt</string>
     <string name="content_description_over_18_icon">Over 18</string>
+    <string name="content_description_passport_face_image">Foto fra dit scannede dokument</string>
+    <string name="content_description_passport_face_image_placeholder">Intet dokumentfoto tilgængeligt</string>
     <string name="content_description_present_document_same_device_icon">Fremvis dokument ved personligt fremmøde</string>
     <string name="content_description_qr_icon">QR-kode</string>
     <string name="content_description_qr_scanner_icon">QR-scanner</string>
