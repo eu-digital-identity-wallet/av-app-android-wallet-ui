@@ -26,6 +26,8 @@ import eu.europa.ec.commonfeature.config.RequestUriConfig
 import eu.europa.ec.corelogic.di.getOrCreatePresentationScope
 import eu.europa.ec.onboardingfeature.interactor.EnrollmentInteractor
 import eu.europa.ec.onboardingfeature.interactor.EnrollmentInteractorPartialState
+import eu.europa.ec.onboardingfeature.ui.enrollment.model.EnrollmentMethodUi
+import eu.europa.ec.onboardingfeature.ui.enrollment.model.toUi
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.component.content.ContentErrorConfig
 import eu.europa.ec.uilogic.config.ConfigNavigation
@@ -52,7 +54,7 @@ data class State(
     val isLoading: Boolean = false,
     val error: ContentErrorConfig? = null,
     val isOnboarding: Boolean = true,
-    val availableEnrollmentMethods: List<EnrollmentMethod> = emptyList(),
+    val availableEnrollmentMethods: List<EnrollmentMethodUi> = emptyList(),
 ) : ViewState
 
 sealed class Event : ViewEvent {
@@ -102,7 +104,7 @@ class EnrollmentViewModel(
 
         return State(
             isOnboarding = isOnboarding,
-            availableEnrollmentMethods = availableMethods
+            availableEnrollmentMethods = availableMethods.map { it.toUi() }
         )
     }
 

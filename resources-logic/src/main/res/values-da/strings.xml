@@ -216,6 +216,7 @@
     <string name="onboarding_verification_description">Denne verifikation er nødvendig for at skabe et bevis på, at du er over 18 år. eID -detaljerne vil ikke blive delt med onlinetjenester, du får adgang til.</string>
     <string name="onboarding_verification_national_id">National eID / National IDP</string>
     <string name="onboarding_verification_national_id_description">Identificer online ved hjælp af dit eID</string>
+    <string name="onboarding_verification_opens_in_browser">Åbnes i din browser</string>
     <string name="onboarding_verification_passport_id_card">Pas eller ID-kort</string>
     <string name="onboarding_verification_passport_id_card_description">Scanner dit pas eller ID-kort til verifikation</string>
     <string name="onboarding_verification_title">Vælg din metode til aldersverifikation</string>

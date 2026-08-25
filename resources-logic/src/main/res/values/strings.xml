@@ -216,6 +216,7 @@
     <string name="onboarding_verification_description">This verification is needed to create a proof that you are over 18. The eID details will not be shared with online services you access.</string>
     <string name="onboarding_verification_national_id">National eID / National IDP</string>
     <string name="onboarding_verification_national_id_description">Identify online using your eID</string>
+    <string name="onboarding_verification_opens_in_browser">Opens in your browser</string>
     <string name="onboarding_verification_passport_id_card">Passport or ID Card</string>
     <string name="onboarding_verification_passport_id_card_description">Scan your passport or ID card for verification</string>
     <string name="onboarding_verification_title">Choose your age verification method</string>

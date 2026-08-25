@@ -17,6 +17,8 @@
 package eu.europa.ec.onboardingfeature.ui.enrollment
 
 import android.content.Context
+import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -32,17 +34,28 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import eu.europa.ec.corelogic.util.CoreActions
+import eu.europa.ec.onboardingfeature.ui.enrollment.model.EnrollmentMethodUi
+import eu.europa.ec.onboardingfeature.ui.enrollment.model.toUi
+import eu.europa.ec.onboardingfeature.util.TestTag
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.uilogic.component.AppIcons
+import eu.europa.ec.uilogic.component.IconDataUi
 import eu.europa.ec.uilogic.component.TopStepBar
 import eu.europa.ec.uilogic.component.content.BroadcastAction
 import eu.europa.ec.uilogic.component.content.ContentScreen
@@ -153,8 +166,8 @@ private fun handleEffect(
 private fun Content(
     paddingValues: PaddingValues,
     onMethodSelected: (EnrollmentMethod) -> Unit,
+    availableMethods: List<EnrollmentMethodUi>,
     showStepBar: Boolean = true,
-    availableMethods: List<EnrollmentMethod> = EnrollmentMethod.entries,
 ) {
     Column(
         modifier = Modifier
@@ -193,7 +206,7 @@ private fun Content(
             availableMethods.forEach { method ->
                 EnrollmentMethodCard(
                     method = method,
-                    onClick = { onMethodSelected(method) }
+                    onClick = { onMethodSelected(method.method) }
                 )
                 VSpacer.Medium()
             }
@@ -203,11 +216,14 @@ private fun Content(
 
 @Composable
 private fun EnrollmentMethodCard(
-    method: EnrollmentMethod,
+    method: EnrollmentMethodUi,
     onClick: () -> Unit,
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag(TestTag.EnrollmentScreen.enrollmentMethod(method.method.name))
+            .semantics { role = Role.Button },
         onClick = onClick,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -222,19 +238,11 @@ private fun EnrollmentMethodCard(
                 .fillMaxWidth()
                 .padding(SPACING_MEDIUM.dp),
         ) {
-            WrapIcon(
-                modifier = Modifier.size(24.dp),
-                iconData = when (method) {
-                    EnrollmentMethod.NATIONAL_ID -> AppIcons.NationalEID
-                    EnrollmentMethod.PASSPORT_ID_CARD -> AppIcons.Id
-                    EnrollmentMethod.TOKEN_QR -> AppIcons.QrScanner
-                },
-                customTint = MaterialTheme.colorScheme.primary
-            )
+            DecorativeIcon(iconData = method.icon, size = 24.dp)
             HSpacer.Small()
             Column {
                 WrapText(
-                    text = getMethodTitle(method),
+                    text = stringResource(method.title),
                     textConfig = TextConfig(
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.primary
@@ -242,37 +250,52 @@ private fun EnrollmentMethodCard(
                 )
                 VSpacer.ExtraSmall()
                 WrapText(
-                    text = getMethodDescription(method),
+                    text = stringResource(method.description),
                     textConfig = TextConfig(
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 )
+                method.externalContextNotice?.let { notice ->
+                    VSpacer.ExtraSmall()
+                    ExternalContextNotice(notice = notice)
+                }
             }
         }
     }
 }
 
 @Composable
-private fun getMethodTitle(method: EnrollmentMethod): String {
-    return stringResource(
-        when (method) {
-            EnrollmentMethod.NATIONAL_ID -> R.string.onboarding_verification_national_id
-            EnrollmentMethod.PASSPORT_ID_CARD -> R.string.onboarding_verification_passport_id_card
-            EnrollmentMethod.TOKEN_QR -> R.string.onboarding_verification_token_qr
-        }
-    )
+private fun ExternalContextNotice(@StringRes notice: Int) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        DecorativeIcon(iconData = AppIcons.OpenNew, size = 16.dp)
+        HSpacer.ExtraSmall()
+        WrapText(
+            text = stringResource(notice),
+            textConfig = TextConfig(
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary
+            )
+        )
+    }
 }
 
 @Composable
-private fun getMethodDescription(method: EnrollmentMethod): String {
-    return stringResource(
-        when (method) {
-            EnrollmentMethod.NATIONAL_ID -> R.string.onboarding_verification_national_id_description
-            EnrollmentMethod.PASSPORT_ID_CARD -> R.string.onboarding_verification_passport_id_card_description
-            EnrollmentMethod.TOKEN_QR -> R.string.onboarding_verification_token_qr_description
-        }
-    )
+private fun DecorativeIcon(
+    iconData: IconDataUi,
+    size: Dp,
+) {
+    // Clearing on the icon's own node would leave its content description in place.
+    Box(modifier = Modifier.clearAndSetSemantics { }) {
+        WrapIcon(
+            modifier = Modifier.size(size),
+            iconData = iconData,
+            customTint = MaterialTheme.colorScheme.primary
+        )
+    }
 }
+
+private fun previewEnrollmentMethods(): List<EnrollmentMethodUi> =
+    EnrollmentMethod.entries.map { it.toUi() }
 
 @ThemeModePreviews
 @Composable
@@ -286,6 +309,7 @@ private fun EnrollmentScreenPreview() {
             Content(
                 paddingValues = paddingValues,
                 onMethodSelected = {},
+                availableMethods = previewEnrollmentMethods(),
                 showStepBar = true
             )
         }
@@ -304,6 +328,7 @@ private fun EnrollmentScreenWithoutStepBarPreview() {
             Content(
                 paddingValues = paddingValues,
                 onMethodSelected = {},
+                availableMethods = previewEnrollmentMethods(),
                 showStepBar = false
             )
         }

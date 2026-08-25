@@ -216,6 +216,7 @@
     <string name="onboarding_verification_description">Questa verifica è necessaria per creare un\'attestazione che dimostri che hai più di 18 anni. I dettagli eID non saranno condivisi con i servizi online a cui accedi.</string>
     <string name="onboarding_verification_national_id">eID nazionale / IdP nazionale</string>
     <string name="onboarding_verification_national_id_description">Identificati online usando il tuo eID</string>
+    <string name="onboarding_verification_opens_in_browser">Si apre nel tuo browser</string>
     <string name="onboarding_verification_passport_id_card">Passaporto o Carta d\'identità</string>
     <string name="onboarding_verification_passport_id_card_description">Scansiona il tuo passaporto o carta d\'identità per la verifica</string>
     <string name="onboarding_verification_title">Scegli il tuo metodo di verifica dell\'età</string>

@@ -216,6 +216,7 @@
     <string name="onboarding_verification_description">Diese Verifizierung ist erforderlich, um Ihren Altersnachweis zu erbringen. Die eID-Daten werden nicht an von Ihnen genutzte Online-Dienste weitergegeben.</string>
     <string name="onboarding_verification_national_id">Nationale eID / Nationaler Personalausweis</string>
     <string name="onboarding_verification_national_id_description">Identifizieren Sie sich online mit Ihrer eID</string>
+    <string name="onboarding_verification_opens_in_browser">Wird in Ihrem Browser geöffnet</string>
     <string name="onboarding_verification_passport_id_card">Reisepass oder Personalausweis</string>
     <string name="onboarding_verification_passport_id_card_description">Scannen Sie Ihren Reisepass oder Personalausweis zur Verifizierung</string>
     <string name="onboarding_verification_title">Wählen Sie Ihre Altersverifizierungsmethode</string>

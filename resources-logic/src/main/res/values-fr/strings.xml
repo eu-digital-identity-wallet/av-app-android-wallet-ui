@@ -216,6 +216,7 @@
     <string name="onboarding_verification_description">Cette vérification est nécessaire pour créer une preuve que vous avez plus de 18 ans. Les détails de l\'eID ne seront pas communiqués aux services en ligne auxquels vous accédez.</string>
     <string name="onboarding_verification_national_id">eID national / IdP national</string>
     <string name="onboarding_verification_national_id_description">Identifiez-vous en ligne en utilisant votre eID</string>
+    <string name="onboarding_verification_opens_in_browser">S\'ouvre dans votre navigateur</string>
     <string name="onboarding_verification_passport_id_card">Passeport ou Carte d\'identité</string>
     <string name="onboarding_verification_passport_id_card_description">Scannez votre passeport ou carte d\'identité pour la vérification</string>
     <string name="onboarding_verification_title">Choisissez la méthode de vérification d\'âge souhaitée</string>
