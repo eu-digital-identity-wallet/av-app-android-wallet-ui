@@ -1,12 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2026 European Commission
+  ~
+  ~ Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
+  ~ Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
+  ~ except in compliance with the Licence.
+  ~
+  ~ You may obtain a copy of the Licence at:
+  ~ https://joinup.ec.europa.eu/software/page/eupl
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software distributed under
+  ~ the Licence is distributed on an "AS IS" basis, WITHOUT WARRANTIES OR CONDITIONS OF
+  ~ ANY KIND, either express or implied. See the Licence for the specific language
+  ~ governing permissions and limitations under the Licence.
+  -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/coordinator_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/transparent_grey"
+    android:background="@color/colorPrimary"
     android:elevation="3dp"
+    android:fitsSystemWindows="true"
     android:textAlignment="gravity"
     tools:context="eu.europa.ec.passportscanner.SmartScannerActivity">
 
@@ -15,59 +31,57 @@
         layout="@layout/top_action_bar_in_live_camera"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="top"
-        android:elevation="10dp" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/top"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.2" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/bottom"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.8" />
-
-    <TextView
-        android:id="@+id/capture_header_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:gravity="center"
-        android:textColor="@color/white"
-        android:textDirection="anyRtl"
-        android:textSize="14sp"
-        android:textStyle="bold"
+        android:elevation="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/capture_sub_header_text"
-        android:layout_width="wrap_content"
+        android:id="@+id/capture_header_text"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:lineSpacingMultiplier="0.9"
-        android:textColor="@color/white"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="24dp"
+        android:textColor="@color/nfc_title_color"
         android:textDirection="anyRtl"
-        android:textSize="12sp"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:textSize="@dimen/nfc_title_text_size"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/capture_sub_header_text"
+        app:layout_constraintEnd_toStartOf="@+id/view_layout"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/capture_header_text" />
+        app:layout_constraintTop_toBottomOf="@+id/action_bar_menu"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="header text" />
+
+    <TextView
+        android:id="@+id/capture_sub_header_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="24dp"
+        android:lineSpacingMultiplier="0.9"
+        android:textColor="@color/nfc_body_color"
+        android:textDirection="anyRtl"
+        android:textSize="@dimen/nfc_body_text_size"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/view_layout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/capture_header_text"
+        tools:text="sub text" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/view_layout"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
         android:elevation="1dp"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="4dp"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/bottom"
-        app:layout_constraintStart_toStartOf="@+id/top"
+        app:layout_constraintDimensionRatio="W,4:3"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/action_bar_menu">
 
         <androidx.camera.view.PreviewView
@@ -75,11 +89,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginHorizontal="4dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="42dp"
+            android:layout_marginVertical="4dp"
             android:elevation="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintDimensionRatio="4:3"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -90,18 +102,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginHorizontal="4dp"
-            android:layout_marginBottom="42dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_marginVertical="4dp" />
 
         <ImageView
             android:id="@+id/rect_image"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginBottom="36dp"
-            android:adjustViewBounds="false"
+            android:adjustViewBounds="true"
             android:contentDescription="@null"
             android:src="@drawable/rectangle"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -109,24 +116,17 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/crop_guide"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.5" />
-
         <RelativeLayout
             android:id="@+id/rect_bounding_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:adjustViewBounds="true"
+            android:background="@color/transparent"
             android:contentDescription="@null"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:background="@color/transparent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -52,7 +52,6 @@ import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.core.SurfaceOrientedMeteringPointFactory
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
-import androidx.constraintlayout.widget.Guideline
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
@@ -333,14 +332,6 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
     }
 
     private fun setupViews() {
-        // scanner layout size
-        val topGuideline = findViewById<Guideline>(R.id.top)
-        val bottomGuideline = findViewById<Guideline>(R.id.bottom)
-        // scanner sizes available for Portrait only
-        if (orientation == Orientation.PORTRAIT.value) {
-            bottomGuideline.setGuidelinePercent(0.625F)
-            topGuideline.setGuidelinePercent(0.275F)
-        }
         // flash
         flashButton?.visibility = if (isLedFlashAvailable(this)) VISIBLE else GONE
         // capture text header

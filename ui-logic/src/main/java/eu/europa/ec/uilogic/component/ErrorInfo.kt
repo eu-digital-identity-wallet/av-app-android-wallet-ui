@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.sp
 import eu.europa.ec.uilogic.component.preview.PreviewTheme
 import eu.europa.ec.uilogic.component.preview.ThemeModePreviews
 import eu.europa.ec.uilogic.component.utils.SIZE_SMALL
+import eu.europa.ec.uilogic.component.utils.screenHeightInDp
 import eu.europa.ec.uilogic.component.utils.screenWidthInDp
 import eu.europa.ec.uilogic.component.wrap.WrapIcon
 
@@ -42,7 +43,7 @@ fun ErrorInfo(
     isIconEnabled: Boolean = false,
 ) {
 
-    val errorIconSize = screenWidthInDp(true) / 6
+    val errorIconSize = minOf(screenWidthInDp(true), screenHeightInDp(true)) / 6
 
     Column(
         modifier = modifier,

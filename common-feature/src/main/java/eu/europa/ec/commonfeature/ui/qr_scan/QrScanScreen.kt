@@ -27,6 +27,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -75,7 +76,6 @@ import eu.europa.ec.uilogic.component.utils.SIZE_EXTRA_SMALL
 import eu.europa.ec.uilogic.component.utils.SIZE_LARGE
 import eu.europa.ec.uilogic.component.utils.SPACING_LARGE
 import eu.europa.ec.uilogic.component.utils.SPACING_SMALL
-import eu.europa.ec.uilogic.component.utils.screenWidthInDp
 import eu.europa.ec.uilogic.component.wrap.WrapCard
 import eu.europa.ec.uilogic.component.wrap.WrapIcon
 import eu.europa.ec.businesslogic.extension.toUri
@@ -221,8 +221,6 @@ private fun OpenCamera(
         ProcessCameraProvider.getInstance(context)
     }
 
-    val scannerAreaSize = screenWidthInDp(true) - SIZE_100.dp
-
     val permissionState = rememberPermissionState(permission = android.Manifest.permission.CAMERA)
     when {
         permissionState.status.isGranted -> onEventSend(Event.CameraAccessGranted)
@@ -236,7 +234,7 @@ private fun OpenCamera(
     }
 
     // The space the Camera is going to occupy.
-    Box(
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
             .background(
@@ -244,6 +242,8 @@ private fun OpenCamera(
             ),
         contentAlignment = Alignment.Center
     ) {
+        val scannerAreaSize = (minOf(maxWidth, maxHeight) - SIZE_100.dp).coerceAtLeast(SIZE_100.dp)
+
         if (hasCameraPermission) {
             val logController = koinInject<LogController>()
             // The Camera.

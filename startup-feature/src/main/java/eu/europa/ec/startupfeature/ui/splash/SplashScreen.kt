@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -50,6 +51,7 @@ import eu.europa.ec.uilogic.component.utils.OneTimeLaunchedEffect
 import eu.europa.ec.uilogic.component.utils.SPACING_LARGE
 import eu.europa.ec.uilogic.component.utils.SPACING_SMALL_PLUS
 import eu.europa.ec.uilogic.component.utils.VSpacer
+import eu.europa.ec.uilogic.component.utils.screenHeightInDp
 import eu.europa.ec.uilogic.component.wrap.TextConfig
 import eu.europa.ec.uilogic.component.wrap.WrapImage
 import eu.europa.ec.uilogic.component.wrap.WrapText
@@ -62,6 +64,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
+
+private const val MAP_MAX_HEIGHT_RATIO = 0.55f
 
 @Composable
 fun SplashScreen(
@@ -142,7 +146,9 @@ private fun MapTitleAndLogo() {
     ) {
         WrapImage(
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                // The map is taller than it is wide, so unbounded it pushes the footer off screen.
+                .heightIn(max = screenHeightInDp(true) * MAP_MAX_HEIGHT_RATIO),
             iconData = AppIcons.EuMap,
             contentScale = ContentScale.FillWidth,
         )

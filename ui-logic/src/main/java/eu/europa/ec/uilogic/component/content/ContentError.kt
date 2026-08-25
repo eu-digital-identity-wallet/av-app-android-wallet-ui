@@ -16,6 +16,7 @@
 
 package eu.europa.ec.uilogic.component.content
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -46,30 +47,31 @@ internal fun ContentError(
     config: ContentErrorConfig,
     modifier: Modifier = Modifier,
 ) {
-    Column(
+    ScrollableFullHeightColumn(
         modifier = modifier,
+        verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        config.icon?.let { iconData ->
-            Spacer(modifier = Modifier.height(TOP_APP_BAR_HEIGHT.dp))
-            WrapImage(
-                iconData = iconData,
-                modifier = Modifier.size(SIZE_100.dp),
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            config.icon?.let { iconData ->
+                Spacer(modifier = Modifier.height(TOP_APP_BAR_HEIGHT.dp))
+                WrapImage(
+                    iconData = iconData,
+                    modifier = Modifier.size(SIZE_100.dp),
+                )
+                Spacer(modifier = Modifier.height(SIZE_MEDIUM.dp))
+            }
+
+            ContentTitle(
+                title = config.errorTitle ?: stringResource(
+                    id = R.string.generic_error_message
+                ),
+                subtitle = config.errorSubTitle ?: stringResource(
+                    id = R.string.generic_error_retry
+                ),
+                subTitleMaxLines = 10
             )
-            Spacer(modifier = Modifier.height(SIZE_MEDIUM.dp))
         }
-
-        ContentTitle(
-            title = config.errorTitle ?: stringResource(
-                id = R.string.generic_error_message
-            ),
-            subtitle = config.errorSubTitle ?: stringResource(
-                id = R.string.generic_error_retry
-            ),
-            subTitleMaxLines = 10
-        )
-
-        Spacer(modifier = Modifier.weight(1f))
 
         config.onRetry?.let { callback ->
             WrapButton(

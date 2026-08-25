@@ -17,7 +17,6 @@
 package eu.europa.ec.startupfeature.ui.hardblock
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -29,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import eu.europa.ec.resourceslogic.R
+import eu.europa.ec.uilogic.component.content.ScrollableFullHeightColumn
 import eu.europa.ec.uilogic.component.preview.ThemeModePreviews
 import eu.europa.ec.uilogic.component.utils.SPACING_LARGE
 import eu.europa.ec.uilogic.component.utils.VSpacer
@@ -37,7 +37,7 @@ import eu.europa.ec.uilogic.component.wrap.WrapText
 
 @Composable
 fun HardwareKeystoreBlockScreen() {
-    Column(
+    ScrollableFullHeightColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(SPACING_LARGE.dp),
