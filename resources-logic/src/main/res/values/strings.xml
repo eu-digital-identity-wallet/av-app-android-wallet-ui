@@ -80,6 +80,11 @@
     <string name="content_description_over_18_icon">Over 18</string>
     <string name="content_description_passport_face_image">Photo from your scanned document</string>
     <string name="content_description_passport_face_image_placeholder">No document photo available</string>
+    <string name="content_description_pin_digits_entered">%1$d of %2$d digits entered</string>
+    <string name="content_description_pin_input_empty">empty</string>
+    <string name="content_description_pin_input_prefix">PIN</string>
+    <string name="content_description_pin_repeated_input_prefix">repeated PIN</string>
+    <string name="content_description_sentence_pair">%1$s. %2$s</string>
     <string name="content_description_present_document_same_device_icon">Present document in person</string>
     <string name="content_description_qr_icon">QR</string>
     <string name="content_description_qr_scanner_icon">QR Scanner</string>

@@ -64,6 +64,7 @@ data class State(
     val error: ContentErrorConfig? = null,
     val config: BiometricUiConfig,
     val quickPinError: String? = null,
+    val lockoutMessage: String? = null,
     val quickPin: String = "",
     val userBiometricsAreEnabled: Boolean = false,
     val isBackable: Boolean = false,
@@ -122,9 +123,16 @@ class BiometricViewModel(
         clock = clock,
         getIsLockedOut = { viewState.value.isLockedOut },
         getLockoutEndTime = { viewState.value.lockoutEndTime },
-        onCountdownUpdate = { message -> setState { copy(quickPinError = message) } },
+        onCountdownUpdate = { message -> setState { copy(lockoutMessage = message) } },
         onLockoutEnd = {
-            setState { copy(isLockedOut = false, quickPinError = null, lockoutEndTime = 0L) }
+            setState {
+                copy(
+                    isLockedOut = false,
+                    quickPinError = null,
+                    lockoutMessage = null,
+                    lockoutEndTime = 0L
+                )
+            }
         },
         getTimeMessage = { minutes, seconds ->
             if (minutes > 0)
@@ -220,7 +228,7 @@ class BiometricViewModel(
                     return
                 }
                 setState {
-                    copy(quickPin = event.quickPin, quickPinError = null)
+                    copy(quickPin = event.quickPin, quickPinError = null, lockoutMessage = null)
                 }
                 authorizeWithPin(event.quickPin)
             }
@@ -241,6 +249,7 @@ class BiometricViewModel(
                             setState {
                                 copy(
                                     quickPinError = it.errorMessage,
+                                    lockoutMessage = null,
                                     isLockedOut = false,
                                 )
                             }
@@ -250,7 +259,8 @@ class BiometricViewModel(
                             setState {
                                 copy(
                                     isLockedOut = false,
-                                    quickPinError = null
+                                    quickPinError = null,
+                                    lockoutMessage = null
                                 )
                             }
                             authenticationSuccess()
@@ -260,7 +270,10 @@ class BiometricViewModel(
                             setState {
                                 copy(
                                     isLockedOut = true,
-                                    lockoutEndTime = it.lockoutEndTime
+                                    lockoutEndTime = it.lockoutEndTime,
+                                    // The countdown that follows is silent, so lockout is
+                                    // announced here or not at all.
+                                    quickPinError = resourceProvider.getString(R.string.quick_pin_locked_out)
                                 )
                             }
                             lockoutCountdownManager.start()

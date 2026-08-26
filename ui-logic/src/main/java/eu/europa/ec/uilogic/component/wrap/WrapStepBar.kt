@@ -36,17 +36,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.selected
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.uilogic.component.preview.PreviewTheme
 import eu.europa.ec.uilogic.component.preview.ThemeModePreviews
 import eu.europa.ec.uilogic.component.utils.SIZE_EXTRA_SMALL
@@ -76,7 +71,10 @@ fun WrapStepBar(currentStep: Int, steps: List<String>, modifier: Modifier = Modi
     val startIndex = calculateStartIndex(currentStep, steps, textMeasurer)
 
     ElevatedCard(
-        modifier = modifier.fillMaxWidth(),
+        // Hidden by product decision: the reader announced every step, not just the current one.
+        modifier = modifier
+            .fillMaxWidth()
+            .clearAndSetSemantics { },
         shape = buttonsShape,
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = SIZE_EXTRA_SMALL.dp),
         colors = CardDefaults.elevatedCardColors(
@@ -97,7 +95,6 @@ fun WrapStepBar(currentStep: Int, steps: List<String>, modifier: Modifier = Modi
                     text = text,
                     index = index,
                     currentStep = currentStep,
-                    totalSteps = steps.size,
                 )
             }
         }
@@ -167,27 +164,11 @@ private fun calculateStartIndexForTrailingItems(
 
 
 @Composable
-private fun Label(text: String, index: Int, currentStep: Int, totalSteps: Int) {
+private fun Label(text: String, index: Int, currentStep: Int) {
     val isActive = index == currentStep
     val textColor = getColor(isActive, inactiveTextColorAlpha)
-    val label = stringResource(
-        id = R.string.accessibility_step_of_total,
-        index + 1,
-        totalSteps,
-        text
-    )
-    val currentStepState = stringResource(id = R.string.accessibility_step_current)
-
     Text(
-        modifier = Modifier
-            .padding(paddingValues)
-            .semantics {
-                selected = isActive
-                contentDescription = label
-                if (isActive) {
-                    stateDescription = currentStepState
-                }
-            },
+        modifier = Modifier.padding(paddingValues),
         text = text,
         color = textColor,
         style = labelTextStyle,

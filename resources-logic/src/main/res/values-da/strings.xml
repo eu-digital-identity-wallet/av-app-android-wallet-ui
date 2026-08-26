@@ -80,6 +80,11 @@
     <string name="content_description_over_18_icon">Over 18</string>
     <string name="content_description_passport_face_image">Foto fra dit scannede dokument</string>
     <string name="content_description_passport_face_image_placeholder">Intet dokumentfoto tilgængeligt</string>
+    <string name="content_description_pin_digits_entered">%1$d af %2$d cifre indtastet</string>
+    <string name="content_description_pin_input_empty">tom</string>
+    <string name="content_description_pin_input_prefix">PIN</string>
+    <string name="content_description_pin_repeated_input_prefix">gentaget PIN</string>
+    <string name="content_description_sentence_pair">%1$s. %2$s</string>
     <string name="content_description_present_document_same_device_icon">Fremvis dokument ved personligt fremmøde</string>
     <string name="content_description_qr_icon">QR-kode</string>
     <string name="content_description_qr_scanner_icon">QR-scanner</string>

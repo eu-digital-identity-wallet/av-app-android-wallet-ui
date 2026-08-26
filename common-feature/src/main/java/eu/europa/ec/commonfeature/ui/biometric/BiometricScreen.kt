@@ -334,8 +334,11 @@ private fun AutoScrollToBottom(
     coroutineScope: CoroutineScope,
     scrollState: ScrollState,
 ) {
-    LaunchedEffect(state.quickPinError, state.quickPin) {
-        if (state.quickPin.isNotEmpty() || !state.quickPinError.isNullOrEmpty()) {
+    LaunchedEffect(state.quickPinError, state.lockoutMessage, state.quickPin) {
+        if (state.quickPin.isNotEmpty() ||
+            !state.quickPinError.isNullOrEmpty() ||
+            !state.lockoutMessage.isNullOrEmpty()
+        ) {
             coroutineScope.launch {
                 scrollState.scrollTo(scrollState.maxValue)
             }
@@ -416,11 +419,13 @@ private fun PinFieldLayout(
         length = state.quickPinSize,
         hasError = !state.quickPinError.isNullOrEmpty(),
         errorMessage = state.quickPinError,
+        lockoutMessage = state.lockoutMessage,
         visualTransformation = PasswordVisualTransformation(),
         pinWidth = 42.dp,
         focusOnCreate = !state.userBiometricsAreEnabled,
         otpText = state.quickPin,
-        enabled = !state.isLockedOut
+        enabled = !state.isLockedOut,
+        accessibilityPrefix = stringResource(R.string.content_description_pin_input_prefix),
     )
 }
 

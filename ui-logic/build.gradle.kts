@@ -43,6 +43,7 @@ dependencies {
     implementation(libs.gson)
 
     testImplementation(project(LibraryModule.TestLogic.path))
+    testImplementation(libs.androidx.compose.ui.test)
 }
 
 excludeFromKoverReport(
