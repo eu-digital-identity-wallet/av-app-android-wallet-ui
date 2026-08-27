@@ -70,6 +70,14 @@
     <string name="content_description_in_progress_icon">En cours</string>
     <string name="content_description_info_icon">Informations</string>
     <string name="content_description_issuer_logo_icon">Logo de l\'émetteur</string>
+    <string name="content_description_landing_screen_add_credentials">Aucune preuve d\'âge restante. Ajoutez-en d\'autres.</string>
+    <string name="content_description_landing_screen_credential_card">Preuve d\'âge de l\'Union européenne, confirmant que vous avez plus de %1$d ans</string>
+    <string name="content_description_landing_screen_credential_card_no_age">Preuve d\'âge de l\'Union européenne</string>
+    <plurals name="content_description_landing_screen_credentials_left">
+        <item quantity="one">%1$d preuve d\'âge restante</item>
+        <item quantity="many">%1$d preuves d\'âge restantes</item>
+        <item quantity="other">%1$d preuves d\'âge restantes</item>
+    </plurals>
     <string name="content_description_logo_plain_icon">Logo de l\'application Vérification de l\'âge</string>
     <string name="content_description_logo_text_icon">Vérification de l\'âge</string>
     <string name="content_description_message_icon">Message</string>
@@ -179,7 +187,11 @@
     <string name="landing_screen_card_age_verification">Vérification de l\'âge</string>
     <string name="landing_screen_card_eu_title">Union\neuropéenne</string>
     <string name="landing_screen_credential_details">Détails d\'identification</string>
-    <string name="landing_screen_credentials_left">%1$d restants</string>
+    <plurals name="landing_screen_credentials_left">
+        <item quantity="one">%1$d restante</item>
+        <item quantity="many">%1$d restantes</item>
+        <item quantity="other">%1$d restantes</item>
+    </plurals>
     <string name="landing_screen_no_age_credential_found">Aucune attestation d\'âge disponible</string>
     <string name="landing_screen_primary_button_label_scan">Lire</string>
     <string name="landing_screen_subtitle">Vous pouvez communiquer votre preuve d\'âge aux services limités aux adultes. Cette preuve confirme que vous avez plus de 18 ans sans révéler aucune autre information personnelle.</string>

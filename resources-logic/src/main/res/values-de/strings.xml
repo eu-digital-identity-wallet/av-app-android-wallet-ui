@@ -70,6 +70,13 @@
     <string name="content_description_in_progress_icon">In Bearbeitung</string>
     <string name="content_description_info_icon">Info</string>
     <string name="content_description_issuer_logo_icon">Logo des Ausstellers</string>
+    <string name="content_description_landing_screen_add_credentials">Keine Altersnachweise übrig. Weitere hinzufügen.</string>
+    <string name="content_description_landing_screen_credential_card">Altersnachweis der Europäischen Union, der bestätigt, dass Sie über %1$d sind</string>
+    <string name="content_description_landing_screen_credential_card_no_age">Altersnachweis der Europäischen Union</string>
+    <plurals name="content_description_landing_screen_credentials_left">
+        <item quantity="one">%1$d Altersnachweis übrig</item>
+        <item quantity="other">%1$d Altersnachweise übrig</item>
+    </plurals>
     <string name="content_description_logo_plain_icon">Logo der App Altersverifizierung</string>
     <string name="content_description_logo_text_icon">Altersverifizierung</string>
     <string name="content_description_message_icon">Nachricht</string>
@@ -179,7 +186,10 @@
     <string name="landing_screen_card_age_verification">Altersverifizierung</string>
     <string name="landing_screen_card_eu_title">Europäische\nUnion</string>
     <string name="landing_screen_credential_details">Zugangsdaten</string>
-    <string name="landing_screen_credentials_left">%1$d übrig</string>
+    <plurals name="landing_screen_credentials_left">
+        <item quantity="one">%1$d übrig</item>
+        <item quantity="other">%1$d übrig</item>
+    </plurals>
     <string name="landing_screen_no_age_credential_found">Es sind keine Altersnachweise verfügbar</string>
     <string name="landing_screen_primary_button_label_scan">Scannen</string>
     <string name="landing_screen_subtitle">Mit Ihrem Altersnachweis können Sie gegenüber Diensten, die ausschließlich Erwachsenen vorbehalten sind, nachweisen, dass Sie alt genug sind, um darauf zuzugreifen. Der Altersnachweis zeigt lediglich, dass Sie über 18 Jahre alt sind. Er enthält keine weiteren personenbezogenen Daten.</string>

@@ -160,7 +160,7 @@ private fun Content(paddingValues: PaddingValues, onLinkAction : () -> Unit) {
         )
 
         VSpacer.Large()
-        WrapLink(data = WrapLinkData(textId = R.string.passport_biometrics_first_link)) { onLinkAction }
+        WrapLink(data = WrapLinkData(textId = R.string.passport_biometrics_first_link)) { onLinkAction() }
     }
 }
 

@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -80,6 +81,7 @@ fun WrapText(
     modifier: Modifier = Modifier,
     text: AnnotatedString,
     textConfig: TextConfig,
+    onTextLayout: (TextLayoutResult) -> Unit = {},
 ) {
     Text(
         modifier = modifier.headingSemantics(textConfig.isHeading),
@@ -89,6 +91,7 @@ fun WrapText(
         textAlign = textConfig.textAlign,
         maxLines = textConfig.maxLines,
         overflow = textConfig.overflow,
+        onTextLayout = onTextLayout,
     )
 }
 

@@ -70,6 +70,13 @@
     <string name="content_description_in_progress_icon">I gang</string>
     <string name="content_description_info_icon">Info</string>
     <string name="content_description_issuer_logo_icon">Udstederlogo</string>
+    <string name="content_description_landing_screen_add_credentials">Ingen aldersbeviser tilbage. Tilføj flere.</string>
+    <string name="content_description_landing_screen_credential_card">Den Europæiske Unions aldersbevis, der bekræfter, at du er over %1$d år</string>
+    <string name="content_description_landing_screen_credential_card_no_age">Den Europæiske Unions aldersbevis</string>
+    <plurals name="content_description_landing_screen_credentials_left">
+        <item quantity="one">%1$d aldersbevis tilbage</item>
+        <item quantity="other">%1$d aldersbeviser tilbage</item>
+    </plurals>
     <string name="content_description_logo_plain_icon">Logo for appen Aldersverifikation</string>
     <string name="content_description_logo_text_icon">Aldersverifikation</string>
     <string name="content_description_message_icon">Besked</string>
@@ -179,7 +186,10 @@
     <string name="landing_screen_card_age_verification">Aldersverifikation</string>
     <string name="landing_screen_card_eu_title">Den Europæiske\nUnion</string>
     <string name="landing_screen_credential_details">Legitimationsdetaljer</string>
-    <string name="landing_screen_credentials_left">%1$d tilbage</string>
+    <plurals name="landing_screen_credentials_left">
+        <item quantity="one">%1$d tilbage</item>
+        <item quantity="other">%1$d tilbage</item>
+    </plurals>
     <string name="landing_screen_no_age_credential_found">Der er ingen aldersbeviser tilgængelige</string>
     <string name="landing_screen_primary_button_label_scan">Skan</string>
     <string name="landing_screen_subtitle">Du kan dele dit aldersbevis med tjenester, der er begrænset til voksne.\nAldersbeviset bekræfter kun, at du er over 18 år. Det indeholder ingen andre personlige oplysninger.</string>

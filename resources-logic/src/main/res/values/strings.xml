@@ -70,6 +70,13 @@
     <string name="content_description_in_progress_icon">In progress</string>
     <string name="content_description_info_icon">Info</string>
     <string name="content_description_issuer_logo_icon">Issuer logo</string>
+    <string name="content_description_landing_screen_add_credentials">No proofs of age left. Add more.</string>
+    <string name="content_description_landing_screen_credential_card">European Union proof of age, confirming that you are over %1$d</string>
+    <string name="content_description_landing_screen_credential_card_no_age">European Union proof of age</string>
+    <plurals name="content_description_landing_screen_credentials_left">
+        <item quantity="one">%1$d proof of age left</item>
+        <item quantity="other">%1$d proofs of age left</item>
+    </plurals>
     <string name="content_description_logo_plain_icon">Age Verification app logo</string>
     <string name="content_description_logo_text_icon">Age Verification</string>
     <string name="content_description_message_icon">Message</string>
@@ -179,7 +186,10 @@
     <string name="landing_screen_card_age_verification">Age Verification</string>
     <string name="landing_screen_card_eu_title">European\nUnion</string>
     <string name="landing_screen_credential_details">Credential Details</string>
-    <string name="landing_screen_credentials_left">%1$d left</string>
+    <plurals name="landing_screen_credentials_left">
+        <item quantity="one">%1$d left</item>
+        <item quantity="other">%1$d left</item>
+    </plurals>
     <string name="landing_screen_no_age_credential_found">There are no age credentials available</string>
     <string name="landing_screen_primary_button_label_scan">Scan</string>
     <string name="landing_screen_subtitle">You can share your proof of age with services restricted to adults. This proof confirms that you are over 18 without revealing any other personal information.</string>

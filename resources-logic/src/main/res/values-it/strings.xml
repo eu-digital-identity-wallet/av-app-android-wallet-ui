@@ -70,6 +70,14 @@
     <string name="content_description_in_progress_icon">In corso</string>
     <string name="content_description_info_icon">Informazioni</string>
     <string name="content_description_issuer_logo_icon">Logo dell\'emittente</string>
+    <string name="content_description_landing_screen_add_credentials">Nessuna prova dell\'età rimanente. Aggiungine altre.</string>
+    <string name="content_description_landing_screen_credential_card">Prova dell\'età dell\'Unione europea, che conferma che hai più di %1$d anni</string>
+    <string name="content_description_landing_screen_credential_card_no_age">Prova dell\'età dell\'Unione europea</string>
+    <plurals name="content_description_landing_screen_credentials_left">
+        <item quantity="one">%1$d prova dell\'età rimanente</item>
+        <item quantity="many">%1$d prove dell\'età rimanenti</item>
+        <item quantity="other">%1$d prove dell\'età rimanenti</item>
+    </plurals>
     <string name="content_description_logo_plain_icon">Logo dell\'app Verifica dell\'età</string>
     <string name="content_description_logo_text_icon">Verifica dell\'età</string>
     <string name="content_description_message_icon">Messaggio</string>
@@ -179,7 +187,11 @@
     <string name="landing_screen_card_age_verification">Verifica dell\'età</string>
     <string name="landing_screen_card_eu_title">Unione\neuropea</string>
     <string name="landing_screen_credential_details">Dettagli delle credenziali</string>
-    <string name="landing_screen_credentials_left">%1$d rimasti</string>
+    <plurals name="landing_screen_credentials_left">
+        <item quantity="one">%1$d rimasta</item>
+        <item quantity="many">%1$d rimaste</item>
+        <item quantity="other">%1$d rimaste</item>
+    </plurals>
     <string name="landing_screen_no_age_credential_found">Non sono disponibili credenziali dell\'età</string>
     <string name="landing_screen_primary_button_label_scan">Scansiona</string>
     <string name="landing_screen_subtitle">Puoi condividere la tua attestazione dell\'età con i servizi riservati agli adulti. Questo documento conferma che hai almeno 18 anni senza rivelare altre informazioni personali.</string>

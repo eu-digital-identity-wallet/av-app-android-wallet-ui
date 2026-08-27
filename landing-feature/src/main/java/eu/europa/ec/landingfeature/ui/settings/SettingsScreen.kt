@@ -18,7 +18,6 @@
 
 package eu.europa.ec.landingfeature.ui.settings
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -38,23 +37,29 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import eu.europa.ec.landingfeature.util.TestTag
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.uilogic.component.AppIcons
 import eu.europa.ec.uilogic.component.content.ContentScreen
 import eu.europa.ec.uilogic.component.content.ScreenNavigateAction
 import eu.europa.ec.uilogic.component.preview.PreviewTheme
 import eu.europa.ec.uilogic.component.preview.ThemeModePreviews
-import eu.europa.ec.uilogic.component.utils.SIZE_SMALL
 import eu.europa.ec.uilogic.component.utils.SPACING_EXTRA_LARGE
 import eu.europa.ec.uilogic.component.utils.VSpacer
 import eu.europa.ec.uilogic.component.wrap.BottomSheetTextDataUi
 import eu.europa.ec.uilogic.component.wrap.DialogBottomSheet
 import eu.europa.ec.uilogic.component.wrap.TextConfig
 import eu.europa.ec.uilogic.component.wrap.WrapImage
+import eu.europa.ec.uilogic.component.wrap.WrapLink
+import eu.europa.ec.uilogic.component.wrap.WrapLinkData
 import eu.europa.ec.uilogic.component.wrap.WrapModalBottomSheet
 import eu.europa.ec.uilogic.component.wrap.WrapText
 import eu.europa.ec.uilogic.extension.getAppVersionCode
@@ -112,7 +117,13 @@ private fun Content(
             .padding(paddingValues)
             .verticalScroll(rememberScrollState())
     ) {
-        Row {
+        val title = stringResource(R.string.settings_screen_title)
+        Row(
+            modifier = Modifier.clearAndSetSemantics {
+                heading()
+                contentDescription = title
+            }
+        ) {
             WrapImage(
                 modifier = Modifier
                     .height(40.dp)
@@ -121,7 +132,7 @@ private fun Content(
                 contentScale = ContentScale.Fit,
             )
             WrapText(
-                text = stringResource(R.string.settings_screen_title),
+                text = title,
                 textConfig = TextConfig(style = MaterialTheme.typography.headlineLarge)
             )
         }
@@ -177,6 +188,7 @@ fun AppInfo() {
         text = stringResource(R.string.settings_screen_app_info),
         textConfig = TextConfig(
             style = MaterialTheme.typography.titleMedium,
+            isHeading = true,
         )
     )
     VSpacer.Small()
@@ -221,21 +233,17 @@ private fun CredentialsSettings(onEvent: (Event) -> Unit) {
         text = stringResource(R.string.settings_screen_credentials),
         textConfig = TextConfig(
             style = MaterialTheme.typography.titleMedium,
+            isHeading = true,
         )
     )
-    WrapText(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                onEvent(Event.DeleteProofsClicked)
-            }
-            .padding(vertical = SIZE_SMALL.dp),
-        text = stringResource(R.string.settings_screen_delete_proofs),
-        textConfig = TextConfig(
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.error,
-        )
-    )
+    VSpacer.Small()
+    WrapLink(
+        data = WrapLinkData(textId = R.string.settings_screen_delete_proofs),
+        modifier = Modifier.testTag(TestTag.SettingsScreen.DELETE_PROOFS_LINK),
+        color = MaterialTheme.colorScheme.error,
+    ) {
+        onEvent(Event.DeleteProofsClicked)
+    }
 }
 @Composable
 private fun SecuritySettings(onEvent: (Event) -> Unit) {
@@ -245,20 +253,16 @@ private fun SecuritySettings(onEvent: (Event) -> Unit) {
         text = stringResource(R.string.settings_screen_security),
         textConfig = TextConfig(
             style = MaterialTheme.typography.titleMedium,
+            isHeading = true,
         )
     )
-    WrapText(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                onEvent(Event.ChangePinClicked)
-            }
-            .padding(vertical = SIZE_SMALL.dp),
-        text = stringResource(R.string.settings_screen_change_pin),
-        textConfig = TextConfig(
-            style = MaterialTheme.typography.bodyMedium,
-        )
-    )
+    VSpacer.Small()
+    WrapLink(
+        data = WrapLinkData(textId = R.string.settings_screen_change_pin),
+        modifier = Modifier.testTag(TestTag.SettingsScreen.CHANGE_PIN_LINK),
+    ) {
+        onEvent(Event.ChangePinClicked)
+    }
 }
 
 @Composable
