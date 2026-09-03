@@ -218,7 +218,6 @@ private fun OpenCamera(
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
-    val positioningHint = stringResource(id = R.string.qr_scan_positioning_hint)
 
     val cameraProviderFuture = remember {
         ProcessCameraProvider.getInstance(context)
