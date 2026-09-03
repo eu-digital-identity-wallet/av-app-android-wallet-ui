@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -70,7 +71,10 @@ fun WrapStepBar(currentStep: Int, steps: List<String>, modifier: Modifier = Modi
     val startIndex = calculateStartIndex(currentStep, steps, textMeasurer)
 
     ElevatedCard(
-        modifier = modifier.fillMaxWidth(),
+        // Hidden by product decision: the reader announced every step, not just the current one.
+        modifier = modifier
+            .fillMaxWidth()
+            .clearAndSetSemantics { },
         shape = buttonsShape,
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = SIZE_EXTRA_SMALL.dp),
         colors = CardDefaults.elevatedCardColors(
@@ -90,7 +94,7 @@ fun WrapStepBar(currentStep: Int, steps: List<String>, modifier: Modifier = Modi
                 Label(
                     text = text,
                     index = index,
-                    currentStep = currentStep
+                    currentStep = currentStep,
                 )
             }
         }
@@ -163,7 +167,6 @@ private fun calculateStartIndexForTrailingItems(
 private fun Label(text: String, index: Int, currentStep: Int) {
     val isActive = index == currentStep
     val textColor = getColor(isActive, inactiveTextColorAlpha)
-
     Text(
         modifier = Modifier.padding(paddingValues),
         text = text,

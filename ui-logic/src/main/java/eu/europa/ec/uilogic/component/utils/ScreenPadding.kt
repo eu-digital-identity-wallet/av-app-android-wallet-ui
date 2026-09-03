@@ -31,12 +31,13 @@ enum class TopSpacing {
 
 internal fun screenPaddings(
     hasStickyBottom: Boolean,
+    layoutDirection: LayoutDirection,
     append: PaddingValues? = null,
     topSpacing: TopSpacing = TopSpacing.WithToolbar,
 ) = PaddingValues(
-    start = HORIZONTAL_SCREEN_PADDING.dp,
+    start = HORIZONTAL_SCREEN_PADDING.dp + (append?.calculateStartPadding(layoutDirection) ?: 0.dp),
     top = calculateTopSpacing(topSpacing).dp + (append?.calculateTopPadding() ?: 0.dp),
-    end = HORIZONTAL_SCREEN_PADDING.dp,
+    end = HORIZONTAL_SCREEN_PADDING.dp + (append?.calculateEndPadding(layoutDirection) ?: 0.dp),
     bottom = if (!hasStickyBottom) {
         BOTTOM_SCREEN_PADDING.dp + (append?.calculateBottomPadding() ?: 0.dp)
     } else {

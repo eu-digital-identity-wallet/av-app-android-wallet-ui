@@ -14,10 +14,15 @@
   ~ governing permissions and limitations under the Licence.
   -->
 <resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="accessibility_page_of_total">Seite %1$d von %2$d</string>
+    <string name="accessibility_page_of_total_titled">Seite %1$d von %2$d: %3$s</string>
+    <string name="accessibility_step_current">Aktueller Schritt</string>
+    <string name="accessibility_step_of_total">Schritt %1$d von %2$d: %3$s</string>
     <string name="age_over">Alter über %d Jahre</string>
     <string name="age_over_18">Alter über 18</string>
     <string name="biometric_confirm_request">Confirm request</string>
     <string name="biometric_default_mode_text_above_pin_field">PIN</string>
+    <string name="biometric_key_invalidated">Biometrischer Schlüssel ungültig — erneute Registrierung erforderlich</string>
     <string name="biometric_login_biometrics_enabled_subtitle">Verwenden Sie Ihre Biometriedaten, um auf die Altersverifizierungs-Wallet zuzugreifen.</string>
     <string name="biometric_login_biometrics_not_enabled_subtitle">Geben Sie bitte Ihre PIN ein, um auf die Altersverifizierungs-Wallet zuzugreifen.</string>
     <string name="biometric_login_forgot_pin">PIN vergessen?</string>
@@ -25,13 +30,12 @@
     <string name="biometric_no_hardware">Ihr Gerät unterstützt keine biometrische Authentifizierung.</string>
     <string name="biometric_prompt_subtitle">Authentifizierung mit Ihrem Biometrie</string>
     <string name="biometric_prompt_title">Biometrische Authentifizierung</string>
-    <string name="biometric_setup_description">Melden Sie sich mit Ihrem Fingerabdruck oder Ihrer Gesichtserkennung bei der App &quot;%s&quot; an.</string>
+    <string name="biometric_setup_description">Melden Sie sich mit Ihrem Fingerabdruck oder Ihrer Gesichtserkennung bei der App \"%s\" an.</string>
     <string name="biometric_setup_enable">Einrichtung starten</string>
     <string name="biometric_setup_required_error">Biometrische Authentifizierung ist erforderlich, um diese App zu verwenden.</string>
     <string name="biometric_setup_skip">Überspringen</string>
     <string name="biometric_setup_title">Biometrischer Zugriff</string>
     <string name="biometric_unknown_error">Bei der Initialisierung der biometrischen Authentifizierung ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
-    <string name="biometric_key_invalidated">Biometrischer Schlüssel ungültig — erneute Registrierung erforderlich</string>
     <string name="cd_close_button">Zurück</string>
     <string name="cd_flash_button">Kamerablitz umschalten</string>
     <string name="confirm_doc_removal_dialog_delete">Ja, löschen</string>
@@ -66,19 +70,33 @@
     <string name="content_description_in_progress_icon">In Bearbeitung</string>
     <string name="content_description_info_icon">Info</string>
     <string name="content_description_issuer_logo_icon">Logo des Ausstellers</string>
-    <string name="content_description_logo_plain_icon">Logo-Symbol</string>
-    <string name="content_description_logo_text_icon">Logo-Symbol</string>
+    <string name="content_description_landing_screen_add_credentials">Keine Altersnachweise übrig. Weitere hinzufügen.</string>
+    <string name="content_description_landing_screen_credential_card">Altersnachweis der Europäischen Union, der bestätigt, dass Sie über %1$d sind</string>
+    <string name="content_description_landing_screen_credential_card_no_age">Altersnachweis der Europäischen Union</string>
+    <plurals name="content_description_landing_screen_credentials_left">
+        <item quantity="one">%1$d Altersnachweis übrig</item>
+        <item quantity="other">%1$d Altersnachweise übrig</item>
+    </plurals>
+    <string name="content_description_logo_plain_icon">Logo der App Altersverifizierung</string>
+    <string name="content_description_logo_text_icon">Altersverifizierung</string>
     <string name="content_description_message_icon">Nachricht</string>
     <string name="content_description_more_vert_icon">Weitere Elemente</string>
     <string name="content_description_national_eid_icon">Nationale eID</string>
     <string name="content_description_no_connection_icon">Keine Internetverbindung</string>
     <string name="content_description_open_new_icon">Neu öffnen</string>
     <string name="content_description_over_18_icon">Über 18</string>
+    <string name="content_description_passport_face_image">Foto aus Ihrem gescannten Dokument</string>
+    <string name="content_description_passport_face_image_placeholder">Kein Dokumentenfoto verfügbar</string>
+    <string name="content_description_pin_digits_entered">%1$d von %2$d Ziffern eingegeben</string>
+    <string name="content_description_pin_input_empty">leer</string>
+    <string name="content_description_pin_input_prefix">PIN</string>
+    <string name="content_description_pin_repeated_input_prefix">wiederholte PIN</string>
     <string name="content_description_present_document_same_device_icon">Dokument persönlich vorlegen</string>
     <string name="content_description_qr_icon">QR</string>
     <string name="content_description_qr_scanner_icon">QR-Scanner</string>
     <string name="content_description_scytales_logo_icon">Scytales-Logo</string>
     <string name="content_description_search_icon">Suchen</string>
+    <string name="content_description_sentence_pair">%1$s. %2$s</string>
     <string name="content_description_settings_icon">Einstellungen</string>
     <string name="content_description_success_icon">Erfolgreich</string>
     <string name="content_description_telekom_logo_icon">Telekom-Logo</string>
@@ -168,7 +186,10 @@
     <string name="landing_screen_card_age_verification">Altersverifizierung</string>
     <string name="landing_screen_card_eu_title">Europäische\nUnion</string>
     <string name="landing_screen_credential_details">Zugangsdaten</string>
-    <string name="landing_screen_credentials_left">%1$d übrig</string>
+    <plurals name="landing_screen_credentials_left">
+        <item quantity="one">%1$d übrig</item>
+        <item quantity="other">%1$d übrig</item>
+    </plurals>
     <string name="landing_screen_no_age_credential_found">Es sind keine Altersnachweise verfügbar</string>
     <string name="landing_screen_primary_button_label_scan">Scannen</string>
     <string name="landing_screen_subtitle">Mit Ihrem Altersnachweis können Sie gegenüber Diensten, die ausschließlich Erwachsenen vorbehalten sind, nachweisen, dass Sie alt genug sind, um darauf zuzugreifen. Der Altersnachweis zeigt lediglich, dass Sie über 18 Jahre alt sind. Er enthält keine weiteren personenbezogenen Daten.</string>
@@ -210,6 +231,7 @@
     <string name="onboarding_verification_description">Diese Verifizierung ist erforderlich, um Ihren Altersnachweis zu erbringen. Die eID-Daten werden nicht an von Ihnen genutzte Online-Dienste weitergegeben.</string>
     <string name="onboarding_verification_national_id">Nationale eID / Nationaler Personalausweis</string>
     <string name="onboarding_verification_national_id_description">Identifizieren Sie sich online mit Ihrer eID</string>
+    <string name="onboarding_verification_opens_in_browser">Wird in Ihrem Browser geöffnet</string>
     <string name="onboarding_verification_passport_id_card">Reisepass oder Personalausweis</string>
     <string name="onboarding_verification_passport_id_card_description">Scannen Sie Ihren Reisepass oder Personalausweis zur Verifizierung</string>
     <string name="onboarding_verification_title">Wählen Sie Ihre Altersverifizierungsmethode</string>
@@ -263,6 +285,8 @@
     <string name="passport_scan_intro_data_download_notice">Zur Verifizierung werden zusätzliche Daten benötigt. Wenn Sie auf „Herunterladen“ tippen, werden ca. 250 MB an Daten für den Gesichtsabgleich heruntergeladen.</string>
     <string name="passport_scan_intro_description">Die Reisepass / Personalausweis Methode ist schnell und sicher! Foto Ihres Reisepasses / Personalausweises aufnehmen, Reisepass / Personalausweis scannen und Video von sich selbst aufnehmen—drei Schritte für sicheres Onboarding.</string>
     <string name="passport_scan_intro_download_button">Herunterladen</string>
+    <string name="passport_scan_intro_download_preparing_announcement">Download abgeschlossen. Gesichtsverifikation wird vorbereitet.</string>
+    <string name="passport_scan_intro_download_progress_announcement">Zusätzliche Daten werden heruntergeladen: %1$d %%</string>
     <string name="passport_scan_intro_downloading_button">%d%%</string>
     <string name="passport_scan_intro_enrollment_method">Altersverifizierungsmethode</string>
     <string name="passport_scan_intro_start_button">Starten</string>
@@ -285,6 +309,7 @@
     <string name="qr_scan_informative_text_issuance_flow">Probleme beim Scannen des QR-Codes?\nBitte versuchen Sie es mit einer anderen Methode</string>
     <string name="qr_scan_informative_text_presentation_flow">Probleme beim Scannen des QR-Codes?\nBitte versuchen Sie es mit einer anderen Methode</string>
     <string name="qr_scan_permission_not_granted">Kameraberechtigung nicht erteilt\nApp öffnen Einstellungen</string>
+    <string name="qr_scan_positioning_hint">Halten Sie Ihr Telefon ruhig und zentrieren Sie den QR-Code im Rahmen.</string>
     <string name="quick_pin_bottom_sheet_cancel_primary_button_text">WEITER</string>
     <string name="quick_pin_bottom_sheet_cancel_secondary_button_text">ABBRECHEN</string>
     <string name="quick_pin_bottom_sheet_cancel_subtitle">Durch Abbrechen werden Sie zurück zur Startseite geleitet, ohne den Pin zu ändern</string>

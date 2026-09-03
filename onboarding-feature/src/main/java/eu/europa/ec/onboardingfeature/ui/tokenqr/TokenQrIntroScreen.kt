@@ -143,7 +143,11 @@ private fun Content(
 
         WrapText(
             text = stringResource(R.string.onboarding_token_qr_intro_title),
-            textConfig = TextConfig(style = MaterialTheme.typography.titleLarge),
+            textConfig = TextConfig(
+                style = MaterialTheme.typography.titleLarge,
+                maxLines = Int.MAX_VALUE,
+                isHeading = true
+            ),
         )
 
         VSpacer.Large()

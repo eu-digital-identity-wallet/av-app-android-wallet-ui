@@ -16,6 +16,7 @@
 
 package eu.europa.ec.uilogic.component.content
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,6 +28,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.semantics.isTraversalGroup
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.unit.dp
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.uilogic.component.IconDataUi
@@ -46,30 +52,52 @@ internal fun ContentError(
     config: ContentErrorConfig,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier,
+    val errorTitle = config.errorTitle ?: stringResource(id = R.string.generic_error_message)
+    val errorSubTitle = config.errorSubTitle ?: stringResource(id = R.string.generic_error_retry)
+
+    // A live region does not fire for a node that appears with the error already in it, so the
+    // message is announced explicitly. Without this the first thing heard is the toolbar's close
+    // button, and the caption is only reachable by swiping back to it.
+    val view = LocalView.current
+    val announcement = stringResource(
+        id = R.string.content_description_sentence_pair,
+        errorTitle,
+        errorSubTitle
+    )
+    LaunchedEffect(announcement) {
+        @Suppress("DEPRECATION")
+        view.announceForAccessibility(announcement)
+    }
+
+    ScrollableFullHeightColumn(
+        // Sorts the error ahead of the toolbar, so swiping starts on the message not the close
+        // button.
+        modifier = modifier.semantics {
+            isTraversalGroup = true
+            traversalIndex = -1f
+        },
+        verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        config.icon?.let { iconData ->
-            Spacer(modifier = Modifier.height(TOP_APP_BAR_HEIGHT.dp))
-            WrapImage(
-                iconData = iconData,
-                modifier = Modifier.size(SIZE_100.dp),
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.semantics(mergeDescendants = true) {},
+        ) {
+            config.icon?.let { iconData ->
+                Spacer(modifier = Modifier.height(TOP_APP_BAR_HEIGHT.dp))
+                WrapImage(
+                    iconData = iconData,
+                    modifier = Modifier.size(SIZE_100.dp),
+                )
+                Spacer(modifier = Modifier.height(SIZE_MEDIUM.dp))
+            }
+
+            ContentTitle(
+                title = errorTitle,
+                subtitle = errorSubTitle,
+                subTitleMaxLines = 10
             )
-            Spacer(modifier = Modifier.height(SIZE_MEDIUM.dp))
         }
-
-        ContentTitle(
-            title = config.errorTitle ?: stringResource(
-                id = R.string.generic_error_message
-            ),
-            subtitle = config.errorSubTitle ?: stringResource(
-                id = R.string.generic_error_retry
-            ),
-            subTitleMaxLines = 10
-        )
-
-        Spacer(modifier = Modifier.weight(1f))
 
         config.onRetry?.let { callback ->
             WrapButton(

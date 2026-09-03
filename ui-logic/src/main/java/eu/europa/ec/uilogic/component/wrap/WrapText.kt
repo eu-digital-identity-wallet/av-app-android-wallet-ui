@@ -22,7 +22,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -42,6 +45,7 @@ import eu.europa.ec.uilogic.component.preview.ThemeModePreviews
  * @property textAlign The horizontal alignment of the text. Defaults to [TextAlign.Start].
  * @property maxLines The maximum number of lines the text can occupy. Defaults to 2.
  * @property overflow How visual overflow should be handled. Defaults to [TextOverflow.Ellipsis].
+ * @property isHeading Whether the text is a heading, exposing heading semantics to screen readers. Defaults to false.
  */
 data class TextConfig(
     val style: TextStyle? = null,
@@ -49,7 +53,11 @@ data class TextConfig(
     val textAlign: TextAlign = TextAlign.Start,
     val maxLines: Int = 2,
     val overflow: TextOverflow = TextOverflow.Ellipsis,
+    val isHeading: Boolean = false,
 )
+
+private fun Modifier.headingSemantics(isHeading: Boolean): Modifier =
+    if (isHeading) semantics { heading() } else this
 
 @Composable
 fun WrapText(
@@ -58,7 +66,7 @@ fun WrapText(
     textConfig: TextConfig,
 ) {
     Text(
-        modifier = modifier,
+        modifier = modifier.headingSemantics(textConfig.isHeading),
         text = text,
         style = textConfig.style ?: LocalTextStyle.current,
         color = textConfig.color ?: MaterialTheme.colorScheme.onSurface,
@@ -73,15 +81,17 @@ fun WrapText(
     modifier: Modifier = Modifier,
     text: AnnotatedString,
     textConfig: TextConfig,
+    onTextLayout: (TextLayoutResult) -> Unit = {},
 ) {
     Text(
-        modifier = modifier,
+        modifier = modifier.headingSemantics(textConfig.isHeading),
         text = text,
         style = textConfig.style ?: LocalTextStyle.current,
         color = textConfig.color ?: MaterialTheme.colorScheme.onSurface,
         textAlign = textConfig.textAlign,
         maxLines = textConfig.maxLines,
         overflow = textConfig.overflow,
+        onTextLayout = onTextLayout,
     )
 }
 

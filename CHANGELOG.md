@@ -1,5 +1,47 @@
 # Changelog
 
+## 2026.09-1
+
+### Added
+
+- Landscape orientation support across the app, including reworked landscape
+  layouts for the passport scanner and the NFC reading screen, and a scrollable
+  full-height content container so screens stay usable in short viewports
+- Screen reader support throughout onboarding: headings on the passport
+  verification screens, a named and reachable page indicator, and heading
+  navigation that carries through the flow
+- TalkBack support for PIN entry, with the entered digits, the error message and
+  the remaining retries announced as they change
+- Link semantics in Settings, so links reach the accessibility tree as links and
+  keep a touch target that meets the platform minimum across their rendered lines
+- Button semantics for the verification method options, including a hint that
+  National eID and National IDP open a browser
+- Accessibility for document and photo capture, with the camera controls
+  labelled, focus following the button state on the scan intro screen, and the
+  portrait camera preview pinned outside the scroll area
+- Accessibility for QR scanning, with the positioning hint announced when the
+  camera opens and the scan action labelled on the dashboard
+- Test ids across the onboarding, dashboard, settings and capture screens
+
+### Changed
+
+- The dashboard credential card is announced as a single description followed by
+  the remaining accesses, and its badge is only actionable when it leads to
+  adding more credentials
+- Headings no longer clamp their line count, so they stay readable at large font
+  scales
+- The testing section of the README points to the ageverification.dev getting
+  started guide
+
+### Fixed
+
+- The remaining-accesses badge rendered a singular count with plural wording in
+  French and Italian, and disagreed in gender with the noun it qualifies
+- The credential card briefly showed an age before the claim resolved
+- The landscape passport scanner frame was pinched into a narrow centre column by
+  portrait guideline percentages applied at runtime
+- The NFC reading illustration scaled to the full screen width in landscape
+
 ## 2026.07-1
 
 ### Added

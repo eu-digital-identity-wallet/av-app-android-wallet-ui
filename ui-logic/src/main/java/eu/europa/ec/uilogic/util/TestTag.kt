@@ -18,6 +18,8 @@ package eu.europa.ec.uilogic.util
 
 object TestTag {
 
+    fun pageIndicatorDot(index: Int) = "page_indicator_dot_$index"
+
     fun pinTextField(index: Int) = "pin_text_field_$index"
 
     fun buttonInBottomSheetWithTwoBigIcons(hostTab: String, index: Int) =
