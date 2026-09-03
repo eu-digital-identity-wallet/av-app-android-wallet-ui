@@ -46,8 +46,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -218,9 +221,19 @@ private fun OpenCamera(
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
+    val positioningHint = stringResource(id = R.string.qr_scan_positioning_hint)
 
     val cameraProviderFuture = remember {
         ProcessCameraProvider.getInstance(context)
+    }
+
+    // The hint is static, so a live region would never fire; announce it once the camera is up.
+    val view = LocalView.current
+    LaunchedEffect(hasCameraPermission) {
+        if (hasCameraPermission) {
+            @Suppress("DEPRECATION")
+            view.announceForAccessibility(positioningHint)
+        }
     }
 
     val permissionState = rememberPermissionState(permission = android.Manifest.permission.CAMERA)
@@ -252,7 +265,8 @@ private fun OpenCamera(
             AndroidView(
                 modifier = Modifier
                     .fillMaxSize()
-                    .testTag(TestTag.QrScanScreen.CAMERA_AREA),
+                    .testTag(TestTag.QrScanScreen.CAMERA_AREA)
+                    .semantics { contentDescription = positioningHint },
                 factory = { context ->
 
                     val previewView = PreviewView(context)
