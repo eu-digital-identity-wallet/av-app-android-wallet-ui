@@ -5,9 +5,9 @@
     android:id="@+id/coordinator_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="40dp"
     android:background="@color/colorPrimary"
     android:elevation="3dp"
+    android:fitsSystemWindows="true"
     android:textAlignment="gravity"
     tools:context="eu.europa.ec.passportscanner.SmartScannerActivity">
 
@@ -24,12 +24,14 @@
     <ScrollView
         android:id="@+id/content_scroll"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:fillViewport="true"
+        android:layout_height="wrap_content"
+        app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toTopOf="@+id/view_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/action_bar_menu">
+        app:layout_constraintTop_toBottomOf="@+id/action_bar_menu"
+        app:layout_constraintVertical_bias="0"
+        app:layout_constraintVertical_chainStyle="packed">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -77,7 +79,8 @@
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/content_scroll">
 
         <androidx.camera.view.PreviewView
             android:id="@+id/view_finder"
