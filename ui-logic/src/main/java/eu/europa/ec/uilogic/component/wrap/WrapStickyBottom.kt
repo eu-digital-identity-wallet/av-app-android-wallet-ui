@@ -31,12 +31,15 @@ import eu.europa.ec.uilogic.component.utils.HSpacer
 
 sealed interface StickyBottomType {
     data class OneButton(
-        val config: ButtonConfig
+        val config: ButtonConfig,
+        val buttonModifier: Modifier = Modifier,
     ) : StickyBottomType
 
     data class TwoButtons(
         val primaryButtonConfig: ButtonConfig,
         val secondaryButtonConfig: ButtonConfig,
+        val primaryButtonModifier: Modifier = Modifier,
+        val secondaryButtonModifier: Modifier = Modifier,
     ) : StickyBottomType
 
     data object Generic : StickyBottomType
@@ -73,7 +76,9 @@ fun WrapStickyBottomContent(
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     WrapButton(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .then(stickyBottomType.buttonModifier),
                         buttonConfig = stickyBottomType.config,
                     ) {
                         content(stickyBottomType.config)
@@ -89,14 +94,18 @@ fun WrapStickyBottomContent(
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 WrapButton(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .then(stickyBottomType.primaryButtonModifier),
                     buttonConfig = stickyBottomType.primaryButtonConfig
                 ) {
                     content(stickyBottomType.primaryButtonConfig)
                 }
                 HSpacer.Small()
                 WrapButton(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .then(stickyBottomType.secondaryButtonModifier),
                     buttonConfig = stickyBottomType.secondaryButtonConfig
                 ) {
                     content(stickyBottomType.secondaryButtonConfig)

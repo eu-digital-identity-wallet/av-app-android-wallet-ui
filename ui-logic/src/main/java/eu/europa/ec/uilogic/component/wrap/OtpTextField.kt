@@ -32,10 +32,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.editableText
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardType
@@ -45,12 +53,25 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.uilogic.component.preview.PreviewTheme
 import eu.europa.ec.uilogic.component.preview.ThemeModePreviews
 import eu.europa.ec.uilogic.component.utils.OneTimeLaunchedEffect
 import eu.europa.ec.uilogic.component.utils.SIZE_EXTRA_SMALL
 import eu.europa.ec.uilogic.component.utils.SIZE_SMALL
 
+/**
+ * PIN entry field: a single [BasicTextField] whose [BasicTextField.decorationBox] draws one box per
+ * digit.
+ *
+ * Screen readers see the digit row, not the text field: it announces the prefix plus how many
+ * digits are in, and any error, but never the digits themselves.
+ *
+ * @param accessibilityPrefixResId Pass a distinct prefix where the same field is reused for a
+ * second PIN, so the two steps do not sound identical.
+ * @param lockoutMessage Rendered like [errorMessage] but never announced, since it changes on a
+ * timer.
+ */
 @Composable
 fun OtpTextField(
     modifier: Modifier = Modifier,
@@ -61,8 +82,10 @@ fun OtpTextField(
     pinWidth: Dp = 40.dp,
     hasError: Boolean = false,
     errorMessage: String? = null,
+    lockoutMessage: String? = null,
     focusOnCreate: Boolean = false,
     enabled: Boolean = true,
+    accessibilityPrefix: String,
 ) {
     LaunchedEffect(Unit) {
         if (otpText.length > length) {
@@ -70,11 +93,31 @@ fun OtpTextField(
         }
     }
 
-    val focusRequester = FocusRequester()
+    val focusRequester = remember { FocusRequester() }
+
+    val emptyLabel = stringResource(id = R.string.content_description_pin_input_empty)
+    val digitsEnteredLabel = stringResource(
+        id = R.string.content_description_pin_digits_entered,
+        otpText.length,
+        length
+    )
+    // Progress and errors arrive on the same keystroke, so one region carries both - two race.
+    val pinDescription = buildString {
+        append(accessibilityPrefix)
+        append(": ")
+        append(if (otpText.isEmpty()) emptyLabel else digitsEnteredLabel)
+        if (!errorMessage.isNullOrEmpty()) {
+            append(". ")
+            append(errorMessage)
+        }
+    }
 
     Column(modifier = modifier) {
         BasicTextField(
-            modifier = Modifier.focusRequester(focusRequester),
+            modifier = Modifier
+                .focusRequester(focusRequester)
+                // The mask lands in EditableText, where it is read out as "bullet" per digit.
+                .semantics { editableText = AnnotatedString("") },
             value = TextFieldValue(otpText, selection = TextRange(otpText.length)),
             onValueChange = {
                 if (!enabled) return@BasicTextField
@@ -88,7 +131,16 @@ fun OtpTextField(
             visualTransformation = visualTransformation,
             decorationBox = {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .semantics {
+                            contentDescription = pinDescription
+                            liveRegion = if (errorMessage.isNullOrEmpty()) {
+                                LiveRegionMode.Polite
+                            } else {
+                                LiveRegionMode.Assertive
+                            }
+                        },
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
@@ -105,14 +157,21 @@ fun OtpTextField(
                 }
             })
 
-        errorMessage?.let {
-            Text(
+        // The countdown replaces the static lockout text rather than stacking under it. Only
+        // errorMessage reaches the description above, so the lockout is announced once and the
+        // countdown never is.
+        (lockoutMessage?.takeIf { it.isNotEmpty() } ?: errorMessage?.takeIf { it.isNotEmpty() })?.let {
+            WrapText(
                 text = it,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.error,
+                textConfig = TextConfig(
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                    maxLines = Int.MAX_VALUE,
+                ),
                 modifier = Modifier.padding(top = 4.dp)
             )
         }
+
         OneTimeLaunchedEffect {
             if (focusOnCreate && enabled) {
                 focusRequester.requestFocus()
@@ -174,6 +233,7 @@ private fun CharView(
         text = char,
         modifier = Modifier
             .width(pinWidth)
+            .clearAndSetSemantics { }
             .border(
                 width = borderWidth,
                 color = borderColor,
@@ -198,6 +258,7 @@ private fun PreviewOtpTextField() {
                 otpText = "123456",
                 visualTransformation = PasswordVisualTransformation(),
                 pinWidth = 42.dp,
+                accessibilityPrefix = "PIN",
             )
         }
 
@@ -217,7 +278,8 @@ private fun PreviewOtpTextFieldWithError() {
             visualTransformation = PasswordVisualTransformation(),
             pinWidth = 42.dp,
             hasError = true,
-            errorMessage = "Invalid code"
+            errorMessage = "Invalid code",
+            accessibilityPrefix = "PIN",
         )
     }
 }

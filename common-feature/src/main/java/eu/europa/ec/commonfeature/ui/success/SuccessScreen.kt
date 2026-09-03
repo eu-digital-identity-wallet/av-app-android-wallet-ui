@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -48,11 +49,13 @@ import eu.europa.ec.uilogic.component.AppIcons
 import eu.europa.ec.uilogic.component.content.ContentHeader
 import eu.europa.ec.uilogic.component.content.ContentScreen
 import eu.europa.ec.uilogic.component.content.ScreenNavigateAction
+import eu.europa.ec.uilogic.component.content.ScrollableFullHeightColumn
 import eu.europa.ec.uilogic.component.preview.PreviewTheme
 import eu.europa.ec.uilogic.component.preview.ThemeModePreviews
 import eu.europa.ec.uilogic.component.utils.PERCENTAGE_25
 import eu.europa.ec.uilogic.component.utils.SIZE_MEDIUM
 import eu.europa.ec.uilogic.component.utils.SPACING_SMALL
+import eu.europa.ec.uilogic.component.utils.screenHeightInDp
 import eu.europa.ec.uilogic.component.wrap.ButtonConfig
 import eu.europa.ec.uilogic.component.wrap.ButtonType
 import eu.europa.ec.uilogic.component.wrap.WrapButton
@@ -129,10 +132,11 @@ private fun SuccessScreenView(
     onNavigationRequested: (Effect.Navigation) -> Unit,
     paddingValues: PaddingValues
 ) {
-    Column(
+    ScrollableFullHeightColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(paddingValues),
+        verticalArrangement = Arrangement.SpaceBetween,
     ) {
         ContentHeader(
             modifier = Modifier.fillMaxWidth(),
@@ -140,28 +144,29 @@ private fun SuccessScreenView(
         )
 
         val imageConfig = state.successConfig.imageConfig
+        // Bounded by the viewport height too, so landscape does not hand it the long screen edge.
+        val imageModifier = Modifier
+            .fillMaxWidth(imageConfig.screenPercentageSize)
+            .heightIn(max = screenHeightInDp(true) * imageConfig.screenPercentageSize)
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
-            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             when (imageConfig.type) {
                 is SuccessUIConfig.ImageConfig.Type.Default -> WrapImage(
-                    modifier = Modifier.fillMaxWidth(imageConfig.screenPercentageSize),
+                    modifier = imageModifier,
                     iconData = AppIcons.Success,
                     colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.success),
-                    contentScale = ContentScale.FillWidth
+                    contentScale = ContentScale.Fit
                 )
 
                 is SuccessUIConfig.ImageConfig.Type.Drawable -> WrapImage(
-                    modifier = Modifier.fillMaxWidth(imageConfig.screenPercentageSize),
+                    modifier = imageModifier,
                     iconData = imageConfig.type.icon,
                     colorFilter = imageConfig.tint?.let { safeImageColorTint ->
                         ColorFilter.tint(safeImageColorTint)
                     },
-                    contentScale = ContentScale.FillWidth
+                    contentScale = ContentScale.Fit
                 )
             }
 

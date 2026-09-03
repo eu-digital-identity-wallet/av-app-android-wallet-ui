@@ -52,7 +52,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.isTraversalGroup
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -62,6 +69,9 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import eu.europa.ec.commonfeature.navigation.helper.handleIntentAction
+import eu.europa.ec.landingfeature.model.AgeCredentialCardUi
+import eu.europa.ec.landingfeature.model.RemainingAccessesUi
+import eu.europa.ec.landingfeature.util.TestTag
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.uilogic.component.AppIcons
 import eu.europa.ec.uilogic.component.ListItemDataUi
@@ -108,8 +118,7 @@ fun LandingScreen(controller: NavController, viewModel: LandingViewModel) {
         Content(
             paddingValues = paddingValues,
             documentClaims = state.documentClaims,
-            credentialCount = state.credentialCount,
-            ageThreshold = state.ageThreshold,
+            credentialCard = state.credentialCard,
             onAddCredential = { viewModel.setEvent(Event.AddCredentials) }
         )
     }
@@ -136,17 +145,24 @@ fun LandingScreen(controller: NavController, viewModel: LandingViewModel) {
 }
 
 @Composable
-private fun ScanButton(onEventSend: (Event) -> Unit) {
+internal fun ScanButton(onEventSend: (Event) -> Unit) {
+    val scanQrLabel = stringResource(R.string.generic_scan_qr)
 
     Column(modifier = Modifier.wrapContentSize()) {
-        FloatingActionButton(modifier = Modifier.align(Alignment.CenterHorizontally),
+        FloatingActionButton(
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .testTag(TestTag.LandingScreen.SCAN_BUTTON)
+                .semantics(mergeDescendants = true) { contentDescription = scanQrLabel },
             onClick = { onEventSend(Event.GoToScanQR) },
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary,
             shape = CircleShape,
         ) {
             WrapIcon(
-                modifier = Modifier.padding(SPACING_LARGE.dp),
+                modifier = Modifier
+                    .padding(SPACING_LARGE.dp)
+                    .clearAndSetSemantics { },
                 iconData = AppIcons.QrScanner
             )
         }
@@ -157,7 +173,9 @@ private fun ScanButton(onEventSend: (Event) -> Unit) {
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             ),
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .clearAndSetSemantics { }
         )
     }
 }
@@ -225,8 +243,7 @@ private fun TopBar(onEventSend: (Event) -> Unit) = Box(
 private fun Content(
     paddingValues: PaddingValues,
     documentClaims: List<ExpandableListItemUi>?,
-    credentialCount: Int?,
-    ageThreshold: Int,
+    credentialCard: AgeCredentialCardUi,
     onAddCredential: () -> Unit,
 ) {
 
@@ -237,7 +254,10 @@ private fun Content(
 
         WrapText(
             text = stringResource(R.string.landing_screen_title),
-            textConfig = TextConfig(style = MaterialTheme.typography.headlineLarge)
+            textConfig = TextConfig(
+                style = MaterialTheme.typography.headlineLarge,
+                isHeading = true,
+            )
         )
 
         VSpacer.Large()
@@ -251,8 +271,7 @@ private fun Content(
         VSpacer.ExtraLarge()
 
         AgeVerificationCard(
-            credentialCount = credentialCount,
-            ageThreshold = ageThreshold,
+            credentialCard = credentialCard,
             onAddCredential = onAddCredential,
         )
 
@@ -273,7 +292,8 @@ private fun CredentialDetails(documentClaims: List<ExpandableListItemUi>) {
         textConfig = TextConfig(
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.primary,
-            textAlign = TextAlign.Start
+            textAlign = TextAlign.Start,
+            isHeading = true,
         )
     )
 
@@ -335,19 +355,25 @@ private fun AgeOverBadge(age: Int) {
 
 @Composable
 private fun AgeVerificationCard(
-    credentialCount: Int?,
-    ageThreshold: Int,
+    credentialCard: AgeCredentialCardUi,
     onAddCredential: () -> Unit,
 ) {
-    Box {
-        if (credentialCount != null) {
-            CredentialCountBadge(credentialCount, onAddCredential)
+    // The card and its badge are one block to a screen reader: the card describes the proof of
+    // age as a whole, then the badge follows with how many accesses are left.
+    Box(modifier = Modifier.semantics { isTraversalGroup = true }) {
+        credentialCard.remainingAccesses?.let { remainingAccesses ->
+            RemainingAccessesBadge(remainingAccesses, onAddCredential)
         }
 
         Card(
             modifier = Modifier
                 .height(130.dp)
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .testTag(TestTag.LandingScreen.CREDENTIAL_CARD)
+                .clearAndSetSemantics {
+                    traversalIndex = 0f
+                    contentDescription = credentialCard.accessibilityLabel
+                },
             colors = CardDefaults.cardColors(
                 containerColor = Color(0xFFEBF1FD),
             ),
@@ -409,8 +435,10 @@ private fun AgeVerificationCard(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Absolute.Center
                     ) {
-                        AgeOverBadge(age = ageThreshold)
-                        HSpacer.Small()
+                        credentialCard.ageThreshold?.let { ageThreshold ->
+                            AgeOverBadge(age = ageThreshold)
+                            HSpacer.Small()
+                        }
                         WrapText(
                             text = stringResource(R.string.landing_screen_card_age_verification),
                             textConfig = TextConfig(
@@ -426,27 +454,44 @@ private fun AgeVerificationCard(
 }
 
 @Composable
-private fun BoxScope.CredentialCountBadge(credentialCount: Int, onAddCredential: () -> Unit) {
+private fun BoxScope.RemainingAccessesBadge(
+    remainingAccesses: RemainingAccessesUi,
+    onAddCredential: () -> Unit,
+) {
+    // Only the depleted badge leads anywhere, so only then is it offered as a button.
+    val actionModifier = if (remainingAccesses.isDepleted) {
+        Modifier.clickable(role = Role.Button) { onAddCredential() }
+    } else {
+        Modifier
+    }
+
     Badge(
         modifier = Modifier
             .align(Alignment.TopEnd)
             .padding(top = SPACING_SMALL.dp, end = SPACING_SMALL.dp)
             .zIndex(1f)
-            .clickable {
-                onAddCredential()
+            .testTag(TestTag.LandingScreen.REMAINING_ACCESSES)
+            .then(actionModifier)
+            .semantics(mergeDescendants = true) {
+                traversalIndex = 1f
+                contentDescription = remainingAccesses.accessibilityLabel
             },
-        containerColor = if (credentialCount > 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+        containerColor = if (remainingAccesses.isDepleted) {
+            MaterialTheme.colorScheme.error
+        } else {
+            MaterialTheme.colorScheme.primary
+        },
     ) {
         WrapText(
             modifier = Modifier.padding(SPACING_EXTRA_SMALL.dp),
-            text = if (credentialCount > 0)
-                stringResource(
-                    R.string.landing_screen_credentials_left,
-                    credentialCount
-                ) else stringResource(R.string.landing_screen_add_credentials),
+            text = remainingAccesses.label,
             textConfig = TextConfig(
                 style = MaterialTheme.typography.labelSmall,
-                color = if (credentialCount > 0) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onError
+                color = if (remainingAccesses.isDepleted) {
+                    MaterialTheme.colorScheme.onError
+                } else {
+                    MaterialTheme.colorScheme.onPrimary
+                }
             )
         )
     }
@@ -484,8 +529,15 @@ private fun LandingScreenPreview() {
                     )
                 ),
                 paddingValues = paddingValues,
-                credentialCount = 3,
-                ageThreshold = 18,
+                credentialCard = AgeCredentialCardUi(
+                    ageThreshold = 18,
+                    accessibilityLabel = "European Union proof of age, confirming that you are over 18",
+                    remainingAccesses = RemainingAccessesUi(
+                        label = "3 left",
+                        accessibilityLabel = "3 proofs of age left",
+                        isDepleted = false,
+                    ),
+                ),
                 onAddCredential = { }
             )
         }

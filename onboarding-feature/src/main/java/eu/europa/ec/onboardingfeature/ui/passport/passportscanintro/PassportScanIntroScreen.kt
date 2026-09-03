@@ -33,13 +33,24 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import eu.europa.ec.onboardingfeature.ui.passport.passportscanintro.Effect.FocusStartButton
+import eu.europa.ec.onboardingfeature.ui.passport.passportscanintro.Effect.Navigation
+import eu.europa.ec.onboardingfeature.util.TestTag
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.uilogic.component.AppIcons
 import eu.europa.ec.uilogic.component.NumberedList
@@ -67,6 +78,7 @@ fun PassportScanIntroScreen(
 ) {
     val state by viewModel.viewState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val startButtonFocusRequester = remember { FocusRequester() }
 
     ContentScreen(
         isLoading = state.isLoading,
@@ -79,6 +91,7 @@ fun PassportScanIntroScreen(
                 onBackPressed = { viewModel.setEvent(Event.OnBackPressed) },
                 onDownloadClicked = { viewModel.setEvent(Event.OnDownloadClicked(context)) },
                 onStartClicked = { viewModel.setEvent(Event.OnStartClicked) },
+                startButtonFocusRequester = startButtonFocusRequester,
                 paddingValues = paddingValues
             )
         }
@@ -88,7 +101,15 @@ fun PassportScanIntroScreen(
 
     LaunchedEffect(Unit) {
         viewModel.effect.onEach { effect ->
-            handleEffect(effect, hostNavController)
+            when (effect) {
+                is Navigation -> handleNavigationEffect(effect, hostNavController)
+
+                is FocusStartButton -> {
+                    // The focus target only exists once the Ready state has enabled the button.
+                    withFrameNanos { }
+                    startButtonFocusRequester.requestFocus()
+                }
+            }
         }.collect()
     }
 }
@@ -99,6 +120,7 @@ private fun ActionButtons(
     onBackPressed: () -> Unit = {},
     onDownloadClicked: () -> Unit = {},
     onStartClicked: () -> Unit = {},
+    startButtonFocusRequester: FocusRequester,
     paddingValues: PaddingValues,
 ) {
     val isDownloading = state.sdkReadiness == SdkReadiness.Downloading
@@ -114,8 +136,11 @@ private fun ActionButtons(
         secondaryButtonConfig = ButtonConfig(
             type = ButtonType.PRIMARY,
             enabled = !isDownloading,
-            onClick = primaryButtonOnClick
-        )
+            onClick = primaryButtonOnClick,
+            focusRequester = startButtonFocusRequester
+        ),
+        primaryButtonModifier = Modifier.testTag(TestTag.PassportScanIntroScreen.BACK_BUTTON),
+        secondaryButtonModifier = Modifier.testTag(TestTag.PassportScanIntroScreen.PRIMARY_BUTTON),
     )
 
     Column {
@@ -123,9 +148,14 @@ private fun ActionButtons(
             LinearProgressIndicator(
                 progress = { state.downloadProgress / 100f },
                 modifier = Modifier
+                    .testTag(TestTag.PassportScanIntroScreen.DOWNLOAD_PROGRESS)
                     .fillMaxWidth()
                     .padding(paddingValues)
-                    .padding(bottom = 8.dp),
+                    .padding(bottom = 8.dp)
+                    .semantics {
+                        liveRegion = LiveRegionMode.Polite
+                        contentDescription = state.downloadStatusAnnouncement
+                    },
             )
         }
 
@@ -162,20 +192,24 @@ private fun ActionButtons(
                     }
                     Text(text = buttonText)
                 }
-                ButtonType.SECONDARY -> Text(text = stringResource(R.string.passport_scan_intro_back_button))
+
+                ButtonType.SECONDARY -> Text(
+                    text = stringResource(R.string.passport_scan_intro_back_button)
+                )
+
                 else -> {}
             }
         }
     }
 }
 
-private fun handleEffect(effect: Effect, hostNavController: NavController) {
+private fun handleNavigationEffect(effect: Navigation, hostNavController: NavController) {
     when (effect) {
-        is Effect.Navigation.GoBack -> {
+        is Navigation.GoBack -> {
             hostNavController.popBackStack()
         }
 
-        is Effect.Navigation.SwitchScreen -> {
+        is Navigation.SwitchScreen -> {
             hostNavController.navigate(effect.screenRoute)
         }
     }
@@ -217,6 +251,8 @@ private fun Content(
             text = stringResource(R.string.passport_scan_intro_title),
             textConfig = TextConfig(
                 style = MaterialTheme.typography.titleLarge,
+                maxLines = Int.MAX_VALUE,
+                isHeading = true
             ),
         )
 
@@ -268,6 +304,7 @@ private fun PassportScanIntroScreenPreview() {
                     onBackPressed = {},
                     onDownloadClicked = {},
                     onStartClicked = {},
+                    startButtonFocusRequester = remember { FocusRequester() },
                     paddingValues = paddingValues
                 )
             }

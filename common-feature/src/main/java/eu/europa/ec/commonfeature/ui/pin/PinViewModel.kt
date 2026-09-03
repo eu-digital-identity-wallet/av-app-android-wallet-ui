@@ -59,6 +59,9 @@ data class State(
     val isLoading: Boolean = false,
     val isButtonEnabled: Boolean = false,
     val quickPinError: String? = null,
+    val lockoutMessage: String? = null,
+    val pinAccessibilityPrefix: String = "",
+    val stepAccessibilityDescription: String = "",
     val validationResult: FormValidationResult = FormValidationResult(false),
     val subtitle: String = "",
     val title: String = "",
@@ -146,12 +149,19 @@ class PinViewModel(
         onCountdownUpdate = { message ->
             setState {
                 copy(
-                    quickPinError = message,
+                    lockoutMessage = message,
                 )
             }
         },
         onLockoutEnd = {
-            setState { copy(isLockedOut = false, quickPinError = null, lockoutEndTime = 0L) }
+            setState {
+                copy(
+                    isLockedOut = false,
+                    quickPinError = null,
+                    lockoutMessage = null,
+                    lockoutEndTime = 0L
+                )
+            }
         },
         getTimeMessage = { minutes, seconds ->
             if (minutes > 0)
@@ -194,7 +204,9 @@ class PinViewModel(
             subtitle = subtitle,
             pinState = pinState,
             buttonText = buttonText,
-            pinFlow = pinFlow
+            pinFlow = pinFlow,
+            pinAccessibilityPrefix = calculateAccessibilityPrefix(pinState),
+            stepAccessibilityDescription = calculateStepDescription(title, subtitle),
         )
     }
 
@@ -269,6 +281,7 @@ class PinViewModel(
                         setState {
                             copy(
                                 quickPinError = it.errorMessage,
+                                lockoutMessage = null,
                                 isLockedOut = false,
                             )
                         }
@@ -295,17 +308,21 @@ class PinViewModel(
 
     private fun setupEnterPhase() {
         val newPinState = PinValidationState.ENTER
+        val newSubtitle = calculateSubtitle(newPinState)
 
         setState {
             copy(
                 quickPinError = null,
+                lockoutMessage = null,
                 enteredPin = "",
                 pinState = newPinState,
                 buttonText = calculateButtonText(newPinState),
                 pin = "",
                 isButtonEnabled = false,
                 resetPin = true,
-                subtitle = calculateSubtitle(newPinState),
+                subtitle = newSubtitle,
+                pinAccessibilityPrefix = calculateAccessibilityPrefix(newPinState),
+                stepAccessibilityDescription = calculateStepDescription(title, newSubtitle),
                 isLockedOut = false,
             )
         }
@@ -313,39 +330,60 @@ class PinViewModel(
 
     private fun setupReenterPhase(enteredPin: String) {
         val newPinState = PinValidationState.REENTER
+        val newSubtitle = calculateSubtitle(newPinState)
+        val newTitle = calculateTitle(newPinState)
 
         setState {
             copy(
                 quickPinError = null,
+                lockoutMessage = null,
                 enteredPin = enteredPin,
                 pinState = PinValidationState.REENTER,
                 buttonText = calculateButtonText(newPinState),
                 pin = "",
                 isButtonEnabled = false,
                 resetPin = true,
-                subtitle = calculateSubtitle(newPinState),
-                title = calculateTitle(newPinState)
+                subtitle = newSubtitle,
+                title = newTitle,
+                pinAccessibilityPrefix = calculateAccessibilityPrefix(newPinState),
+                stepAccessibilityDescription = calculateStepDescription(newTitle, newSubtitle),
             )
         }
     }
 
     private fun setupEnterPhaseFromReenter() {
         val newPinState = PinValidationState.ENTER
+        val newSubtitle = calculateSubtitle(newPinState)
+        val newTitle = calculateTitle(newPinState)
 
         setState {
             copy(
                 quickPinError = null,
+                lockoutMessage = null,
                 enteredPin = "",
                 pinState = newPinState,
                 buttonText = calculateButtonText(newPinState),
                 pin = "",
                 isButtonEnabled = false,
                 resetPin = true,
-                subtitle = calculateSubtitle(newPinState),
-                title = calculateTitle(newPinState),
+                subtitle = newSubtitle,
+                title = newTitle,
+                pinAccessibilityPrefix = calculateAccessibilityPrefix(newPinState),
+                stepAccessibilityDescription = calculateStepDescription(newTitle, newSubtitle),
             )
         }
     }
+
+    private fun calculateAccessibilityPrefix(pinState: PinValidationState): String =
+        resourceProvider.getString(
+            when (pinState) {
+                PinValidationState.REENTER -> R.string.content_description_pin_repeated_input_prefix
+                else -> R.string.content_description_pin_input_prefix
+            }
+        )
+
+    private fun calculateStepDescription(title: String, subtitle: String): String =
+        resourceProvider.getString(R.string.content_description_sentence_pair, title, subtitle)
 
     private fun calculateTitle(pinState: PinValidationState): String {
         return when (pinState) {
@@ -365,7 +403,8 @@ class PinViewModel(
                     is QuickPinInteractorSetPinPartialState.Failed -> {
                         setState {
                             copy(
-                                quickPinError = it.errorMessage
+                                quickPinError = it.errorMessage,
+                                lockoutMessage = null
                             )
                         }
                     }
@@ -422,6 +461,7 @@ class PinViewModel(
                     validationResult = validationResult,
                     isButtonEnabled = validationResult.isValid,
                     quickPinError = validationResult.message,
+                    lockoutMessage = null,
                     pin = pin,
                     resetPin = false
                 )
