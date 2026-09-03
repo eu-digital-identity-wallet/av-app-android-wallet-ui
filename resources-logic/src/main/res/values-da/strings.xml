@@ -56,7 +56,7 @@
     <string name="content_description_arrow_up_icon">Pil op</string>
     <string name="content_description_check_icon">Kontrollér</string>
     <string name="content_description_clock_timer_icon">Stopur</string>
-    <string name="content_description_close_icon">Close</string>
+    <string name="content_description_close_icon">Luk</string>
     <string name="content_description_date_range_icon">Vælg interval for filtrering af datoer</string>
     <string name="content_description_documents_icon">Dokumenter</string>
     <string name="content_description_edit_icon">Rediger</string>
@@ -91,12 +91,12 @@
     <string name="content_description_pin_input_empty">tom</string>
     <string name="content_description_pin_input_prefix">PIN</string>
     <string name="content_description_pin_repeated_input_prefix">gentaget PIN</string>
-    <string name="content_description_sentence_pair">%1$s. %2$s</string>
     <string name="content_description_present_document_same_device_icon">Fremvis dokument ved personligt fremmøde</string>
     <string name="content_description_qr_icon">QR-kode</string>
     <string name="content_description_qr_scanner_icon">QR-scanner</string>
     <string name="content_description_scytales_logo_icon">Scytales-logo</string>
     <string name="content_description_search_icon">Søg</string>
+    <string name="content_description_sentence_pair">%1$s. %2$s</string>
     <string name="content_description_settings_icon">Indstillinger</string>
     <string name="content_description_success_icon">Udført</string>
     <string name="content_description_telekom_logo_icon">Telekom-logo</string>
@@ -285,6 +285,8 @@
     <string name="passport_scan_intro_data_download_notice">Bekræftelse kræver yderligere data. Når du trykker på Download, downloades cirka 250 MB aktiver til ansigtsmatchning.</string>
     <string name="passport_scan_intro_description">Pas / ID-kort metoden er hurtig og sikker! Tag et billede af dit pas / ID-kort, scan dit pas / ID-kort og optag en video af dig selv—tre trin for sikker onboarding.</string>
     <string name="passport_scan_intro_download_button">Download</string>
+    <string name="passport_scan_intro_download_preparing_announcement">Download fuldført. Forbereder ansigtsverifikation.</string>
+    <string name="passport_scan_intro_download_progress_announcement">Downloader yderligere data: %1$d %%</string>
     <string name="passport_scan_intro_downloading_button">%d%%</string>
     <string name="passport_scan_intro_enrollment_method">Aldersverifikationsmetode</string>
     <string name="passport_scan_intro_start_button">Start</string>
@@ -307,6 +309,7 @@
     <string name="qr_scan_informative_text_issuance_flow">Har du problemer med at scanne QR -koden?\nPrøv en alternativ måde</string>
     <string name="qr_scan_informative_text_presentation_flow">Har du problemer med at scanne QR -koden?\nPrøv en alternativ måde</string>
     <string name="qr_scan_permission_not_granted">Kameratilladelse ikke angivet\nÅbn app-indstillinger</string>
+    <string name="qr_scan_positioning_hint">Hold din telefon stille og centrér QR-koden i rammen</string>
     <string name="quick_pin_bottom_sheet_cancel_primary_button_text">Ja, annuller</string>
     <string name="quick_pin_bottom_sheet_cancel_secondary_button_text">Nej</string>
     <string name="quick_pin_bottom_sheet_cancel_subtitle">Er du sikker på, at du vil annullere ændringen af PIN?</string>

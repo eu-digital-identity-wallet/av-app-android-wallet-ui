@@ -47,6 +47,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -216,6 +220,7 @@ private fun OpenCamera(
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
+    val positioningHint = stringResource(id = R.string.qr_scan_positioning_hint)
 
     val cameraProviderFuture = remember {
         ProcessCameraProvider.getInstance(context)
@@ -239,7 +244,11 @@ private fun OpenCamera(
             .fillMaxSize()
             .background(
                 color = Color.Black,
-            ),
+            )
+            .semantics(mergeDescendants = true) {
+                contentDescription = positioningHint
+                liveRegion = LiveRegionMode.Polite
+            },
         contentAlignment = Alignment.Center
     ) {
         val scannerAreaSize = (minOf(maxWidth, maxHeight) - SIZE_100.dp).coerceAtLeast(SIZE_100.dp)

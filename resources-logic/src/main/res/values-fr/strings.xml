@@ -56,7 +56,7 @@
     <string name="content_description_arrow_up_icon">Flèche vers le haut</string>
     <string name="content_description_check_icon">Vérifier</string>
     <string name="content_description_clock_timer_icon">Chronomètre</string>
-    <string name="content_description_close_icon">Close</string>
+    <string name="content_description_close_icon">Fermer</string>
     <string name="content_description_date_range_icon">Sélectionner le filtre de plage de dates</string>
     <string name="content_description_documents_icon">Documents</string>
     <string name="content_description_edit_icon">Modifier</string>
@@ -92,12 +92,12 @@
     <string name="content_description_pin_input_empty">vide</string>
     <string name="content_description_pin_input_prefix">code PIN</string>
     <string name="content_description_pin_repeated_input_prefix">code PIN répété</string>
-    <string name="content_description_sentence_pair">%1$s. %2$s</string>
     <string name="content_description_present_document_same_device_icon">Présenter le document en personne</string>
     <string name="content_description_qr_icon">QR</string>
     <string name="content_description_qr_scanner_icon">Lecteur QR</string>
     <string name="content_description_scytales_logo_icon">Logo Scytales</string>
     <string name="content_description_search_icon">Recherche</string>
+    <string name="content_description_sentence_pair">%1$s. %2$s</string>
     <string name="content_description_settings_icon">Paramètres</string>
     <string name="content_description_success_icon">Succès</string>
     <string name="content_description_telekom_logo_icon">Logo Telekom</string>
@@ -287,6 +287,8 @@
     <string name="passport_scan_intro_data_download_notice">La vérification nécessite des données supplémentaires. Lorsque vous appuyez sur Télécharger, environ 250 Mo de fichiers seront téléchargés pour la reconnaissance faciale.</string>
     <string name="passport_scan_intro_description">La méthode passeport / carte d\'identité est rapide et sécurisée ! Prendre une photo de votre passeport / carte d\'identité, scannez votre passeport / carte d\'identité et enregistrer une vidéo de vous-même—trois étapes pour un onboarding sécurisé.</string>
     <string name="passport_scan_intro_download_button">Télécharger</string>
+    <string name="passport_scan_intro_download_preparing_announcement">Téléchargement terminé. Préparation de la vérification du visage.</string>
+    <string name="passport_scan_intro_download_progress_announcement">Téléchargement des données supplémentaires : %1$d %%</string>
     <string name="passport_scan_intro_downloading_button">%d%%</string>
     <string name="passport_scan_intro_enrollment_method">Méthode de vérification d\'âge</string>
     <string name="passport_scan_intro_start_button">Commencer</string>
@@ -309,6 +311,7 @@
     <string name="qr_scan_informative_text_issuance_flow">La lecture du code QR ne fonctionne pas ?\nVeuillez essayer une autre méthode</string>
     <string name="qr_scan_informative_text_presentation_flow">La lecture du code QR ne fonctionne pas ?\nVeuillez essayer une autre méthode</string>
     <string name="qr_scan_permission_not_granted">Autorisation d\'accès à la caméra non donnée\nOuvrir les paramètres de l\'application</string>
+    <string name="qr_scan_positioning_hint">Tenez votre téléphone immobile et centrez le code QR dans le cadre</string>
     <string name="quick_pin_bottom_sheet_cancel_primary_button_text">Oui, annuler</string>
     <string name="quick_pin_bottom_sheet_cancel_secondary_button_text">Non</string>
     <string name="quick_pin_bottom_sheet_cancel_subtitle">Êtes-vous sûr de vouloir annuler le changement de code PIN ?</string>
