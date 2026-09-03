@@ -140,7 +140,7 @@
     <string name="generic_no">Ingen</string>
     <string name="generic_ok">OK</string>
     <string name="generic_or">ELLER</string>
-    <string name="generic_scan_qr">Scan QR-kode</string>
+    <string name="generic_scan_qr">Skan QR-kode</string>
     <string name="generic_success">Udført</string>
     <string name="generic_unknown">Ukendt</string>
     <string name="generic_view_details">Legitimationsdetaljer</string>
@@ -309,7 +309,7 @@
     <string name="qr_scan_informative_text_issuance_flow">Har du problemer med at scanne QR -koden?\nPrøv en alternativ måde</string>
     <string name="qr_scan_informative_text_presentation_flow">Har du problemer med at scanne QR -koden?\nPrøv en alternativ måde</string>
     <string name="qr_scan_permission_not_granted">Kameratilladelse ikke angivet\nÅbn app-indstillinger</string>
-    <string name="qr_scan_positioning_hint">Hold din telefon stille og centrér QR-koden i rammen</string>
+    <string name="qr_scan_positioning_hint">Hold din telefon stabilt, og centrer QR-koden inden for rammen</string>
     <string name="quick_pin_bottom_sheet_cancel_primary_button_text">Ja, annuller</string>
     <string name="quick_pin_bottom_sheet_cancel_secondary_button_text">Nej</string>
     <string name="quick_pin_bottom_sheet_cancel_subtitle">Er du sikker på, at du vil annullere ændringen af PIN?</string>

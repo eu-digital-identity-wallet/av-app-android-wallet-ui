@@ -141,7 +141,7 @@
     <string name="generic_no">Non</string>
     <string name="generic_ok">OK</string>
     <string name="generic_or">OU</string>
-    <string name="generic_scan_qr">Scan QR</string>
+    <string name="generic_scan_qr">Lire le code QR</string>
     <string name="generic_success">Succès</string>
     <string name="generic_unknown">Inconnu</string>
     <string name="generic_view_details">Détails d\'identification</string>
@@ -311,7 +311,7 @@
     <string name="qr_scan_informative_text_issuance_flow">La lecture du code QR ne fonctionne pas ?\nVeuillez essayer une autre méthode</string>
     <string name="qr_scan_informative_text_presentation_flow">La lecture du code QR ne fonctionne pas ?\nVeuillez essayer une autre méthode</string>
     <string name="qr_scan_permission_not_granted">Autorisation d\'accès à la caméra non donnée\nOuvrir les paramètres de l\'application</string>
-    <string name="qr_scan_positioning_hint">Tenez votre téléphone immobile et centrez le code QR dans le cadre</string>
+    <string name="qr_scan_positioning_hint">Tenez votre téléphone stable et centrez le code QR dans le cadre.</string>
     <string name="quick_pin_bottom_sheet_cancel_primary_button_text">Oui, annuler</string>
     <string name="quick_pin_bottom_sheet_cancel_secondary_button_text">Non</string>
     <string name="quick_pin_bottom_sheet_cancel_subtitle">Êtes-vous sûr de vouloir annuler le changement de code PIN ?</string>

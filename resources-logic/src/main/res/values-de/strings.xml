@@ -309,7 +309,7 @@
     <string name="qr_scan_informative_text_issuance_flow">Probleme beim Scannen des QR-Codes?\nBitte versuchen Sie es mit einer anderen Methode</string>
     <string name="qr_scan_informative_text_presentation_flow">Probleme beim Scannen des QR-Codes?\nBitte versuchen Sie es mit einer anderen Methode</string>
     <string name="qr_scan_permission_not_granted">Kameraberechtigung nicht erteilt\nApp öffnen Einstellungen</string>
-    <string name="qr_scan_positioning_hint">Halten Sie Ihr Handy ruhig und zentrieren Sie den QR-Code im Rahmen</string>
+    <string name="qr_scan_positioning_hint">Halten Sie Ihr Telefon ruhig und zentrieren Sie den QR-Code im Rahmen.</string>
     <string name="quick_pin_bottom_sheet_cancel_primary_button_text">WEITER</string>
     <string name="quick_pin_bottom_sheet_cancel_secondary_button_text">ABBRECHEN</string>
     <string name="quick_pin_bottom_sheet_cancel_subtitle">Durch Abbrechen werden Sie zurück zur Startseite geleitet, ohne den Pin zu ändern</string>

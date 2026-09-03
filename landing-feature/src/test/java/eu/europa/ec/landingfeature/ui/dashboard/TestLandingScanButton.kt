@@ -16,9 +16,12 @@
 
 package eu.europa.ec.landingfeature.ui.dashboard
 
+import android.content.Context
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
+import androidx.test.core.app.ApplicationProvider
+import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.testlogic.base.TestApplication
 import org.junit.Rule
 import org.junit.Test
@@ -38,17 +41,21 @@ class TestLandingScanButton {
         composeTestRule.setContent {
             ScanButton(onEventSend = {})
         }
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val scanQr = context.getString(R.string.generic_scan_qr)
+        val qrScanner = context.getString(R.string.content_description_qr_scanner_icon)
+        val scan = context.getString(R.string.landing_screen_primary_button_label_scan)
 
         composeTestRule
-            .onNodeWithContentDescription("Scan QR")
+            .onNodeWithContentDescription(scanQr)
             .assertExists()
 
         composeTestRule
-            .onNodeWithContentDescription("QR Scanner")
+            .onNodeWithContentDescription(qrScanner)
             .assertDoesNotExist()
 
         composeTestRule
-            .onNodeWithText("Scan")
+            .onNodeWithText(scan)
             .assertDoesNotExist()
     }
 }

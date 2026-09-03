@@ -48,10 +48,6 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.LiveRegionMode
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.liveRegion
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -246,13 +242,8 @@ private fun OpenCamera(
             .fillMaxSize()
             .background(
                 color = Color.Black,
-            )
-            .testTag(TestTag.QrScanScreen.CAMERA_AREA)
-            .semantics(mergeDescendants = true) {
-                contentDescription = positioningHint
-                liveRegion = LiveRegionMode.Polite
-            },
-        contentAlignment = Alignment.Center
+            ),
+        contentAlignment = Alignment.Center,
     ) {
         val scannerAreaSize = (minOf(maxWidth, maxHeight) - SIZE_100.dp).coerceAtLeast(SIZE_100.dp)
 
@@ -262,7 +253,7 @@ private fun OpenCamera(
             AndroidView(
                 modifier = Modifier
                     .fillMaxSize()
-                    .semantics { contentDescription = positioningHint },
+                    .testTag(TestTag.QrScanScreen.CAMERA_AREA),
                 factory = { context ->
 
                     val previewView = PreviewView(context)
