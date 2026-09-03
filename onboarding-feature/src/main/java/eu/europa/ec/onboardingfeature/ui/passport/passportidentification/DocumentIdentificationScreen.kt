@@ -249,7 +249,8 @@ private fun Content(paddingValues: PaddingValues) {
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.SemiBold,
                 ),
-                maxLines = Int.MAX_VALUE
+                maxLines = Int.MAX_VALUE,
+                isHeading = true
             ),
         )
 
@@ -294,7 +295,9 @@ fun VerifyYourDataContent(scannedDocument: ScannedDocument, paddingValues: Paddi
             textConfig = TextConfig(
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.SemiBold
-                )
+                ),
+                maxLines = Int.MAX_VALUE,
+                isHeading = true
             ),
         )
 
@@ -313,7 +316,9 @@ fun VerifyYourDataContent(scannedDocument: ScannedDocument, paddingValues: Paddi
                     textConfig = TextConfig(
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontWeight = FontWeight.SemiBold
-                        )
+                        ),
+                        maxLines = Int.MAX_VALUE,
+                        isHeading = true
                     ),
                 )
 
@@ -371,7 +376,7 @@ private fun PassportImageOrFallback(scannedDocument: ScannedDocument) {
         scannedDocument.faceImage?.let { faceImage ->
             Image(
                 painter = BitmapPainter(faceImage.asImageBitmap()),
-                contentDescription = "Passport Face Image",
+                contentDescription = stringResource(R.string.content_description_passport_face_image),
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(8.dp))
@@ -380,7 +385,7 @@ private fun PassportImageOrFallback(scannedDocument: ScannedDocument) {
             )
         } ?: Image(
             painter = painterResource(R.drawable.ic_logo_plain),
-            contentDescription = "Placeholder Image",
+            contentDescription = stringResource(R.string.content_description_passport_face_image_placeholder),
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(8.dp))

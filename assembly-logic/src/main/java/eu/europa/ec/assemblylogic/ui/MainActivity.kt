@@ -52,7 +52,8 @@ class MainActivity : EudiComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            Content(intent) {
+            // Android redelivers the launch intent on recreation, so only a cold boot may consume it.
+            Content(intent.takeIf { savedInstanceState == null }) {
                 featureStartupGraph(it)
                 featureOnboardingGraph(it)
                 featureCommonGraph(it)

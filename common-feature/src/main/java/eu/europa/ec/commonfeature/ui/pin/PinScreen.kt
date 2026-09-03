@@ -37,6 +37,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -97,7 +102,10 @@ fun PinScreen(
                 modifier = Modifier
                     .testTag(TestTag.PinScreen.BUTTON)
                     .fillMaxWidth()
-                    .padding(paddingValues),
+                    .padding(paddingValues)
+                    // The flow presses this itself. Cleared unconditionally - gating it on the
+                    // enabled state changes the tree as an error appears, costing its announcement.
+                    .clearAndSetSemantics { },
 
                 stickyBottomConfig = StickyBottomConfig(
                     type = StickyBottomType.OneButton(
@@ -197,12 +205,30 @@ private fun Content(
             )
         }
 
-        VSpacer.ExtraLarge()
-        WrapText(
-            textConfig = TextConfig(style = MaterialTheme.typography.titleLarge),
-            text = state.title
-        )
-        VSpacer.Large()
+        // Announces the step change, which happens on its own. The description must be this
+        // node's own: text merged from the children does not fire the live region.
+        Column(
+            modifier = Modifier.clearAndSetSemantics {
+                liveRegion = LiveRegionMode.Assertive
+                contentDescription = state.stepAccessibilityDescription
+                heading()
+            }
+        ) {
+            VSpacer.ExtraLarge()
+            WrapText(
+                textConfig = TextConfig(
+                    style = MaterialTheme.typography.titleLarge,
+                    maxLines = Int.MAX_VALUE,
+                    isHeading = true
+                ),
+                text = state.title
+            )
+            VSpacer.Large()
+
+            PinHintText(state.subtitle)
+        }
+
+        VSpacer.Small()
 
         PinFieldLayout(
             modifier = Modifier
@@ -260,10 +286,6 @@ private fun PinFieldLayout(
     state: State,
     onPinInput: (String) -> Unit,
 ) {
-    PinHintText(state.subtitle)
-
-    VSpacer.Small()
-
     OtpTextField(
         modifier = modifier,
         onUpdate = onPinInput,
@@ -271,10 +293,12 @@ private fun PinFieldLayout(
         length = state.quickPinSize,
         hasError = !state.quickPinError.isNullOrEmpty(),
         errorMessage = state.quickPinError,
+        lockoutMessage = state.lockoutMessage,
         visualTransformation = PasswordVisualTransformation(),
         pinWidth = 42.dp,
         focusOnCreate = true,
-        enabled = !state.isLockedOut
+        enabled = !state.isLockedOut,
+        accessibilityPrefix = state.pinAccessibilityPrefix,
     )
 }
 

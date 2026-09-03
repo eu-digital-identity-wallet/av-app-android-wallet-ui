@@ -22,12 +22,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.union
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -106,6 +112,7 @@ fun ContentScreen(
     bodyContent: @Composable (PaddingValues) -> Unit
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
+    val layoutDirection = LocalLayoutDirection.current
 
     val hasToolBar = contentErrorConfig != null
             || navigatableAction != ScreenNavigateAction.NONE
@@ -113,13 +120,17 @@ fun ContentScreen(
             || toolBarConfig?.actions?.isNotEmpty() == true
     val topSpacing = if (hasToolBar) TopSpacing.WithToolbar else TopSpacing.WithoutToolbar
 
+    val topBarInsets = WindowInsets.systemBars
+        .union(WindowInsets.displayCutout)
+        .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)
+
     Scaffold(
         topBar = {
             if (topBar != null && contentErrorConfig == null) {
                 Box(
                     modifier = Modifier
                         .wrapContentSize()
-                        .statusBarsPadding()
+                        .windowInsetsPadding(topBarInsets)
                 ) {
                     topBar()
                 }
@@ -131,6 +142,7 @@ fun ContentScreen(
                     onBack = contentErrorConfig?.onCancel ?: onBack,
                     keyboardController = keyboardController,
                     toolbarConfig = toolBarConfig,
+                    windowInsets = topBarInsets,
                 )
             }
         },
@@ -154,11 +166,13 @@ fun ContentScreen(
         floatingActionButton = fab,
         floatingActionButtonPosition = fabPosition,
         snackbarHost = snackbarHost,
+        contentWindowInsets = WindowInsets.systemBars.union(WindowInsets.displayCutout),
     ) { padding ->
 
         val screenPaddingsIgnoringSticky = screenPaddings(
             hasStickyBottom = false,
             append = padding,
+            layoutDirection = layoutDirection,
             topSpacing = topSpacing
         )
 
@@ -191,6 +205,7 @@ fun ContentScreen(
                             screenPaddings(
                                 hasStickyBottom = stickyBottom != null,
                                 append = padding,
+                                layoutDirection = layoutDirection,
                                 topSpacing = topSpacing
                             )
                         )
@@ -200,14 +215,16 @@ fun ContentScreen(
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .navigationBarsPadding()
+                                .windowInsetsPadding(
+                                    WindowInsets.navigationBars.only(WindowInsetsSides.Bottom)
+                                )
                                 .zIndex(Z_STICKY),
                             contentAlignment = Alignment.Center
                         ) {
                             stickyBottomContent(
                                 stickyBottomPaddings(
                                     contentScreenPaddings = screenPaddingsIgnoringSticky,
-                                    layoutDirection = LocalLayoutDirection.current
+                                    layoutDirection = layoutDirection
                                 )
                             )
                         }
@@ -241,9 +258,11 @@ private fun DefaultToolBar(
     onBack: (() -> Unit)?,
     keyboardController: SoftwareKeyboardController?,
     toolbarConfig: ToolbarConfig?,
+    windowInsets: WindowInsets,
 ) {
 
     TopAppBar(
+        windowInsets = windowInsets,
         title = {
             Text(
                 text = toolbarConfig?.title.orEmpty(),

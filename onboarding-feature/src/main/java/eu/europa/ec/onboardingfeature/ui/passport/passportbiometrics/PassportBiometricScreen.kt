@@ -138,7 +138,9 @@ private fun Content(paddingValues: PaddingValues, onLinkAction : () -> Unit) {
             textConfig = TextConfig(
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.SemiBold
-                )
+                ),
+                maxLines = Int.MAX_VALUE,
+                isHeading = true
             ),
         )
 
@@ -158,7 +160,7 @@ private fun Content(paddingValues: PaddingValues, onLinkAction : () -> Unit) {
         )
 
         VSpacer.Large()
-        WrapLink(data = WrapLinkData(textId = R.string.passport_biometrics_first_link)) { onLinkAction }
+        WrapLink(data = WrapLinkData(textId = R.string.passport_biometrics_first_link)) { onLinkAction() }
     }
 }
 

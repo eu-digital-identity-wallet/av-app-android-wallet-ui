@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -28,6 +29,8 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerScope
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -119,13 +122,17 @@ private fun Content(
 ) {
     Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(paddingValues),
+            .fillMaxSize()
+            .padding(paddingValues)
+            .verticalScroll(rememberScrollState()),
     ) {
         TopStepBar(0)
         VSpacer.ExtraLarge()
         WelcomePager(pagerState = pagerState, pages = pages)
-        WrapPageIndicator(pagerState)
+        WrapPageIndicator(
+            pagerState = pagerState,
+            pageTitles = pages.map { stringResource(id = it.title) }
+        )
     }
 
     LaunchedEffect(Unit) {
@@ -187,7 +194,10 @@ private fun singlePage(
             modifier = Modifier.fillMaxWidth(),
             text = stringResource(id = pages[page].title),
             textConfig = TextConfig(
-                style = MaterialTheme.typography.titleLarge, textAlign = TextAlign.Start
+                style = MaterialTheme.typography.titleLarge,
+                textAlign = TextAlign.Start,
+                maxLines = Int.MAX_VALUE,
+                isHeading = true
             )
         )
         VSpacer.Large()

@@ -7,23 +7,25 @@
     android:paddingStart="@dimen/top_action_bar_padding_horizontal"
     android:paddingEnd="@dimen/top_action_bar_padding_horizontal">
 
-    <ImageView
+    <ToggleButton
         android:id="@+id/flash_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_gravity="start"
+        android:layout_width="@dimen/top_action_button_size"
+        android:layout_height="@dimen/top_action_button_size"
+        android:background="@drawable/camera_flash"
+        android:backgroundTint="@color/nfc_link_color"
         android:contentDescription="@string/cd_flash_button"
-        android:padding="@dimen/top_action_button_padding"
-        app:srcCompat="@drawable/camera_flash"
-        app:tint="@color/nfc_link_color" />
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:saveEnabled="false"
+        android:textOff="@null"
+        android:textOn="@null"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/close_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
         android:contentDescription="@string/cd_close_button"
         android:padding="@dimen/top_action_button_padding"
         app:layout_constraintEnd_toEndOf="parent"

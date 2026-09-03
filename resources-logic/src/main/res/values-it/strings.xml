@@ -14,10 +14,15 @@
   ~ governing permissions and limitations under the Licence.
   -->
 <resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="accessibility_page_of_total">Pagina %1$d di %2$d</string>
+    <string name="accessibility_page_of_total_titled">Pagina %1$d di %2$d: %3$s</string>
+    <string name="accessibility_step_current">Passaggio corrente</string>
+    <string name="accessibility_step_of_total">Passaggio %1$d di %2$d: %3$s</string>
     <string name="age_over">Maggiore di %d anni\n</string>
     <string name="age_over_18">Età superiore a 18 anni</string>
     <string name="biometric_confirm_request">Confirm request</string>
     <string name="biometric_default_mode_text_above_pin_field">PIN</string>
+    <string name="biometric_key_invalidated">Chiave biometrica invalidata — è richiesta una nuova registrazione</string>
     <string name="biometric_login_biometrics_enabled_subtitle">Usa i tuoi dati biometrici per accedere all\'applicazione di verifica dell\'età.</string>
     <string name="biometric_login_biometrics_not_enabled_subtitle">Per accedere all\'applicazione di verifica dell\'età, inserisci il tuo PIN.</string>
     <string name="biometric_login_forgot_pin">Hai dimenticato il tuo PIN?</string>
@@ -25,13 +30,12 @@
     <string name="biometric_no_hardware">Il tuo dispositivo non supporta l\'autenticazione biometrica</string>
     <string name="biometric_prompt_subtitle">Accedi con i tuoi dati biometrici</string>
     <string name="biometric_prompt_title">Autenticazione biometrica</string>
-    <string name="biometric_setup_description">Usa la tua impronta digitale o il riconoscimento facciale per accedere all\'app &quot;%s&quot;.</string>
+    <string name="biometric_setup_description">Usa la tua impronta digitale o il riconoscimento facciale per accedere all\'app \"%s\".</string>
     <string name="biometric_setup_enable">Avvia la configurazione</string>
     <string name="biometric_setup_required_error">L\'autenticazione biometrica è necessaria per usare questa app.</string>
     <string name="biometric_setup_skip">Salta</string>
     <string name="biometric_setup_title">Accesso biometrico</string>
     <string name="biometric_unknown_error">Si è verificato un errore durante l\'inizializzazione dell\'autenticazione biometrica. Riprova.</string>
-    <string name="biometric_key_invalidated">Chiave biometrica invalidata — è richiesta una nuova registrazione</string>
     <string name="cd_close_button">Indietro</string>
     <string name="cd_flash_button">Attiva/disattiva il flash della fotocamera</string>
     <string name="confirm_doc_removal_dialog_delete">Sì, elimina</string>
@@ -52,7 +56,7 @@
     <string name="content_description_arrow_up_icon">Freccia su</string>
     <string name="content_description_check_icon">Controlla</string>
     <string name="content_description_clock_timer_icon">Timer</string>
-    <string name="content_description_close_icon">Close</string>
+    <string name="content_description_close_icon">Chiudi</string>
     <string name="content_description_date_range_icon">Seleziona l\'intervallo di date del filtro</string>
     <string name="content_description_documents_icon">Documenti</string>
     <string name="content_description_edit_icon">Modifica</string>
@@ -66,19 +70,34 @@
     <string name="content_description_in_progress_icon">In corso</string>
     <string name="content_description_info_icon">Informazioni</string>
     <string name="content_description_issuer_logo_icon">Logo dell\'emittente</string>
-    <string name="content_description_logo_plain_icon">Icona del logo normale</string>
-    <string name="content_description_logo_text_icon">Icona del logo testuale</string>
+    <string name="content_description_landing_screen_add_credentials">Nessuna prova dell\'età rimanente. Aggiungine altre.</string>
+    <string name="content_description_landing_screen_credential_card">Prova dell\'età dell\'Unione europea, che conferma che hai più di %1$d anni</string>
+    <string name="content_description_landing_screen_credential_card_no_age">Prova dell\'età dell\'Unione europea</string>
+    <plurals name="content_description_landing_screen_credentials_left">
+        <item quantity="one">%1$d prova dell\'età rimanente</item>
+        <item quantity="many">%1$d prove dell\'età rimanenti</item>
+        <item quantity="other">%1$d prove dell\'età rimanenti</item>
+    </plurals>
+    <string name="content_description_logo_plain_icon">Logo dell\'app Verifica dell\'età</string>
+    <string name="content_description_logo_text_icon">Verifica dell\'età</string>
     <string name="content_description_message_icon">Messaggio</string>
     <string name="content_description_more_vert_icon">Più elementi</string>
     <string name="content_description_national_eid_icon">eID Nazionale</string>
     <string name="content_description_no_connection_icon">Nessuna connessione Internet</string>
     <string name="content_description_open_new_icon">Apri nuovo</string>
     <string name="content_description_over_18_icon">Più di 18</string>
+    <string name="content_description_passport_face_image">Foto dal documento scansionato</string>
+    <string name="content_description_passport_face_image_placeholder">Nessuna foto del documento disponibile</string>
+    <string name="content_description_pin_digits_entered">%1$d di %2$d cifre inserite</string>
+    <string name="content_description_pin_input_empty">vuoto</string>
+    <string name="content_description_pin_input_prefix">PIN</string>
+    <string name="content_description_pin_repeated_input_prefix">PIN ripetuto</string>
     <string name="content_description_present_document_same_device_icon">Presenta il documento di persona</string>
     <string name="content_description_qr_icon">QR</string>
     <string name="content_description_qr_scanner_icon">Scanner QR</string>
     <string name="content_description_scytales_logo_icon">Logo Scytales</string>
     <string name="content_description_search_icon">Ricerca</string>
+    <string name="content_description_sentence_pair">%1$s. %2$s</string>
     <string name="content_description_settings_icon">Impostazioni</string>
     <string name="content_description_success_icon">Operazione completata</string>
     <string name="content_description_telekom_logo_icon">Logo Telekom</string>
@@ -168,7 +187,11 @@
     <string name="landing_screen_card_age_verification">Verifica dell\'età</string>
     <string name="landing_screen_card_eu_title">Unione\neuropea</string>
     <string name="landing_screen_credential_details">Dettagli delle credenziali</string>
-    <string name="landing_screen_credentials_left">%1$d rimasti</string>
+    <plurals name="landing_screen_credentials_left">
+        <item quantity="one">%1$d rimasta</item>
+        <item quantity="many">%1$d rimaste</item>
+        <item quantity="other">%1$d rimaste</item>
+    </plurals>
     <string name="landing_screen_no_age_credential_found">Non sono disponibili credenziali dell\'età</string>
     <string name="landing_screen_primary_button_label_scan">Scansiona</string>
     <string name="landing_screen_subtitle">Puoi condividere la tua attestazione dell\'età con i servizi riservati agli adulti. Questo documento conferma che hai almeno 18 anni senza rivelare altre informazioni personali.</string>
@@ -210,6 +233,7 @@
     <string name="onboarding_verification_description">Questa verifica è necessaria per creare un\'attestazione che dimostri che hai più di 18 anni. I dettagli eID non saranno condivisi con i servizi online a cui accedi.</string>
     <string name="onboarding_verification_national_id">eID nazionale / IdP nazionale</string>
     <string name="onboarding_verification_national_id_description">Identificati online usando il tuo eID</string>
+    <string name="onboarding_verification_opens_in_browser">Si apre nel tuo browser</string>
     <string name="onboarding_verification_passport_id_card">Passaporto o Carta d\'identità</string>
     <string name="onboarding_verification_passport_id_card_description">Scansiona il tuo passaporto o carta d\'identità per la verifica</string>
     <string name="onboarding_verification_title">Scegli il tuo metodo di verifica dell\'età</string>
@@ -263,6 +287,8 @@
     <string name="passport_scan_intro_data_download_notice">La verifica richiede dati aggiuntivi. Toccando Scarica, verranno scaricati circa 250 MB di risorse per il riconoscimento facciale.</string>
     <string name="passport_scan_intro_description">Il metodo passaporto / carta d\'identità è veloce e sicuro! Scatta una foto del tuo passaporto / carta d\'identità, scansiona il tuo passaporto / carta d\'identità e registra un video di te stesso—tre passaggi per un onboarding sicuro.</string>
     <string name="passport_scan_intro_download_button">Scarica</string>
+    <string name="passport_scan_intro_download_preparing_announcement">Download completato. Preparazione della verifica del volto.</string>
+    <string name="passport_scan_intro_download_progress_announcement">Download dei dati aggiuntivi: %1$d%%</string>
     <string name="passport_scan_intro_downloading_button">%d%%</string>
     <string name="passport_scan_intro_enrollment_method">Metodo di verifica dell\'età</string>
     <string name="passport_scan_intro_start_button">Inizia</string>
@@ -285,6 +311,7 @@
     <string name="qr_scan_informative_text_issuance_flow">Non riesci a scansionare il codice QR?\nProva con un metodo alternativo</string>
     <string name="qr_scan_informative_text_presentation_flow">Non riesci a scansionare il codice QR?\nProva con un metodo alternativo</string>
     <string name="qr_scan_permission_not_granted">Autorizzazione della fotocamera non fornita\nApri le impostazioni dell\'app</string>
+    <string name="qr_scan_positioning_hint">Tieni fermo il telefono e centra il codice QR all\'interno dell\'inquadratura.</string>
     <string name="quick_pin_bottom_sheet_cancel_primary_button_text">Sì, annulla</string>
     <string name="quick_pin_bottom_sheet_cancel_secondary_button_text">No</string>
     <string name="quick_pin_bottom_sheet_cancel_subtitle">Sei sicuro di voler annullare il cambio PIN?</string>

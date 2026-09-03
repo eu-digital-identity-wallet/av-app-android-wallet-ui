@@ -21,6 +21,7 @@ import androidx.lifecycle.viewModelScope
 import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.onboardingfeature.interactor.PassportScanIntroInteractor
 import eu.europa.ec.passportscanner.face.SdkInitStatus
+import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.component.content.ContentErrorConfig
 import eu.europa.ec.uilogic.extension.createErrorConfigFromMessage
@@ -41,6 +42,7 @@ data class State(
     val isLoading: Boolean = false,
     val sdkReadiness: SdkReadiness = SdkReadiness.NotReady,
     val downloadProgress: Int = 0,
+    val downloadStatusAnnouncement: String = "",
     val error: ContentErrorConfig? = null,
 ) : ViewState
 
@@ -56,6 +58,8 @@ sealed class Effect : ViewSideEffect {
         data object GoBack : Navigation()
         data class SwitchScreen(val screenRoute: String, val inclusive: Boolean) : Navigation()
     }
+
+    data object FocusStartButton : Effect()
 }
 
 @KoinViewModel
@@ -77,15 +81,9 @@ class PassportScanIntroViewModel(
                 setEffect { Effect.Navigation.GoBack }
             }
 
-            is Event.OnDownloadClicked -> {
-                setState { copy(sdkReadiness = SdkReadiness.Downloading, error = null) }
-                collectSdkInit(event.context.applicationContext)
-            }
+            is Event.OnDownloadClicked -> startDownload(event.context)
 
-            is Event.OnRetryClicked -> {
-                setState { copy(sdkReadiness = SdkReadiness.Downloading, error = null) }
-                collectSdkInit(event.context.applicationContext)
-            }
+            is Event.OnRetryClicked -> startDownload(event.context)
 
             is Event.OnStartClicked -> {
                 setEffect {
@@ -96,6 +94,17 @@ class PassportScanIntroViewModel(
                 }
             }
         }
+    }
+
+    private fun startDownload(context: Context) {
+        setState {
+            copy(
+                sdkReadiness = SdkReadiness.Downloading,
+                downloadStatusAnnouncement = "",
+                error = null
+            )
+        }
+        collectSdkInit(context.applicationContext)
     }
 
     private fun collectSdkInit(context: Context) {
@@ -113,6 +122,7 @@ class PassportScanIntroViewModel(
                             copy(
                                 sdkReadiness = SdkReadiness.Downloading,
                                 downloadProgress = status.progress,
+                                downloadStatusAnnouncement = progressAnnouncement(status.progress),
                                 error = null
                             )
                         }
@@ -123,6 +133,9 @@ class PassportScanIntroViewModel(
                             copy(
                                 sdkReadiness = SdkReadiness.Downloading,
                                 downloadProgress = 100,
+                                downloadStatusAnnouncement = resourceProvider.getString(
+                                    R.string.passport_scan_intro_download_preparing_announcement
+                                ),
                                 error = null
                             )
                         }
@@ -136,6 +149,7 @@ class PassportScanIntroViewModel(
                                 error = null
                             )
                         }
+                        setEffect { Effect.FocusStartButton }
                     }
 
                     is SdkInitStatus.Error -> {
@@ -143,6 +157,7 @@ class PassportScanIntroViewModel(
                             copy(
                                 sdkReadiness = SdkReadiness.NotReady,
                                 downloadProgress = 0,
+                                downloadStatusAnnouncement = "",
                                 error = createErrorConfigFromMessage(
                                     errorMessage = status.message,
                                     resourceProvider = resourceProvider,
@@ -162,5 +177,21 @@ class PassportScanIntroViewModel(
                 }
             }
         }
+    }
+
+    private fun progressAnnouncement(progress: Int): String {
+        val announcedProgress = progress - progress % PROGRESS_ANNOUNCEMENT_STEP
+        return if (announcedProgress == 0) {
+            ""
+        } else {
+            resourceProvider.getString(
+                R.string.passport_scan_intro_download_progress_announcement,
+                announcedProgress
+            )
+        }
+    }
+
+    private companion object {
+        const val PROGRESS_ANNOUNCEMENT_STEP = 25
     }
 }

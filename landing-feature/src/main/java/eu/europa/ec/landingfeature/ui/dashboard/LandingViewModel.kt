@@ -27,6 +27,8 @@ import eu.europa.ec.commonfeature.extension.toExpandableListItems
 import eu.europa.ec.corelogic.di.getOrCreatePresentationScope
 import eu.europa.ec.landingfeature.interactor.LandingPageInteractor
 import eu.europa.ec.landingfeature.interactor.LandingPageInteractor.GetAgeCredentialPartialState
+import eu.europa.ec.landingfeature.model.AgeCredentialCardUi
+import eu.europa.ec.landingfeature.model.RemainingAccessesUi
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.component.content.ContentErrorConfig
@@ -54,8 +56,7 @@ data class State(
     val isLoading: Boolean = false,
     val error: ContentErrorConfig? = null,
     val documentClaims: List<ExpandableListItemUi>? = null,
-    val credentialCount: Int? = null,
-    val ageThreshold: Int = 18,
+    val credentialCard: AgeCredentialCardUi,
 ) : ViewState
 
 sealed class Event : ViewEvent {
@@ -88,7 +89,12 @@ class LandingViewModel(
 ) : MviViewModel<Event, State, Effect>() {
 
     override fun setInitialState(): State {
-        return State()
+        return State(
+            credentialCard = ageCredentialCard(
+                ageThreshold = null,
+                credentialCount = null,
+            )
+        )
     }
 
     override fun handleEvents(event: Event) {
@@ -112,7 +118,7 @@ class LandingViewModel(
             }
 
             Event.AddCredentials -> {
-                if (viewState.value.credentialCount == 0) {
+                if (viewState.value.credentialCard.remainingAccesses?.isDepleted == true) {
                     switchScreen(OnboardingScreens.Enrollment.screenRoute)
                 }
             }
@@ -144,8 +150,10 @@ class LandingViewModel(
                                 copy(
                                     isLoading = false,
                                     documentClaims = listItems,
-                                    credentialCount = result.ageCredentialUi.credentialCount,
-                                    ageThreshold = result.ageCredentialUi.ageThreshold ?: 18,
+                                    credentialCard = ageCredentialCard(
+                                        ageThreshold = result.ageCredentialUi.ageThreshold,
+                                        credentialCount = result.ageCredentialUi.credentialCount,
+                                    ),
                                 )
                             }
                         }
@@ -165,6 +173,43 @@ class LandingViewModel(
                     }
                 }
         }
+    }
+
+    private fun ageCredentialCard(ageThreshold: Int?, credentialCount: Int?) = AgeCredentialCardUi(
+        ageThreshold = ageThreshold,
+        accessibilityLabel = ageThreshold?.let {
+            resourceProvider.getString(
+                R.string.content_description_landing_screen_credential_card,
+                it
+            )
+        } ?: resourceProvider.getString(
+            R.string.content_description_landing_screen_credential_card_no_age
+        ),
+        remainingAccesses = credentialCount?.let { count -> remainingAccesses(count) },
+    )
+
+    private fun remainingAccesses(count: Int): RemainingAccessesUi = when {
+        count > 0 -> RemainingAccessesUi(
+            label = resourceProvider.getQuantityString(
+                R.plurals.landing_screen_credentials_left,
+                count,
+                count
+            ),
+            accessibilityLabel = resourceProvider.getQuantityString(
+                R.plurals.content_description_landing_screen_credentials_left,
+                count,
+                count
+            ),
+            isDepleted = false,
+        )
+
+        else -> RemainingAccessesUi(
+            label = resourceProvider.getString(R.string.landing_screen_add_credentials),
+            accessibilityLabel = resourceProvider.getString(
+                R.string.content_description_landing_screen_add_credentials
+            ),
+            isDepleted = true,
+        )
     }
 
     private fun navigateToQrScan() {

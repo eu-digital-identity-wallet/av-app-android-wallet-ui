@@ -38,6 +38,7 @@ import android.view.View.VISIBLE
 import android.view.ViewTreeObserver
 import android.view.Window
 import android.widget.TextView
+import android.widget.ToggleButton
 import androidx.camera.camera2.interop.Camera2Interop
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraInfoUnavailableException
@@ -52,7 +53,6 @@ import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.core.SurfaceOrientedMeteringPointFactory
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
-import androidx.constraintlayout.widget.Guideline
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
@@ -96,7 +96,7 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
     private var cameraProvider: ProcessCameraProvider? = null
     private var orientation: String? = null
 
-    private var flashButton: View? = null
+    private var flashButton: ToggleButton? = null
     private var closeButton: View? = null
     private var rectangle: View? = null
     private var rectangleGuide: View? = null
@@ -333,14 +333,6 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
     }
 
     private fun setupViews() {
-        // scanner layout size
-        val topGuideline = findViewById<Guideline>(R.id.top)
-        val bottomGuideline = findViewById<Guideline>(R.id.bottom)
-        // scanner sizes available for Portrait only
-        if (orientation == Orientation.PORTRAIT.value) {
-            bottomGuideline.setGuidelinePercent(0.625F)
-            topGuideline.setGuidelinePercent(0.275F)
-        }
         // flash
         flashButton?.visibility = if (isLedFlashAvailable(this)) VISIBLE else GONE
         // capture text header
@@ -353,7 +345,7 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
         }
         // assign camera click listeners
         closeButton?.setOnClickListener(this)
-        flashButton?.setOnClickListener(this)
+        flashButton?.setOnCheckedChangeListener { _, isChecked -> enableFlashlight(isChecked) }
     }
 
     override fun onRequestPermissionsResult(
@@ -396,17 +388,6 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
     override fun onClick(view: View) {
         when (view.id) {
             R.id.close_button -> onBackPressedDispatcher.onBackPressed()
-            R.id.flash_button -> {
-                flashButton?.let {
-                    if (it.isSelected) {
-                        it.isSelected = false
-                        enableFlashlight(false)
-                    } else {
-                        it.isSelected = true
-                        enableFlashlight(true)
-                    }
-                }
-            }
         }
     }
 

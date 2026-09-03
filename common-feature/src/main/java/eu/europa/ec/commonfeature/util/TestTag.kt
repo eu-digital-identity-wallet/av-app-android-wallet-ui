@@ -46,4 +46,8 @@ object TestTag {
         const val PIN_TEXT = "biometric_screen_pin_text"
         const val PIN_TITLE = "biometric_screen_title"
     }
+
+    object QrScanScreen {
+        const val CAMERA_AREA = "qr_scan_screen_camera_area"
+    }
 }

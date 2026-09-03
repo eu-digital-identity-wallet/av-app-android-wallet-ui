@@ -25,6 +25,8 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -142,8 +144,9 @@ private fun Content(
 ) {
     Column(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .padding(paddingValues)
+            .verticalScroll(rememberScrollState())
     ) {
         TopStepBar(currentStep = 1)
         ConsentAndTosSection(
@@ -186,14 +189,17 @@ fun ConsentAndTosSection(
     val context = LocalContext.current
     Column(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
             .padding(horizontal = 0.dp, vertical = SPACING_EXTRA_LARGE.dp),
     ) {
         WrapText(
             modifier = Modifier.fillMaxWidth(),
             text = stringResource(R.string.consent_screen_title),
             textConfig = TextConfig(
-                style = MaterialTheme.typography.titleLarge, textAlign = TextAlign.Start
+                style = MaterialTheme.typography.titleLarge,
+                textAlign = TextAlign.Start,
+                maxLines = Int.MAX_VALUE,
+                isHeading = true
             )
         )
 

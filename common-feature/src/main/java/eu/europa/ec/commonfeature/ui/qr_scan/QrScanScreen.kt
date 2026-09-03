@@ -27,6 +27,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -45,7 +46,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -58,10 +63,12 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import eu.europa.ec.businesslogic.controller.log.LogController
+import eu.europa.ec.businesslogic.extension.toUri
 import eu.europa.ec.commonfeature.config.QrScanFlow
 import eu.europa.ec.commonfeature.config.QrScanUiConfig
 import eu.europa.ec.commonfeature.ui.qr_scan.component.QrCodeAnalyzer
 import eu.europa.ec.commonfeature.ui.qr_scan.component.qrBorderCanvas
+import eu.europa.ec.commonfeature.util.TestTag
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.uilogic.component.AppIcons
 import eu.europa.ec.uilogic.component.ErrorInfo
@@ -75,10 +82,8 @@ import eu.europa.ec.uilogic.component.utils.SIZE_EXTRA_SMALL
 import eu.europa.ec.uilogic.component.utils.SIZE_LARGE
 import eu.europa.ec.uilogic.component.utils.SPACING_LARGE
 import eu.europa.ec.uilogic.component.utils.SPACING_SMALL
-import eu.europa.ec.uilogic.component.utils.screenWidthInDp
 import eu.europa.ec.uilogic.component.wrap.WrapCard
 import eu.europa.ec.uilogic.component.wrap.WrapIcon
-import eu.europa.ec.businesslogic.extension.toUri
 import eu.europa.ec.uilogic.extension.openAppSettings
 import eu.europa.ec.uilogic.extension.openUrl
 import eu.europa.ec.uilogic.extension.paddingFrom
@@ -119,7 +124,7 @@ fun QrScanScreen(
 private fun handleNavigationEffect(
     context: Context,
     navigationEffect: Effect.Navigation,
-    navController: NavController
+    navController: NavController,
 ) {
     when (navigationEffect) {
         is Effect.Navigation.SwitchScreen -> {
@@ -216,12 +221,20 @@ private fun OpenCamera(
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
+    val positioningHint = stringResource(id = R.string.qr_scan_positioning_hint)
 
     val cameraProviderFuture = remember {
         ProcessCameraProvider.getInstance(context)
     }
 
-    val scannerAreaSize = screenWidthInDp(true) - SIZE_100.dp
+    // The hint is static, so a live region would never fire; announce it once the camera is up.
+    val view = LocalView.current
+    LaunchedEffect(hasCameraPermission) {
+        if (hasCameraPermission) {
+            @Suppress("DEPRECATION")
+            view.announceForAccessibility(positioningHint)
+        }
+    }
 
     val permissionState = rememberPermissionState(permission = android.Manifest.permission.CAMERA)
     when {
@@ -236,20 +249,24 @@ private fun OpenCamera(
     }
 
     // The space the Camera is going to occupy.
-    Box(
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
             .background(
                 color = Color.Black,
             ),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
+        val scannerAreaSize = (minOf(maxWidth, maxHeight) - SIZE_100.dp).coerceAtLeast(SIZE_100.dp)
+
         if (hasCameraPermission) {
             val logController = koinInject<LogController>()
             // The Camera.
             AndroidView(
                 modifier = Modifier
-                    .fillMaxSize(),
+                    .fillMaxSize()
+                    .testTag(TestTag.QrScanScreen.CAMERA_AREA)
+                    .semantics { contentDescription = positioningHint },
                 factory = { context ->
 
                     val previewView = PreviewView(context)
