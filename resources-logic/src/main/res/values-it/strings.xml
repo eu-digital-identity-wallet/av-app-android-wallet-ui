@@ -311,7 +311,7 @@
     <string name="qr_scan_informative_text_issuance_flow">Non riesci a scansionare il codice QR?\nProva con un metodo alternativo</string>
     <string name="qr_scan_informative_text_presentation_flow">Non riesci a scansionare il codice QR?\nProva con un metodo alternativo</string>
     <string name="qr_scan_permission_not_granted">Autorizzazione della fotocamera non fornita\nApri le impostazioni dell\'app</string>
-    <string name="qr_scan_positioning_hint">Tieni fermo il telefono e centra il codice QR nel riquadro</string>
+    <string name="qr_scan_positioning_hint">Tieni fermo il telefono e centra il codice QR all\'interno dell\'inquadratura.</string>
     <string name="quick_pin_bottom_sheet_cancel_primary_button_text">Sì, annulla</string>
     <string name="quick_pin_bottom_sheet_cancel_secondary_button_text">No</string>
     <string name="quick_pin_bottom_sheet_cancel_subtitle">Sei sicuro di voler annullare il cambio PIN?</string>
