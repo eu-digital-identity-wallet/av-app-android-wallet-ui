@@ -56,7 +56,7 @@
     <string name="content_description_arrow_up_icon">Pil op</string>
     <string name="content_description_check_icon">Kontrollér</string>
     <string name="content_description_clock_timer_icon">Stopur</string>
-    <string name="content_description_close_icon">Close</string>
+    <string name="content_description_close_icon">Luk</string>
     <string name="content_description_date_range_icon">Vælg interval for filtrering af datoer</string>
     <string name="content_description_documents_icon">Dokumenter</string>
     <string name="content_description_edit_icon">Rediger</string>
@@ -91,12 +91,12 @@
     <string name="content_description_pin_input_empty">tom</string>
     <string name="content_description_pin_input_prefix">PIN</string>
     <string name="content_description_pin_repeated_input_prefix">gentaget PIN</string>
-    <string name="content_description_sentence_pair">%1$s. %2$s</string>
     <string name="content_description_present_document_same_device_icon">Fremvis dokument ved personligt fremmøde</string>
     <string name="content_description_qr_icon">QR-kode</string>
     <string name="content_description_qr_scanner_icon">QR-scanner</string>
     <string name="content_description_scytales_logo_icon">Scytales-logo</string>
     <string name="content_description_search_icon">Søg</string>
+    <string name="content_description_sentence_pair">%1$s. %2$s</string>
     <string name="content_description_settings_icon">Indstillinger</string>
     <string name="content_description_success_icon">Udført</string>
     <string name="content_description_telekom_logo_icon">Telekom-logo</string>
@@ -140,7 +140,7 @@
     <string name="generic_no">Ingen</string>
     <string name="generic_ok">OK</string>
     <string name="generic_or">ELLER</string>
-    <string name="generic_scan_qr">Scan QR-kode</string>
+    <string name="generic_scan_qr">Skan QR-kode</string>
     <string name="generic_success">Udført</string>
     <string name="generic_unknown">Ukendt</string>
     <string name="generic_view_details">Legitimationsdetaljer</string>
@@ -309,6 +309,7 @@
     <string name="qr_scan_informative_text_issuance_flow">Har du problemer med at scanne QR -koden?\nPrøv en alternativ måde</string>
     <string name="qr_scan_informative_text_presentation_flow">Har du problemer med at scanne QR -koden?\nPrøv en alternativ måde</string>
     <string name="qr_scan_permission_not_granted">Kameratilladelse ikke angivet\nÅbn app-indstillinger</string>
+    <string name="qr_scan_positioning_hint">Hold din telefon stabilt, og centrer QR-koden inden for rammen</string>
     <string name="quick_pin_bottom_sheet_cancel_primary_button_text">Ja, annuller</string>
     <string name="quick_pin_bottom_sheet_cancel_secondary_button_text">Nej</string>
     <string name="quick_pin_bottom_sheet_cancel_subtitle">Er du sikker på, at du vil annullere ændringen af PIN?</string>

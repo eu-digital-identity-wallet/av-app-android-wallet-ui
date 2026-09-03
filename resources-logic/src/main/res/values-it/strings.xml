@@ -56,7 +56,7 @@
     <string name="content_description_arrow_up_icon">Freccia su</string>
     <string name="content_description_check_icon">Controlla</string>
     <string name="content_description_clock_timer_icon">Timer</string>
-    <string name="content_description_close_icon">Close</string>
+    <string name="content_description_close_icon">Chiudi</string>
     <string name="content_description_date_range_icon">Seleziona l\'intervallo di date del filtro</string>
     <string name="content_description_documents_icon">Documenti</string>
     <string name="content_description_edit_icon">Modifica</string>
@@ -92,12 +92,12 @@
     <string name="content_description_pin_input_empty">vuoto</string>
     <string name="content_description_pin_input_prefix">PIN</string>
     <string name="content_description_pin_repeated_input_prefix">PIN ripetuto</string>
-    <string name="content_description_sentence_pair">%1$s. %2$s</string>
     <string name="content_description_present_document_same_device_icon">Presenta il documento di persona</string>
     <string name="content_description_qr_icon">QR</string>
     <string name="content_description_qr_scanner_icon">Scanner QR</string>
     <string name="content_description_scytales_logo_icon">Logo Scytales</string>
     <string name="content_description_search_icon">Ricerca</string>
+    <string name="content_description_sentence_pair">%1$s. %2$s</string>
     <string name="content_description_settings_icon">Impostazioni</string>
     <string name="content_description_success_icon">Operazione completata</string>
     <string name="content_description_telekom_logo_icon">Logo Telekom</string>
@@ -311,6 +311,7 @@
     <string name="qr_scan_informative_text_issuance_flow">Non riesci a scansionare il codice QR?\nProva con un metodo alternativo</string>
     <string name="qr_scan_informative_text_presentation_flow">Non riesci a scansionare il codice QR?\nProva con un metodo alternativo</string>
     <string name="qr_scan_permission_not_granted">Autorizzazione della fotocamera non fornita\nApri le impostazioni dell\'app</string>
+    <string name="qr_scan_positioning_hint">Tieni fermo il telefono e centra il codice QR all\'interno dell\'inquadratura.</string>
     <string name="quick_pin_bottom_sheet_cancel_primary_button_text">Sì, annulla</string>
     <string name="quick_pin_bottom_sheet_cancel_secondary_button_text">No</string>
     <string name="quick_pin_bottom_sheet_cancel_subtitle">Sei sicuro di voler annullare il cambio PIN?</string>

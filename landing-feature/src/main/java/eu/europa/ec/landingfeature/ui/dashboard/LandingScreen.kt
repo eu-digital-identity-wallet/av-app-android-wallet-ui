@@ -145,17 +145,24 @@ fun LandingScreen(controller: NavController, viewModel: LandingViewModel) {
 }
 
 @Composable
-private fun ScanButton(onEventSend: (Event) -> Unit) {
+internal fun ScanButton(onEventSend: (Event) -> Unit) {
+    val scanQrLabel = stringResource(R.string.generic_scan_qr)
 
     Column(modifier = Modifier.wrapContentSize()) {
-        FloatingActionButton(modifier = Modifier.align(Alignment.CenterHorizontally),
+        FloatingActionButton(
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .testTag(TestTag.LandingScreen.SCAN_BUTTON)
+                .semantics(mergeDescendants = true) { contentDescription = scanQrLabel },
             onClick = { onEventSend(Event.GoToScanQR) },
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary,
             shape = CircleShape,
         ) {
             WrapIcon(
-                modifier = Modifier.padding(SPACING_LARGE.dp),
+                modifier = Modifier
+                    .padding(SPACING_LARGE.dp)
+                    .clearAndSetSemantics { },
                 iconData = AppIcons.QrScanner
             )
         }
@@ -166,7 +173,9 @@ private fun ScanButton(onEventSend: (Event) -> Unit) {
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             ),
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .clearAndSetSemantics { }
         )
     }
 }
