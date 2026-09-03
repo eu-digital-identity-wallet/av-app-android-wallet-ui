@@ -4,6 +4,7 @@
   <dimen name="top_action_bar_padding_horizontal">8dp</dimen>
   <dimen name="top_action_bar_height">64dp</dimen>
   <dimen name="top_action_button_padding">12dp</dimen>
+  <dimen name="top_action_button_size">48dp</dimen>
 
   <!-- NFC Screen dimensions -->
   <dimen name="nfc_screen_padding">16dp</dimen>

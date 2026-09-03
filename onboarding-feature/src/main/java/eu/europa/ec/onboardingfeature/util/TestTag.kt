@@ -21,4 +21,10 @@ object TestTag {
     object EnrollmentScreen {
         fun enrollmentMethod(name: String) = "enrollment_screen_method_${name.lowercase()}"
     }
+
+    object PassportScanIntroScreen {
+        const val DOWNLOAD_PROGRESS = "passport_scan_intro_screen_download_progress"
+        const val PRIMARY_BUTTON = "passport_scan_intro_screen_primary_button"
+        const val BACK_BUTTON = "passport_scan_intro_screen_back_button"
+    }
 }

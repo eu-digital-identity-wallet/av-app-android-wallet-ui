@@ -16,76 +16,77 @@
         layout="@layout/top_action_bar_in_live_camera"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="top"
-        android:elevation="10dp" />
-
-    <TextView
-        android:id="@+id/capture_header_text"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:textColor="@color/nfc_title_color"
-        android:textDirection="anyRtl"
-        android:layout_marginVertical="16dp"
-        android:layout_marginHorizontal="32dp"
-        android:textSize="@dimen/nfc_title_text_size"
-        android:textStyle="bold"
+        android:elevation="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/action_bar_menu"
-        tools:text="header text" />
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/capture_sub_header_text"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_marginHorizontal="32dp"
-        android:lineSpacingMultiplier="0.9"
-        android:textColor="@color/nfc_body_color"
-        android:textDirection="anyRtl"
-        android:textSize="@dimen/nfc_body_text_size"
+    <ScrollView
+        android:id="@+id/content_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toTopOf="@+id/view_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/capture_header_text"
-        tools:text="sub text" />
+        app:layout_constraintTop_toBottomOf="@+id/action_bar_menu">
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/top"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.275" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/bottom"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.625" />
+            <TextView
+                android:id="@+id/capture_header_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="32dp"
+                android:layout_marginVertical="16dp"
+                android:gravity="center"
+                android:textColor="@color/nfc_title_color"
+                android:textDirection="anyRtl"
+                android:textSize="@dimen/nfc_title_text_size"
+                android:textStyle="bold"
+                tools:text="header text" />
+
+            <TextView
+                android:id="@+id/capture_sub_header_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="32dp"
+                android:layout_marginBottom="24dp"
+                android:gravity="center"
+                android:lineSpacingMultiplier="0.9"
+                android:textColor="@color/nfc_body_color"
+                android:textDirection="anyRtl"
+                android:textSize="@dimen/nfc_body_text_size"
+                tools:text="sub text" />
+
+        </LinearLayout>
+
+    </ScrollView>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/view_layout"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
         android:elevation="1dp"
-        android:visibility="visible"
         android:paddingHorizontal="12dp"
         android:paddingVertical="4dp"
-        app:layout_constraintBottom_toTopOf="@+id/bottom"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/top">
+        app:layout_constraintStart_toStartOf="parent">
 
         <androidx.camera.view.PreviewView
             android:id="@+id/view_finder"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:layout_marginHorizontal="4dp"
             android:layout_marginVertical="4dp"
             android:elevation="0dp"
-            app:layout_constraintDimensionRatio="4:3"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="H,4:3"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -93,34 +94,35 @@
         <include
             android:id="@+id/guide_layout"
             layout="@layout/guide_layout"
-            android:layout_marginHorizontal="4dp"
-            android:layout_marginVertical="4dp"
-            android:layout_height="match_parent"
-            android:layout_width="match_parent"/>
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="@+id/view_finder"
+            app:layout_constraintEnd_toEndOf="@+id/view_finder"
+            app:layout_constraintStart_toStartOf="@+id/view_finder"
+            app:layout_constraintTop_toTopOf="@+id/view_finder" />
 
         <ImageView
             android:id="@+id/rect_image"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:adjustViewBounds="true"
             android:contentDescription="@null"
             android:src="@drawable/rectangle"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintBottom_toBottomOf="@+id/view_finder"
+            app:layout_constraintEnd_toEndOf="@+id/view_finder"
+            app:layout_constraintStart_toStartOf="@+id/view_finder"
+            app:layout_constraintTop_toTopOf="@+id/view_finder" />
 
         <RelativeLayout
             android:id="@+id/rect_bounding_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:adjustViewBounds="true"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/transparent"
             android:contentDescription="@null"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:background="@color/transparent"/>
+            app:layout_constraintBottom_toBottomOf="@+id/view_finder"
+            app:layout_constraintEnd_toEndOf="@+id/view_finder"
+            app:layout_constraintStart_toStartOf="@+id/view_finder"
+            app:layout_constraintTop_toTopOf="@+id/view_finder" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

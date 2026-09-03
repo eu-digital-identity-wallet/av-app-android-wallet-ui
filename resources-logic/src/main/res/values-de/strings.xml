@@ -285,6 +285,8 @@
     <string name="passport_scan_intro_data_download_notice">Zur Verifizierung werden zusätzliche Daten benötigt. Wenn Sie auf „Herunterladen“ tippen, werden ca. 250 MB an Daten für den Gesichtsabgleich heruntergeladen.</string>
     <string name="passport_scan_intro_description">Die Reisepass / Personalausweis Methode ist schnell und sicher! Foto Ihres Reisepasses / Personalausweises aufnehmen, Reisepass / Personalausweis scannen und Video von sich selbst aufnehmen—drei Schritte für sicheres Onboarding.</string>
     <string name="passport_scan_intro_download_button">Herunterladen</string>
+    <string name="passport_scan_intro_download_preparing_announcement">Download abgeschlossen. Gesichtsverifikation wird vorbereitet.</string>
+    <string name="passport_scan_intro_download_progress_announcement">Zusätzliche Daten werden heruntergeladen: %1$d %%</string>
     <string name="passport_scan_intro_downloading_button">%d%%</string>
     <string name="passport_scan_intro_enrollment_method">Altersverifizierungsmethode</string>
     <string name="passport_scan_intro_start_button">Starten</string>

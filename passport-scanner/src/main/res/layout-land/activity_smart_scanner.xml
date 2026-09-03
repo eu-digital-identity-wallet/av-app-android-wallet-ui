@@ -36,39 +36,51 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/capture_header_text"
+    <ScrollView
+        android:id="@+id/content_scroll"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginEnd="24dp"
-        android:textColor="@color/nfc_title_color"
-        android:textDirection="anyRtl"
-        android:textSize="@dimen/nfc_title_text_size"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/capture_sub_header_text"
-        app:layout_constraintEnd_toStartOf="@+id/view_layout"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/action_bar_menu"
-        app:layout_constraintVertical_chainStyle="packed"
-        tools:text="header text" />
-
-    <TextView
-        android:id="@+id/capture_sub_header_text"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginEnd="24dp"
-        android:lineSpacingMultiplier="0.9"
-        android:textColor="@color/nfc_body_color"
-        android:textDirection="anyRtl"
-        android:textSize="@dimen/nfc_body_text_size"
+        android:layout_height="0dp"
+        android:fillViewport="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/view_layout"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/capture_header_text"
-        tools:text="sub text" />
+        app:layout_constraintTop_toBottomOf="@+id/action_bar_menu">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/capture_header_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginEnd="24dp"
+                android:textColor="@color/nfc_title_color"
+                android:textDirection="anyRtl"
+                android:textSize="@dimen/nfc_title_text_size"
+                android:textStyle="bold"
+                tools:text="header text" />
+
+            <TextView
+                android:id="@+id/capture_sub_header_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="24dp"
+                android:layout_marginBottom="8dp"
+                android:lineSpacingMultiplier="0.9"
+                android:textColor="@color/nfc_body_color"
+                android:textDirection="anyRtl"
+                android:textSize="@dimen/nfc_body_text_size"
+                tools:text="sub text" />
+
+        </LinearLayout>
+
+    </ScrollView>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/view_layout"

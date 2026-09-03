@@ -287,6 +287,8 @@
     <string name="passport_scan_intro_data_download_notice">La verifica richiede dati aggiuntivi. Toccando Scarica, verranno scaricati circa 250 MB di risorse per il riconoscimento facciale.</string>
     <string name="passport_scan_intro_description">Il metodo passaporto / carta d\'identità è veloce e sicuro! Scatta una foto del tuo passaporto / carta d\'identità, scansiona il tuo passaporto / carta d\'identità e registra un video di te stesso—tre passaggi per un onboarding sicuro.</string>
     <string name="passport_scan_intro_download_button">Scarica</string>
+    <string name="passport_scan_intro_download_preparing_announcement">Download completato. Preparazione della verifica del volto.</string>
+    <string name="passport_scan_intro_download_progress_announcement">Download dei dati aggiuntivi: %1$d%%</string>
     <string name="passport_scan_intro_downloading_button">%d%%</string>
     <string name="passport_scan_intro_enrollment_method">Metodo di verifica dell\'età</string>
     <string name="passport_scan_intro_start_button">Inizia</string>

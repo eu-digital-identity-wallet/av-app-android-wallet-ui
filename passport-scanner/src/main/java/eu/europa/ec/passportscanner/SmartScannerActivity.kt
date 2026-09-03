@@ -38,6 +38,7 @@ import android.view.View.VISIBLE
 import android.view.ViewTreeObserver
 import android.view.Window
 import android.widget.TextView
+import android.widget.ToggleButton
 import androidx.camera.camera2.interop.Camera2Interop
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraInfoUnavailableException
@@ -95,7 +96,7 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
     private var cameraProvider: ProcessCameraProvider? = null
     private var orientation: String? = null
 
-    private var flashButton: View? = null
+    private var flashButton: ToggleButton? = null
     private var closeButton: View? = null
     private var rectangle: View? = null
     private var rectangleGuide: View? = null
@@ -344,7 +345,7 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
         }
         // assign camera click listeners
         closeButton?.setOnClickListener(this)
-        flashButton?.setOnClickListener(this)
+        flashButton?.setOnCheckedChangeListener { _, isChecked -> enableFlashlight(isChecked) }
     }
 
     override fun onRequestPermissionsResult(
@@ -387,17 +388,6 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
     override fun onClick(view: View) {
         when (view.id) {
             R.id.close_button -> onBackPressedDispatcher.onBackPressed()
-            R.id.flash_button -> {
-                flashButton?.let {
-                    if (it.isSelected) {
-                        it.isSelected = false
-                        enableFlashlight(false)
-                    } else {
-                        it.isSelected = true
-                        enableFlashlight(true)
-                    }
-                }
-            }
         }
     }
 

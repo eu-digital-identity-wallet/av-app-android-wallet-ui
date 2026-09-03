@@ -285,6 +285,8 @@
     <string name="passport_scan_intro_data_download_notice">Bekræftelse kræver yderligere data. Når du trykker på Download, downloades cirka 250 MB aktiver til ansigtsmatchning.</string>
     <string name="passport_scan_intro_description">Pas / ID-kort metoden er hurtig og sikker! Tag et billede af dit pas / ID-kort, scan dit pas / ID-kort og optag en video af dig selv—tre trin for sikker onboarding.</string>
     <string name="passport_scan_intro_download_button">Download</string>
+    <string name="passport_scan_intro_download_preparing_announcement">Download fuldført. Forbereder ansigtsverifikation.</string>
+    <string name="passport_scan_intro_download_progress_announcement">Downloader yderligere data: %1$d %%</string>
     <string name="passport_scan_intro_downloading_button">%d%%</string>
     <string name="passport_scan_intro_enrollment_method">Aldersverifikationsmetode</string>
     <string name="passport_scan_intro_start_button">Start</string>

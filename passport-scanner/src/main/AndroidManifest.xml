@@ -31,6 +31,7 @@
             android:keepScreenOn="true"/>
         <activity
             android:name="kl.open.fmandroid.CameraActivity"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
             android:keepScreenOn="true"
             android:exported="false"/>
 

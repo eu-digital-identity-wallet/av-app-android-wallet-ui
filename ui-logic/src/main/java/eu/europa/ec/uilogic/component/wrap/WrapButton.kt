@@ -17,6 +17,7 @@
 package eu.europa.ec.uilogic.component.wrap
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,6 +29,8 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 import eu.europa.ec.uilogic.component.preview.PreviewTheme
@@ -56,6 +59,7 @@ data class ButtonConfig(
     val shape: Shape = buttonsShape,
     val contentPadding: PaddingValues = buttonsContentPadding,
     val buttonColors: ButtonColors? = null,
+    val focusRequester: FocusRequester? = null,
 )
 
 @Composable
@@ -64,15 +68,20 @@ fun WrapButton(
     buttonConfig: ButtonConfig,
     content: @Composable RowScope.() -> Unit,
 ) {
+    // Buttons are only focusable outside touch mode, so screen-reader focus needs its own target.
+    val focusModifier = buttonConfig.focusRequester?.let { requester ->
+        Modifier.focusRequester(requester).focusable(enabled = buttonConfig.enabled)
+    } ?: Modifier
+
     when (buttonConfig.type) {
         ButtonType.PRIMARY -> WrapPrimaryButton(
-            modifier = modifier,
+            modifier = modifier.then(focusModifier),
             buttonConfig = buttonConfig,
             content = content,
         )
 
         ButtonType.SECONDARY -> WrapSecondaryButton(
-            modifier = modifier,
+            modifier = modifier.then(focusModifier),
             buttonConfig = buttonConfig,
             content = content,
         )

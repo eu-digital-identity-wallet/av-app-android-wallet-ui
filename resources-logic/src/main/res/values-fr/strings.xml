@@ -287,6 +287,8 @@
     <string name="passport_scan_intro_data_download_notice">La vérification nécessite des données supplémentaires. Lorsque vous appuyez sur Télécharger, environ 250 Mo de fichiers seront téléchargés pour la reconnaissance faciale.</string>
     <string name="passport_scan_intro_description">La méthode passeport / carte d\'identité est rapide et sécurisée ! Prendre une photo de votre passeport / carte d\'identité, scannez votre passeport / carte d\'identité et enregistrer une vidéo de vous-même—trois étapes pour un onboarding sécurisé.</string>
     <string name="passport_scan_intro_download_button">Télécharger</string>
+    <string name="passport_scan_intro_download_preparing_announcement">Téléchargement terminé. Préparation de la vérification du visage.</string>
+    <string name="passport_scan_intro_download_progress_announcement">Téléchargement des données supplémentaires : %1$d %%</string>
     <string name="passport_scan_intro_downloading_button">%d%%</string>
     <string name="passport_scan_intro_enrollment_method">Méthode de vérification d\'âge</string>
     <string name="passport_scan_intro_start_button">Commencer</string>
