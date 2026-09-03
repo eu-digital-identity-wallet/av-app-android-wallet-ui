@@ -152,6 +152,7 @@ internal fun ScanButton(onEventSend: (Event) -> Unit) {
         FloatingActionButton(
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
+                .testTag(TestTag.LandingScreen.SCAN_BUTTON)
                 .semantics(mergeDescendants = true) { contentDescription = scanQrLabel },
             onClick = { onEventSend(Event.GoToScanQR) },
             containerColor = MaterialTheme.colorScheme.primary,

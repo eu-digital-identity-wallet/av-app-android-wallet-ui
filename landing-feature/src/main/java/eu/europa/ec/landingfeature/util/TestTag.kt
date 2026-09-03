@@ -26,5 +26,6 @@ object TestTag {
     object LandingScreen {
         const val CREDENTIAL_CARD = "landing_screen_credential_card"
         const val REMAINING_ACCESSES = "landing_screen_remaining_accesses"
+        const val SCAN_BUTTON = "landing_screen_scan_button"
     }
 }

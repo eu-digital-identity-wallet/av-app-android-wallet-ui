@@ -46,6 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
@@ -63,10 +64,12 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import eu.europa.ec.businesslogic.controller.log.LogController
+import eu.europa.ec.businesslogic.extension.toUri
 import eu.europa.ec.commonfeature.config.QrScanFlow
 import eu.europa.ec.commonfeature.config.QrScanUiConfig
 import eu.europa.ec.commonfeature.ui.qr_scan.component.QrCodeAnalyzer
 import eu.europa.ec.commonfeature.ui.qr_scan.component.qrBorderCanvas
+import eu.europa.ec.commonfeature.util.TestTag
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.uilogic.component.AppIcons
 import eu.europa.ec.uilogic.component.ErrorInfo
@@ -82,7 +85,6 @@ import eu.europa.ec.uilogic.component.utils.SPACING_LARGE
 import eu.europa.ec.uilogic.component.utils.SPACING_SMALL
 import eu.europa.ec.uilogic.component.wrap.WrapCard
 import eu.europa.ec.uilogic.component.wrap.WrapIcon
-import eu.europa.ec.businesslogic.extension.toUri
 import eu.europa.ec.uilogic.extension.openAppSettings
 import eu.europa.ec.uilogic.extension.openUrl
 import eu.europa.ec.uilogic.extension.paddingFrom
@@ -123,7 +125,7 @@ fun QrScanScreen(
 private fun handleNavigationEffect(
     context: Context,
     navigationEffect: Effect.Navigation,
-    navController: NavController
+    navController: NavController,
 ) {
     when (navigationEffect) {
         is Effect.Navigation.SwitchScreen -> {
@@ -245,6 +247,7 @@ private fun OpenCamera(
             .background(
                 color = Color.Black,
             )
+            .testTag(TestTag.QrScanScreen.CAMERA_AREA)
             .semantics(mergeDescendants = true) {
                 contentDescription = positioningHint
                 liveRegion = LiveRegionMode.Polite
@@ -258,7 +261,8 @@ private fun OpenCamera(
             // The Camera.
             AndroidView(
                 modifier = Modifier
-                    .fillMaxSize(),
+                    .fillMaxSize()
+                    .semantics { contentDescription = positioningHint },
                 factory = { context ->
 
                     val previewView = PreviewView(context)
