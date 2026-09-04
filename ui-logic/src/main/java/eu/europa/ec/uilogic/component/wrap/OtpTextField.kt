@@ -118,16 +118,24 @@ fun OtpTextField(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
             visualTransformation = visualTransformation,
             decorationBox = {
-                DecoratorBox(
-                    pinDescription,
-                    errorMessage,
-                    length,
-                    visualTransformation,
-                    otpText,
-                    pinWidth,
-                    hasError,
-                    enabled
-                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .decoratorBoxSemantics(pinDescription, errorMessage),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    repeat(length) { index ->
+                        CharView(
+                            index = index,
+                            text = visualTransformation.filter(AnnotatedString(otpText)).text.text,
+                            pinWidth = pinWidth,
+                            hasError = hasError,
+                            enabled = enabled,
+                        )
+
+                    }
+                }
             }
         )
 
@@ -140,6 +148,17 @@ fun OtpTextField(
             if (focusOnCreate && enabled) {
                 focusRequester.requestFocus()
             }
+        }
+    }
+}
+
+private fun Modifier.decoratorBoxSemantics(pinDescription: String, errorMessage: String?): Modifier {
+    return semantics {
+        contentDescription = pinDescription
+        liveRegion = if (errorMessage.isNullOrEmpty()) {
+            LiveRegionMode.Polite
+        } else {
+            LiveRegionMode.Assertive
         }
     }
 }
@@ -168,45 +187,6 @@ private fun ErrorMessage(lockoutMessage: String?, errorMessage: String?) {
             ),
             modifier = Modifier.padding(top = 4.dp)
         )
-    }
-}
-
-@Suppress("LongParameterList")
-@Composable
-private fun DecoratorBox(
-    pinDescription: String,
-    errorMessage: String?,
-    length: Int,
-    visualTransformation: VisualTransformation,
-    otpText: String,
-    pinWidth: Dp,
-    hasError: Boolean,
-    enabled: Boolean,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .semantics {
-                contentDescription = pinDescription
-                liveRegion = if (errorMessage.isNullOrEmpty()) {
-                    LiveRegionMode.Polite
-                } else {
-                    LiveRegionMode.Assertive
-                }
-            },
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
-        repeat(length) { index ->
-            CharView(
-                index = index,
-                text = visualTransformation.filter(AnnotatedString(otpText)).text.text,
-                pinWidth = pinWidth,
-                hasError = hasError,
-                enabled = enabled,
-            )
-
-        }
     }
 }
 
