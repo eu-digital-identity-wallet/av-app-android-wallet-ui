@@ -196,17 +196,14 @@ private fun buildPinDescription(
     emptyLabel: String,
     digitsEnteredLabel: String,
     errorMessage: String?,
-): String {
-    val pinDescription = buildString {
-        append(accessibilityPrefix)
-        append(": ")
-        append(if (otpText.isEmpty()) emptyLabel else digitsEnteredLabel)
-        if (!errorMessage.isNullOrEmpty()) {
-            append(". ")
-            append(errorMessage)
-        }
+): String = buildString {
+    this.append(accessibilityPrefix)
+    this.append(": ")
+    this.append(if (otpText.isEmpty()) emptyLabel else digitsEnteredLabel)
+    if (!errorMessage.isNullOrEmpty()) {
+        this.append(". ")
+        this.append(errorMessage)
     }
-    return pinDescription
 }
 
 @Composable
