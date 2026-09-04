@@ -13,7 +13,6 @@
  * ANY KIND, either express or implied. See the Licence for the specific language
  * governing permissions and limitations under the Licence.
  */
-
 package eu.europa.ec.uilogic.component.wrap
 
 import androidx.compose.foundation.background
@@ -112,7 +111,7 @@ fun OtpTextField(
                 .semantics { editableText = AnnotatedString("") },
             value = TextFieldValue(otpText, selection = TextRange(otpText.length)),
             onValueChange = {
-                onValueChanged(enabled, it, length, onUpdate)
+                ensureOtpLength(enabled, it, length, onUpdate)
             },
             enabled = enabled,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
@@ -139,10 +138,10 @@ fun OtpTextField(
             }
         )
 
-        // The countdown replaces the static lockout text rather than stacking under it. Only
-        // errorMessage reaches the description above, so the lockout is announced once and the
-        // countdown never is.
-        ErrorMessage(lockoutMessage, errorMessage)
+        ErrorMessage(
+            lockoutMessage = lockoutMessage,
+            errorMessage = errorMessage
+        )
 
         OneTimeLaunchedEffect {
             if (focusOnCreate && enabled) {
@@ -163,7 +162,7 @@ private fun Modifier.decoratorBoxSemantics(pinDescription: String, errorMessage:
     }
 }
 
-private fun onValueChanged(
+private fun ensureOtpLength(
     enabled: Boolean,
     value: TextFieldValue,
     length: Int,
@@ -177,6 +176,9 @@ private fun onValueChanged(
 
 @Composable
 private fun ErrorMessage(lockoutMessage: String?, errorMessage: String?) {
+    // The countdown replaces the static lockout text rather than stacking under it. Only
+    // errorMessage reaches the description above, so the lockout is announced once and the
+    // countdown never is.
     (lockoutMessage?.takeIf { it.isNotEmpty() } ?: errorMessage?.takeIf { it.isNotEmpty() })?.let {
         WrapText(
             text = it,
