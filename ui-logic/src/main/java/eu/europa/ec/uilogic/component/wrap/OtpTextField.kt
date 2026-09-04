@@ -88,8 +88,8 @@ fun OtpTextField(
     accessibilityPrefix: String,
 ) {
     LaunchedEffect(Unit) {
-        if (otpText.length > length) {
-            throw IllegalArgumentException("Otp text value must not have more than otpCount: $length characters")
+        require(otpText.length <= length) {
+            "Otp text value must not have more than otpCount: $length characters"
         }
     }
 
@@ -102,15 +102,7 @@ fun OtpTextField(
         length
     )
     // Progress and errors arrive on the same keystroke, so one region carries both - two race.
-    val pinDescription = buildString {
-        append(accessibilityPrefix)
-        append(": ")
-        append(if (otpText.isEmpty()) emptyLabel else digitsEnteredLabel)
-        if (!errorMessage.isNullOrEmpty()) {
-            append(". ")
-            append(errorMessage)
-        }
-    }
+    val pinDescription = buildPinDescription(accessibilityPrefix, otpText, emptyLabel, digitsEnteredLabel, errorMessage)
 
     Column(modifier = modifier) {
         BasicTextField(
@@ -120,57 +112,29 @@ fun OtpTextField(
                 .semantics { editableText = AnnotatedString("") },
             value = TextFieldValue(otpText, selection = TextRange(otpText.length)),
             onValueChange = {
-                if (!enabled) return@BasicTextField
-                if (it.text.length > length) {
-                    return@BasicTextField
-                }
-                onUpdate.invoke(it.text)
+                onValueChanged(enabled, it, length, onUpdate)
             },
             enabled = enabled,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
             visualTransformation = visualTransformation,
             decorationBox = {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .semantics {
-                            contentDescription = pinDescription
-                            liveRegion = if (errorMessage.isNullOrEmpty()) {
-                                LiveRegionMode.Polite
-                            } else {
-                                LiveRegionMode.Assertive
-                            }
-                        },
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                ) {
-                    repeat(length) { index ->
-                        CharView(
-                            index = index,
-                            text = visualTransformation.filter(AnnotatedString(otpText)).text.text,
-                            pinWidth = pinWidth,
-                            hasError = hasError,
-                            enabled = enabled,
-                        )
-
-                    }
-                }
-            })
+                DecoratorBox(
+                    pinDescription,
+                    errorMessage,
+                    length,
+                    visualTransformation,
+                    otpText,
+                    pinWidth,
+                    hasError,
+                    enabled
+                )
+            }
+        )
 
         // The countdown replaces the static lockout text rather than stacking under it. Only
         // errorMessage reaches the description above, so the lockout is announced once and the
         // countdown never is.
-        (lockoutMessage?.takeIf { it.isNotEmpty() } ?: errorMessage?.takeIf { it.isNotEmpty() })?.let {
-            WrapText(
-                text = it,
-                textConfig = TextConfig(
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.error,
-                    maxLines = Int.MAX_VALUE,
-                ),
-                modifier = Modifier.padding(top = 4.dp)
-            )
-        }
+        ErrorMessage(lockoutMessage, errorMessage)
 
         OneTimeLaunchedEffect {
             if (focusOnCreate && enabled) {
@@ -178,14 +142,100 @@ fun OtpTextField(
             }
         }
     }
+}
 
+private fun onValueChanged(
+    enabled: Boolean,
+    value: TextFieldValue,
+    length: Int,
+    onUpdate: (String) -> Unit,
+) {
+    if (!enabled || value.text.length > length) {
+        return
+    }
+    onUpdate(value.text)
+}
+
+@Composable
+private fun ErrorMessage(lockoutMessage: String?, errorMessage: String?) {
+    (lockoutMessage?.takeIf { it.isNotEmpty() } ?: errorMessage?.takeIf { it.isNotEmpty() })?.let {
+        WrapText(
+            text = it,
+            textConfig = TextConfig(
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.error,
+                maxLines = Int.MAX_VALUE,
+            ),
+            modifier = Modifier.padding(top = 4.dp)
+        )
+    }
+}
+
+@Suppress("LongParameterList")
+@Composable
+private fun DecoratorBox(
+    pinDescription: String,
+    errorMessage: String?,
+    length: Int,
+    visualTransformation: VisualTransformation,
+    otpText: String,
+    pinWidth: Dp,
+    hasError: Boolean,
+    enabled: Boolean,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .semantics {
+                contentDescription = pinDescription
+                liveRegion = if (errorMessage.isNullOrEmpty()) {
+                    LiveRegionMode.Polite
+                } else {
+                    LiveRegionMode.Assertive
+                }
+            },
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        repeat(length) { index ->
+            CharView(
+                index = index,
+                text = visualTransformation.filter(AnnotatedString(otpText)).text.text,
+                pinWidth = pinWidth,
+                hasError = hasError,
+                enabled = enabled,
+            )
+
+        }
+    }
+}
+
+private fun buildPinDescription(
+    accessibilityPrefix: String,
+    otpText: String,
+    emptyLabel: String,
+    digitsEnteredLabel: String,
+    errorMessage: String?,
+): String {
+    val pinDescription = buildString {
+        append(accessibilityPrefix)
+        append(": ")
+        append(if (otpText.isEmpty()) emptyLabel else digitsEnteredLabel)
+        if (!errorMessage.isNullOrEmpty()) {
+            append(". ")
+            append(errorMessage)
+        }
+    }
+    return pinDescription
 }
 
 @Composable
 fun PinHintText(pinHintText: String) {
     WrapText(
-        textConfig = TextConfig(style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.inverseSurface.copy(alpha = 0.66f)),
+        textConfig = TextConfig(
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.inverseSurface.copy(alpha = 0.66f)
+        ),
         text = pinHintText
     )
 }
@@ -242,9 +292,7 @@ private fun CharView(
             .background(backgroundColor)
             .padding(vertical = SIZE_SMALL.dp)
     )
-
 }
-
 
 @ThemeModePreviews
 @Composable
@@ -264,7 +312,6 @@ private fun PreviewOtpTextField() {
 
     }
 }
-
 
 @ThemeModePreviews
 @Composable
