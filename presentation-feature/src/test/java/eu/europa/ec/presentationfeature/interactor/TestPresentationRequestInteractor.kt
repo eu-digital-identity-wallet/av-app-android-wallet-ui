@@ -515,15 +515,29 @@ class TestPresentationRequestInteractor {
 
     //region shouldUseAppAuthenticationBeforePresentation
     @Test
-    fun `Given wallet user authentication is required, When shouldUseAppAuthenticationBeforePresentation is called, Then returns false`() {
+    fun `Given wallet user authentication is required and the vault is unlocked, When shouldUseAppAuthenticationBeforePresentation is called, Then returns false`() {
         // Given
         whenever(walletCoreConfig.userAuthenticationRequired).thenReturn(true)
+        whenever(vaultKeyProvider.isUnlocked()).thenReturn(true)
 
         // When
         val result = interactor.shouldUseAppAuthenticationBeforePresentation()
 
         // Then
         assertEquals(false, result)
+    }
+
+    @Test
+    fun `Given wallet user authentication is required and the vault is locked, When shouldUseAppAuthenticationBeforePresentation is called, Then returns true`() {
+        // Given
+        whenever(walletCoreConfig.userAuthenticationRequired).thenReturn(true)
+        whenever(vaultKeyProvider.isUnlocked()).thenReturn(false)
+
+        // When
+        val result = interactor.shouldUseAppAuthenticationBeforePresentation()
+
+        // Then
+        assertEquals(true, result)
     }
 
     @Test
