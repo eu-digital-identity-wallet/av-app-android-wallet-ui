@@ -191,6 +191,7 @@ class PresentationRequestInteractorImpl(
         walletCorePresentationController.updateRequestedDocuments(disclosedDocuments.toMutableList())
     }
 
+    // Document key auth at Share doesn't unlock the vault the loading step reads from.
     override fun shouldUseAppAuthenticationBeforePresentation(): Boolean =
-        !walletCoreConfig.userAuthenticationRequired
+        !walletCoreConfig.userAuthenticationRequired || !vaultKeyProvider.isUnlocked()
 }
