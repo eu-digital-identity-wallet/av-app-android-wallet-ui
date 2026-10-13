@@ -195,7 +195,7 @@
     </plurals>
     <string name="landing_screen_no_age_credential_found">Aucune attestation d\'âge disponible</string>
     <string name="landing_screen_primary_button_label_scan">Lire</string>
-    <string name="landing_screen_subtitle">Vous pouvez communiquer votre preuve d\'âge aux services limités aux adultes. Cette preuve confirme que vous avez plus de 18 ans sans révéler aucune autre information personnelle.</string>
+    <string name="landing_screen_subtitle">Vous pouvez prouver de manière sécurisée que vous avez plus d\'un âge spécifique, comme 18 ans, pour accéder à des services soumis à des restrictions d\'âge, sans partager d\'autres informations personnelles.</string>
     <string name="landing_screen_title">Vérification de l\'âge</string>
     <string name="loading_biometry_biometrics_enabled_description">Utilisez votre biométrie pour consentir à la transaction.</string>
     <string name="loading_biometry_biometrics_not_enabled_description">Pour consentir à la transaction, vous devez prouver votre identité.</string>

@@ -193,7 +193,7 @@
     </plurals>
     <string name="landing_screen_no_age_credential_found">Der er ingen aldersbeviser tilgængelige</string>
     <string name="landing_screen_primary_button_label_scan">Skan</string>
-    <string name="landing_screen_subtitle">Du kan dele dit aldersbevis med tjenester, der er begrænset til voksne.\nAldersbeviset bekræfter kun, at du er over 18 år. Det indeholder ingen andre personlige oplysninger.</string>
+    <string name="landing_screen_subtitle">Du kan bevis på en sikker måde, at du er over en bestemt alder, f.eks. 18 år, for at få adgang til aldersbegrænsede tjenester, uden at dele andre personlige oplysninger.</string>
     <string name="landing_screen_title">Aldersverifikation</string>
     <string name="loading_biometry_biometrics_enabled_description">Brug din biometri til at godkende transaktionen.</string>
     <string name="loading_biometry_biometrics_not_enabled_description">Verificer din identitet for at godkende transaktionen.</string>

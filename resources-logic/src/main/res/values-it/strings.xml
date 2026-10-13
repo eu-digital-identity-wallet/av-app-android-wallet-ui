@@ -195,7 +195,7 @@
     </plurals>
     <string name="landing_screen_no_age_credential_found">Non sono disponibili credenziali dell\'età</string>
     <string name="landing_screen_primary_button_label_scan">Scansiona</string>
-    <string name="landing_screen_subtitle">Puoi condividere la tua attestazione dell\'età con i servizi riservati agli adulti. Questo documento conferma che hai almeno 18 anni senza rivelare altre informazioni personali.</string>
+    <string name="landing_screen_subtitle">Puoi dimostrare in modo sicuro di avere un\'età specifica, ad esempio 18 anni, per accedere a servizi con restrizioni di età, senza condividere altri dati personali.</string>
     <string name="landing_screen_title">Verifica dell\'età</string>
     <string name="loading_biometry_biometrics_enabled_description">Usa i tuoi dati biometrici per approvare la transazione.</string>
     <string name="loading_biometry_biometrics_not_enabled_description">Per approvare la transazione, devi verificare la tua identità.</string>

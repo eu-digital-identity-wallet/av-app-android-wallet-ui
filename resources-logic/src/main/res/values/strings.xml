@@ -193,7 +193,7 @@
     </plurals>
     <string name="landing_screen_no_age_credential_found">There are no age credentials available</string>
     <string name="landing_screen_primary_button_label_scan">Scan</string>
-    <string name="landing_screen_subtitle">You can share your proof of age with services restricted to adults. This proof confirms that you are over 18 without revealing any other personal information.</string>
+    <string name="landing_screen_subtitle">You can securely prove that you\'re over a specific age, such as 18, to access age-restricted services, without sharing any other personal details.</string>
     <string name="landing_screen_title">Age Verification</string>
     <string name="loading_biometry_biometrics_enabled_description">Use your biometrics to approve the transaction.</string>
     <string name="loading_biometry_biometrics_not_enabled_description">To approve the transaction you need to verify your identity.</string>
