@@ -174,8 +174,8 @@
     <string name="issuance_document_offer_relying_party_default_name">Udsteder</string>
     <string name="issuance_document_offer_relying_party_description">ønsker at tilføje følgende</string>
     <string name="issuance_generic_error">Noget gik galt med at udstede dit/dine dokumenter(er)</string>
-    <string name="issuance_qr_scan_subtitle">Scan en QR-kode leveret af en udsteder for at tilføje et digitalt dokument til din applikation.</string>
-    <string name="issuance_qr_scan_title">Tilføj dokument fra QR</string>
+    <string name="issuance_qr_scan_subtitle">Scan den QR-kode, som udstederen har leveret, for at modtage dit aldersbevis.</string>
+    <string name="issuance_qr_scan_title">Scan QR-kode</string>
     <string name="issuance_success_header_description">Du har føjet følgende til din applikation</string>
     <string name="issuance_success_header_description_when_error">Du har tilføjet dokumentet/dokumenterne til din applikation</string>
     <string name="issuance_success_header_issuer_default_name">Udsteder</string>
@@ -227,8 +227,8 @@
     <string name="onboarding_step_2_title">Samtykke</string>
     <string name="onboarding_step_3_title">Sikkerhed</string>
     <string name="onboarding_step_4_title">Verifikation</string>
-    <string name="onboarding_token_qr_intro_description">Hvis du har verificeret din identitet på stedet, kan du modtage et token eller en QR-kode. Tryk på Scan og scan QR-koden for at starte tilmeldingen.</string>
-    <string name="onboarding_token_qr_intro_title">Token / QR-kode</string>
+    <string name="onboarding_token_qr_intro_description">Scan den QR-kode, du fik efter din personlige aldersbekræftelse, for at modtage dit aldersbevis.</string>
+    <string name="onboarding_token_qr_intro_title">Scan QR-kode</string>
     <string name="onboarding_verification_description">Vælg, hvordan du ønsker at modtage dit aldersbevis. De oplysninger, du deler i dette trin, deles aldrig med de onlinetjenester, der anmoder om dit aldersbevis.</string>
     <string name="onboarding_verification_national_id">National eID / National IDP</string>
     <string name="onboarding_verification_national_id_description">Bekræft din alder med dit eID</string>

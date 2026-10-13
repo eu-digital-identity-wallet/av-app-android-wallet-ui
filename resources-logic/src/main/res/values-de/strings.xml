@@ -174,8 +174,8 @@
     <string name="issuance_document_offer_relying_party_default_name">Aussteller</string>
     <string name="issuance_document_offer_relying_party_description">möchte Folgendes hinzufügen:</string>
     <string name="issuance_generic_error">Bei der Ausstellung Ihrer Dokumente ist ein Fehler aufgetreten.</string>
-    <string name="issuance_qr_scan_subtitle">Scannen Sie einen vom Aussteller bereitgestellten QR-Code, um ein digitales Dokument hinzuzufügen zu Ihrem Portemonnaie.</string>
-    <string name="issuance_qr_scan_title">Dokument per QR-Code hinzufügen</string>
+    <string name="issuance_qr_scan_subtitle">Scannen Sie den vom Aussteller bereitgestellten QR-Code, um Ihren Altersnachweis zu erhalten.</string>
+    <string name="issuance_qr_scan_title">QR-Code scannen</string>
     <string name="issuance_success_header_description">Sie haben Folgendes erfolgreich zu Ihrem Wallet hinzugefügt</string>
     <string name="issuance_success_header_description_when_error">Sie haben das/die Dokument(e) erfolgreich zu Ihrem Wallet hinzugefügt</string>
     <string name="issuance_success_header_issuer_default_name">Aussteller</string>
@@ -227,8 +227,8 @@
     <string name="onboarding_step_2_title">Zustimmung</string>
     <string name="onboarding_step_3_title">Sicherheit</string>
     <string name="onboarding_step_4_title">Verifizierung</string>
-    <string name="onboarding_token_qr_intro_description">Wenn Sie Ihre Identität vor Ort verifiziert haben, können Sie ein Token oder einen QR-Code erhalten. Tippen Sie auf Scannen und scannen Sie den QR-Code, um die Registrierung zu starten.</string>
-    <string name="onboarding_token_qr_intro_title">Token / QR Code</string>
+    <string name="onboarding_token_qr_intro_description">Scannen Sie den QR-Code, den Sie nach Ihrer persönlichen Altersverifikation erhalten haben, um Ihren Altersnachweis zu erhalten.</string>
+    <string name="onboarding_token_qr_intro_title">QR-Code scannen</string>
     <string name="onboarding_verification_description">Wählen Sie, wie Sie Ihren Altersnachweis erhalten möchten. Die Informationen, die Sie in diesem Schritt mitteilen, werden niemals an die Online-Dienste weitergegeben, die Ihren Altersnachweis anfordern.</string>
     <string name="onboarding_verification_national_id">Nationale eID / Nationaler Personalausweis</string>
     <string name="onboarding_verification_national_id_description">Verifizieren Sie Ihr Alter mit Ihrer eID</string>

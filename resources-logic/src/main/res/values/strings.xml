@@ -174,8 +174,8 @@
     <string name="issuance_document_offer_relying_party_default_name">Issuer</string>
     <string name="issuance_document_offer_relying_party_description">wants to add the following</string>
     <string name="issuance_generic_error">Something went wrong issuing your document(s)</string>
-    <string name="issuance_qr_scan_subtitle">Scan a QR code provided from an issuer to add a digital document to your application.</string>
-    <string name="issuance_qr_scan_title">Add document from QR</string>
+    <string name="issuance_qr_scan_subtitle">Scan the QR code provided by the issuer to receive your Proof of Age.</string>
+    <string name="issuance_qr_scan_title">Scan QR Code</string>
     <string name="issuance_success_header_description">You have successfully added the following to your application</string>
     <string name="issuance_success_header_description_when_error">You have successfully added the document(s) to your application</string>
     <string name="issuance_success_header_issuer_default_name">Issuer</string>
@@ -227,8 +227,8 @@
     <string name="onboarding_step_2_title">Consent</string>
     <string name="onboarding_step_3_title">Security</string>
     <string name="onboarding_step_4_title">Verification</string>
-    <string name="onboarding_token_qr_intro_description">If you have verified your identity in person, you may receive a token or QR code. Tap Scan and scan the QR code to start the enrollment.</string>
-    <string name="onboarding_token_qr_intro_title">Token / QR Code</string>
+    <string name="onboarding_token_qr_intro_description">Scan the QR code provided to you after your in-person age verification to receive your proof of age.</string>
+    <string name="onboarding_token_qr_intro_title">Scan QR Code</string>
     <string name="onboarding_verification_description">Select how you want to receive your proof of age. The information you share in this step is never shared with the online services requesting your proof of age.</string>
     <string name="onboarding_verification_national_id">National eID / National IDP</string>
     <string name="onboarding_verification_national_id_description">Verify your age using your eID</string>

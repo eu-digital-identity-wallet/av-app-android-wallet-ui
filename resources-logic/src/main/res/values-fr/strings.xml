@@ -175,8 +175,8 @@
     <string name="issuance_document_offer_relying_party_default_name">Émetteur</string>
     <string name="issuance_document_offer_relying_party_description">veut ajouter ce qui suit</string>
     <string name="issuance_generic_error">Une erreur s\'est produite lors de l\'émission de votre/vos document(s)</string>
-    <string name="issuance_qr_scan_subtitle">Lire un code QR fourni par un émetteur pour ajouter un document numérique à votre portefeuille.</string>
-    <string name="issuance_qr_scan_title">Ajouter un document du QR</string>
+    <string name="issuance_qr_scan_subtitle">Scannez le code QR fourni par l\'émetteur pour recevoir votre preuve d\'âge.</string>
+    <string name="issuance_qr_scan_title">Scanner le code QR</string>
     <string name="issuance_success_header_description">Vous avez réussi à ajouter ce qui suit à votre portefeuille</string>
     <string name="issuance_success_header_description_when_error">Le (s) document (s) a/ont bien été ajouté (s) à votre portefeuille</string>
     <string name="issuance_success_header_issuer_default_name">Émetteur</string>
@@ -229,8 +229,8 @@
     <string name="onboarding_step_2_title">Consentement</string>
     <string name="onboarding_step_3_title">Sécurité</string>
     <string name="onboarding_step_4_title">Vérification</string>
-    <string name="onboarding_token_qr_intro_description">Si vous avez vérifié votre identité sur place, vous pouvez recevoir un token ou un code QR. Appuyez sur Scanner et scannez le code QR pour démarrer l\'inscription.</string>
-    <string name="onboarding_token_qr_intro_title">Token / Code QR</string>
+    <string name="onboarding_token_qr_intro_description">Scannez le code QR qui vous a été fourni après votre vérification d\'âge en personne pour recevoir votre preuve d\'âge.</string>
+    <string name="onboarding_token_qr_intro_title">Scanner le code QR</string>
     <string name="onboarding_verification_description">Sélectionnez la façon dont vous souhaitez recevoir votre preuve d\'âge. Les informations que vous partagez à cette étape ne sont jamais transmises aux services en ligne qui demandent votre preuve d\'âge.</string>
     <string name="onboarding_verification_national_id">eID national / IdP national</string>
     <string name="onboarding_verification_national_id_description">Vérifiez votre âge avec votre eID</string>
