@@ -190,6 +190,7 @@ private fun Content(
         VSpacer.Large()
         BulletHolder(
             stringResource(R.string.passport_live_video_step_first),
+            stringResource(R.string.passport_live_video_step_second),
             stringResource(R.string.passport_live_video_step_third)
         )
 
