@@ -264,11 +264,11 @@
     <string name="passport_identification">Identificazione</string>
     <string name="passport_identification_back">Indietro</string>
     <string name="passport_identification_capture">Scansiona</string>
-    <string name="passport_identification_description">Per questo passaggio, cattura l\'area MRZ (zona leggibile dalla macchina) nella parte inferiore della pagina foto del tuo passaporto / carta d\'identità. Assicurati che:</string>
-    <string name="passport_identification_footer">Prendiamo un codice identificativo da questo passaporto / carta d\'identità per accedere alla parte leggibile dalla macchina del documento.</string>
+    <string name="passport_identification_description">Scatta una foto nitida del tuo passaporto / carta d\'identità. Assicurati che:</string>
+    <string name="passport_identification_footer">Dall\'immagine viene estratto solo il codice della zona leggibile dalla macchina (MRZ) situato nella parte inferiore del documento.</string>
     <string name="passport_identification_step_first">L\'intera pagina foto del passaporto / carta d\'identità sia visibile e ben illuminata.</string>
-    <string name="passport_identification_step_second">Nessun riflesso o sfocatura oscuri i dettagli.</string>
-    <string name="passport_identification_title">Scansiona il tuo passaporto / carta d\'identità</string>
+    <string name="passport_identification_step_second">Non ci sono riflessi o sfocature che oscurano i dettagli</string>
+    <string name="passport_identification_title">Scatta una foto del tuo passaporto / carta d\'identità</string>
     <string name="passport_live_video">Video in diretta</string>
     <string name="passport_live_video_back">Indietro</string>
     <string name="passport_live_video_description">In questo passaggio, registrerai un breve video di te stesso per confermare la tua identità. Assicurati di:</string>

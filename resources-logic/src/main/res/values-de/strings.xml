@@ -262,11 +262,11 @@
     <string name="passport_identification">Identifikation</string>
     <string name="passport_identification_back">Zurück</string>
     <string name="passport_identification_capture">Scannen</string>
-    <string name="passport_identification_description">Für diesen Schritt erfassen Sie den MRZ-Bereich (maschinenlesbare Zone) am unteren Rand der Fotoseite Ihres Reisepasses / Personalausweises. Stellen Sie sicher:</string>
-    <string name="passport_identification_footer">Wir nehmen einen Identifikationscode von diesem Reisepass / Personalausweis, um Zugang zum maschinenlesbaren Teil des Dokuments zu erhalten.</string>
+    <string name="passport_identification_description">Machen Sie ein klares Foto von Ihrem Reisepass / Personalausweis. Bitte stellen Sie sicher:</string>
+    <string name="passport_identification_footer">Aus dem Bild wird nur der maschinenlesbare Zonen-Code (MRZ) am unteren Rand des Dokuments extrahiert.</string>
     <string name="passport_identification_step_first">Die gesamte Fotoseite des Reisepasses / Personalausweises ist sichtbar und gut beleuchtet.</string>
-    <string name="passport_identification_step_second">Keine Reflexionen oder Unschärfen verdecken die Details.</string>
-    <string name="passport_identification_title">Scannen Sie Ihren Reisepass / Personalausweis</string>
+    <string name="passport_identification_step_second">Es gibt keine Reflexionen oder Unschärfe, die die Details verdecken</string>
+    <string name="passport_identification_title">Machen Sie ein Foto von Ihrem Reisepass / Personalausweis</string>
     <string name="passport_live_video">Live-video</string>
     <string name="passport_live_video_back">Zurück</string>
     <string name="passport_live_video_description">In diesem Schritt nehmen Sie ein kurzes Video von sich auf, um Ihre Identität zu bestätigen. Achten Sie darauf:</string>

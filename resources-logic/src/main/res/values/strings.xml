@@ -262,11 +262,11 @@
     <string name="passport_identification">Identification</string>
     <string name="passport_identification_back">Back</string>
     <string name="passport_identification_capture">Scan</string>
-    <string name="passport_identification_description">For this step, capture the MRZ (Machine Readable Zone) area at the bottom of your passport / ID card photo page. Make sure:</string>
-    <string name="passport_identification_footer">We take an identification code from this passport / ID card to get access to the machine readable part of the document.</string>
+    <string name="passport_identification_description">Capture a clear photo of your passport / ID card. Please make sure:</string>
+    <string name="passport_identification_footer">Only the Machine Readable Zone code located at the bottom of the document is extracted from the image.</string>
     <string name="passport_identification_step_first">The entire passport / ID card photo page is visible and well-lit</string>
-    <string name="passport_identification_step_second">No reflections or blurriness obscure the details.</string>
-    <string name="passport_identification_title">Scan your passport / ID card</string>
+    <string name="passport_identification_step_second">There are no reflections or blur obscuring the details</string>
+    <string name="passport_identification_title">Take a photo of your passport / ID card</string>
     <string name="passport_live_video">Live video</string>
     <string name="passport_live_video_back">Back</string>
     <string name="passport_live_video_description">In this step, you will record a short video of yourself to confirm your identity. Make sure to:</string>

@@ -262,11 +262,11 @@
     <string name="passport_identification">Identifikation</string>
     <string name="passport_identification_back">Tilbage</string>
     <string name="passport_identification_capture">Scan</string>
-    <string name="passport_identification_description">For dette trin skal du tage MRZ-området (maskinlæsbar zone) nederst på fotosiden af dit pas / ID-kort. Sørg for:</string>
-    <string name="passport_identification_footer">Vi tager en identifikationskode fra dette pas / ID-kort for at få adgang til den maskinlæsbare del af dokumentet.</string>
+    <string name="passport_identification_description">Tag et klart foto af dit pas / ID-kort. Sørg venligst for:</string>
+    <string name="passport_identification_footer">Kun den maskinlæsbare zone-kode (MRZ) nederst i dokumentet udtrækkes fra billedet.</string>
     <string name="passport_identification_step_first">At hele fotosiden af passet / ID-kortet er synlig og godt oplyst.</string>
-    <string name="passport_identification_step_second">Ingen refleksioner eller sløring skjuler detaljerne.</string>
-    <string name="passport_identification_title">Scan dit pas / ID-kort</string>
+    <string name="passport_identification_step_second">Der er ingen refleksioner eller sløring, der skjuler detaljerne</string>
+    <string name="passport_identification_title">Tag et foto af dit pas / ID-kort</string>
     <string name="passport_live_video">Live-video</string>
     <string name="passport_live_video_back">Tilbage</string>
     <string name="passport_live_video_description">I dette trin skal du optage en kort video af dig selv for at bekræfte din identitet. Sørg for at:</string>
