@@ -41,6 +41,7 @@
     <string name="confirm_doc_removal_dialog_delete">Ja, löschen</string>
     <string name="confirm_doc_removal_dialog_text">Sind Sie sicher, dass Sie alle gespeicherten Nachweise löschen möchten?</string>
     <string name="confirm_doc_removal_dialog_title">Löschen der Dokumente bestätigen</string>
+    <string name="consent_screen_additional_note">Bitte beachten Sie, dass die Links nicht funktionieren. Sie sind Platzhalter für die Produktionsimplementierer.</string>
     <string name="consent_screen_confirm_button">Weiter</string>
     <string name="consent_screen_data_protection_button">Datenschutzinformationen</string>
     <string name="consent_screen_data_protection_checkbox">Ich habe die Datenschutzhinweise gelesen</string>

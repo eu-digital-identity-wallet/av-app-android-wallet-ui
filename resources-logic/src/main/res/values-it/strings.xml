@@ -41,6 +41,7 @@
     <string name="confirm_doc_removal_dialog_delete">Sì, elimina</string>
     <string name="confirm_doc_removal_dialog_text">Confermi di voler eliminare tutte le attestazioni archiviate?</string>
     <string name="confirm_doc_removal_dialog_title">Conferma l\'eliminazione dei documenti</string>
+    <string name="consent_screen_additional_note">Si prega di notare che i link non funzionano. Sono segnaposto per gli implementatori di produzione.</string>
     <string name="consent_screen_confirm_button">Avanti</string>
     <string name="consent_screen_data_protection_button">Informazioni sulla protezione dei dati</string>
     <string name="consent_screen_data_protection_checkbox">Ho letto l\'informativa sulla protezione dei dati</string>

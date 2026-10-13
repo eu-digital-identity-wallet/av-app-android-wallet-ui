@@ -41,6 +41,7 @@
     <string name="confirm_doc_removal_dialog_delete">Yes, delete</string>
     <string name="confirm_doc_removal_dialog_text">Are you sure you want to delete all the stored proofs?</string>
     <string name="confirm_doc_removal_dialog_title">Confirm documents deletion</string>
+    <string name="consent_screen_additional_note">Please notice that the links do not work. They are placeholders for the production implementers.</string>
     <string name="consent_screen_confirm_button">Next</string>
     <string name="consent_screen_data_protection_button">Data Protection Information</string>
     <string name="consent_screen_data_protection_checkbox">I have read the data protection notice</string>

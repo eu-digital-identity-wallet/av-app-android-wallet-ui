@@ -41,6 +41,7 @@
     <string name="confirm_doc_removal_dialog_delete">Oui, supprimer.</string>
     <string name="confirm_doc_removal_dialog_text">Voulez-vous vraiment supprimer toutes les preuves enregistrées ?</string>
     <string name="confirm_doc_removal_dialog_title">Confirmer la suppression des documents</string>
+    <string name="consent_screen_additional_note">Veuillez noter que les liens ne fonctionnent pas. Ce sont des espaces réservés pour les implémenteurs de production.</string>
     <string name="consent_screen_confirm_button">Suivant</string>
     <string name="consent_screen_data_protection_button">Information relatifs a la protection des données</string>
     <string name="consent_screen_data_protection_checkbox">J\'ai lu l\'avis de protection des données</string>

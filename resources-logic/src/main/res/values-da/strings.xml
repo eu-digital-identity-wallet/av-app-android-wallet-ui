@@ -41,6 +41,7 @@
     <string name="confirm_doc_removal_dialog_delete">Ja, slet</string>
     <string name="confirm_doc_removal_dialog_text">Er du sikker på, at du vil slette alle gemte beviser?</string>
     <string name="confirm_doc_removal_dialog_title">Bekræft sletning af dokumenter</string>
+    <string name="consent_screen_additional_note">Bemærk venligst, at linkene ikke fungerer. De er pladsholdere for produktionsimplementerne.</string>
     <string name="consent_screen_confirm_button">Næste</string>
     <string name="consent_screen_data_protection_button">Oplysninger om databeskyttelse</string>
     <string name="consent_screen_data_protection_checkbox">Jeg har læst databeskyttelsesmeddelelsen</string>
