@@ -105,10 +105,6 @@ class PresentationSuccessInteractorImpl(
                             header = ListItemDataUi(
                                 itemId = documentId,
                                 mainContentData = ListItemMainContentDataUi.Text(text = document.name),
-                                supportingText = resourceProvider.getString(R.string.document_success_collapsed_supporting_text),
-                                trailingContentData = ListItemTrailingContentDataUi.Icon(
-                                    iconData = AppIcons.KeyboardArrowDown
-                                )
                             ),
                             nestedItems = disclosedClaimsUi,
                             isExpanded = false,

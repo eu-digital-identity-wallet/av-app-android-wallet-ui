@@ -18,14 +18,12 @@ package eu.europa.ec.commonfeature.ui.request
 
 import eu.europa.ec.commonfeature.ui.request.model.RequestDocumentItemUi
 import eu.europa.ec.corelogic.di.getOrCreatePresentationScope
-import eu.europa.ec.uilogic.component.AppIcons
 import eu.europa.ec.uilogic.component.ListItemTrailingContentDataUi
 import eu.europa.ec.uilogic.component.content.ContentErrorConfig
 import eu.europa.ec.uilogic.component.content.ContentHeaderConfig
 import eu.europa.ec.uilogic.component.wrap.ExpandableListItemUi
 import eu.europa.ec.uilogic.config.NavigationType
 import eu.europa.ec.uilogic.extension.toggleCheckboxState
-import eu.europa.ec.uilogic.extension.toggleExpansionState
 import eu.europa.ec.uilogic.mvi.MviViewModel
 import eu.europa.ec.uilogic.mvi.ViewEvent
 import eu.europa.ec.uilogic.mvi.ViewSideEffect
@@ -53,7 +51,6 @@ sealed class Event : ViewEvent {
     data object StickyButtonPressed : Event()
 
     data class UserIdentificationClicked(val itemId: String) : Event()
-    data class ExpandOrCollapseRequestDocumentItem(val itemId: String) : Event()
 
     sealed class BottomSheet : Event() {
         data class UpdateBottomSheetState(val isOpen: Boolean) : BottomSheet()
@@ -152,10 +149,6 @@ abstract class RequestViewModel : MviViewModel<Event, State, Effect>() {
                 }
             }
 
-            is Event.ExpandOrCollapseRequestDocumentItem -> {
-                expandOrCollapseRequestDocumentItem(id = event.itemId)
-            }
-
             is Event.BottomSheet.UpdateBottomSheetState -> {
                 setState {
                     copy(isBottomSheetOpen = event.isOpen)
@@ -186,40 +179,6 @@ abstract class RequestViewModel : MviViewModel<Event, State, Effect>() {
                 setEffect { Effect.Navigation.SwitchScreen(navigationType.route) }
             }
         }
-    }
-
-    private fun expandOrCollapseRequestDocumentItem(id: String) {
-        val currentItems = viewState.value.items
-
-        val updatedItems = currentItems.map { requestDocument ->
-            val newHeader = if (requestDocument.headerUi.header.itemId == id) {
-                val newIsExpanded = !requestDocument.headerUi.isExpanded
-                val newCollapsed = requestDocument.headerUi.header.copy(
-                    trailingContentData = ListItemTrailingContentDataUi.Icon(
-                        iconData = if (newIsExpanded) {
-                            AppIcons.KeyboardArrowUp
-                        } else {
-                            AppIcons.KeyboardArrowDown
-                        }
-                    )
-                )
-
-                requestDocument.headerUi.copy(
-                    header = newCollapsed,
-                    isExpanded = newIsExpanded
-                )
-            } else {
-                requestDocument.headerUi
-            }
-
-            requestDocument.copy(
-                headerUi = newHeader.copy(
-                    nestedItems = newHeader.nestedItems.toggleExpansionState(id),
-                )
-            )
-        }
-
-        updateData(updatedItems, viewState.value.allowShare)
     }
 
     private fun updateUserIdentificationItem(id: String) {

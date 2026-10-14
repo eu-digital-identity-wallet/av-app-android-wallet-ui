@@ -266,10 +266,8 @@ private fun DisplayRequestItems(
                         onItemClick = { item ->
                             onEventSend(Event.UserIdentificationClicked(itemId = item.itemId))
                         },
-                        onExpandedChange = { expandedItem ->
-                            onEventSend(Event.ExpandOrCollapseRequestDocumentItem(itemId = expandedItem.itemId))
-                        },
-                        isExpanded = requestDocument.headerUi.isExpanded,
+                        onExpandedChange = { },
+                        isExpanded = true,
                         throttleClicks = false,
                         hideSensitiveContent = false,
                         collapsedMainContentVerticalPadding = SPACING_MEDIUM.dp,

@@ -33,7 +33,6 @@ import eu.europa.ec.eudi.iso18013.transfer.response.RequestedDocument
 import eu.europa.ec.eudi.iso18013.transfer.response.device.MsoMdocItem
 import eu.europa.ec.eudi.wallet.document.IssuedDocument
 import eu.europa.ec.eudi.wallet.transfer.openId4vp.SdJwtVcItem
-import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.component.AppIcons
 import eu.europa.ec.uilogic.component.ListItemDataUi
@@ -99,7 +98,6 @@ object RequestTransformer {
 
     fun transformToUiItems(
         documentsDomain: List<DocumentPayloadDomain>,
-        resourceProvider: ResourceProvider,
     ): List<RequestDocumentItemUi> {
         return documentsDomain.map {
             RequestDocumentItemUi(
@@ -108,10 +106,6 @@ object RequestTransformer {
                     header = ListItemDataUi(
                         itemId = it.docId,
                         mainContentData = ListItemMainContentDataUi.Text(text = it.docName),
-                        supportingText = resourceProvider.getString(R.string.request_collapsed_supporting_text),
-                        trailingContentData = ListItemTrailingContentDataUi.Icon(
-                            iconData = AppIcons.KeyboardArrowDown
-                        )
                     ),
                     nestedItems = it.toSelectiveExpandableListItems(),
                     isExpanded = false,
