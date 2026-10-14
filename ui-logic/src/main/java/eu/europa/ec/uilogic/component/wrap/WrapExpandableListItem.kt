@@ -77,7 +77,7 @@ fun WrapExpandableListItem(
         throttleClicks = throttleClicks,
         shape = shape,
         colors = colors,
-        onExpandedChange = { onExpandedChange?.invoke(header) },
+        onExpandedChange = onExpandedChange?.let { { it(header) } },
         cardCollapsedContent = {
             WrapListItem(
                 modifier = Modifier.fillMaxWidth(),
