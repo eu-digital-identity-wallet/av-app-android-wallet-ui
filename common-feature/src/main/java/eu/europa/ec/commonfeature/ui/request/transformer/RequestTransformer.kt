@@ -107,7 +107,7 @@ object RequestTransformer {
                         mainContentData = ListItemMainContentDataUi.Text(text = it.docName),
                     ),
                     nestedItems = it.toSelectiveExpandableListItems(),
-                    isExpanded = false,
+                    isExpanded = true,
                 ),
             )
         }

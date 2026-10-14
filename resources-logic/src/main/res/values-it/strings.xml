@@ -119,7 +119,6 @@
     <string name="document_details_boolean_item_false_readable_value">no</string>
     <string name="document_details_boolean_item_true_readable_value">sì</string>
     <string name="document_provider_section_header">This information will be shared:</string>
-    <string name="document_success_collapsed_supporting_text">Credenziali</string>
     <string name="document_success_header_description">Hai condiviso correttamente le seguenti informazioni con</string>
     <string name="document_success_header_description_when_error">Hai condiviso correttamente le informazioni con</string>
     <string name="document_success_relying_party_default_name">Servizio online</string>

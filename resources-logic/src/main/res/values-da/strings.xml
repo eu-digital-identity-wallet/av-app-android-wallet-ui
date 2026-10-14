@@ -118,7 +118,6 @@
     <string name="document_details_boolean_item_false_readable_value">nej</string>
     <string name="document_details_boolean_item_true_readable_value">ja</string>
     <string name="document_provider_section_header">This information will be shared:</string>
-    <string name="document_success_collapsed_supporting_text">Legitimationsdetaljer</string>
     <string name="document_success_header_description">Du delte følgende oplysninger med</string>
     <string name="document_success_header_description_when_error">Du delte oplysningerne med</string>
     <string name="document_success_relying_party_default_name">Online tjeneste</string>
