@@ -77,12 +77,4 @@ object StringResourceProviderMocker {
         whenever(resourceProvider.getString(R.string.issuance_success_header_issuer_default_name))
             .thenReturn(name)
     }
-
-    fun mockGetUiItemsStrings(
-        resourceProvider: ResourceProvider,
-        supportingText: String,
-    ) {
-        whenever(resourceProvider.getString(R.string.document_success_collapsed_supporting_text))
-            .thenReturn(supportingText)
-    }
 }
