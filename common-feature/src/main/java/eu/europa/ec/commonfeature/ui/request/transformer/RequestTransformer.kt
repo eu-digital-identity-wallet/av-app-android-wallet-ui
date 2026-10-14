@@ -34,7 +34,6 @@ import eu.europa.ec.eudi.iso18013.transfer.response.device.MsoMdocItem
 import eu.europa.ec.eudi.wallet.document.IssuedDocument
 import eu.europa.ec.eudi.wallet.transfer.openId4vp.SdJwtVcItem
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
-import eu.europa.ec.uilogic.component.AppIcons
 import eu.europa.ec.uilogic.component.ListItemDataUi
 import eu.europa.ec.uilogic.component.ListItemMainContentDataUi
 import eu.europa.ec.uilogic.component.ListItemTrailingContentDataUi

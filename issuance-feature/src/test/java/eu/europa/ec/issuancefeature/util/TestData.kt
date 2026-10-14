@@ -175,9 +175,6 @@ internal val mockedSdJwtPidClaims = listOf(
         header = ListItemDataUi(
             itemId = "$mockedSdJwtPidId,age_equal_or_over",
             mainContentData = ListItemMainContentDataUi.Text("age_equal_or_over"),
-            trailingContentData = ListItemTrailingContentDataUi.Icon(
-                iconData = AppIcons.KeyboardArrowDown
-            )
         ),
         nestedItems = listOf(
             ExpandableListItemUi.SingleListItem(
@@ -195,7 +192,7 @@ internal val mockedSdJwtPidClaims = listOf(
                 )
             )
         ),
-        isExpanded = false
+        isExpanded = true
     ),
     ExpandableListItemUi.SingleListItem(
         header = ListItemDataUi(
@@ -251,9 +248,6 @@ internal val mockedSdJwtPidClaims = listOf(
             itemId = "$mockedSdJwtPidId,$mockedUuid",
             overlineText = null,
             mainContentData = ListItemMainContentDataUi.Text("nationalities"),
-            trailingContentData = ListItemTrailingContentDataUi.Icon(
-                iconData = AppIcons.KeyboardArrowDown
-            )
         ),
         nestedItems = listOf(
             ExpandableListItemUi.SingleListItem(
@@ -264,16 +258,13 @@ internal val mockedSdJwtPidClaims = listOf(
                 )
             )
         ),
-        isExpanded = false
+        isExpanded = true
     ),
     ExpandableListItemUi.NestedListItem(
         header = ListItemDataUi(
             itemId = "$mockedSdJwtPidId,place_of_birth",
             overlineText = null,
             mainContentData = ListItemMainContentDataUi.Text("place_of_birth"),
-            trailingContentData = ListItemTrailingContentDataUi.Icon(
-                iconData = AppIcons.KeyboardArrowDown
-            )
         ),
         nestedItems = listOf(
             ExpandableListItemUi.SingleListItem(
@@ -284,7 +275,7 @@ internal val mockedSdJwtPidClaims = listOf(
                 )
             )
         ),
-        isExpanded = false
+        isExpanded = true
     ),
 )
 
