@@ -266,10 +266,8 @@ private fun DisplayRequestItems(
                         onItemClick = { item ->
                             onEventSend(Event.UserIdentificationClicked(itemId = item.itemId))
                         },
-                        onExpandedChange = { expandedItem ->
-                            onEventSend(Event.ExpandOrCollapseRequestDocumentItem(itemId = expandedItem.itemId))
-                        },
-                        isExpanded = requestDocument.headerUi.isExpanded,
+                        onExpandedChange = null,
+                        isExpanded = true,
                         throttleClicks = false,
                         hideSensitiveContent = false,
                         collapsedMainContentVerticalPadding = SPACING_MEDIUM.dp,
@@ -348,10 +346,6 @@ private fun ContentPreview() {
                             header = ListItemDataUi(
                                 itemId = "000",
                                 mainContentData = ListItemMainContentDataUi.Text(text = "Digital ID"),
-                                supportingText = stringResource(R.string.request_collapsed_supporting_text),
-                                trailingContentData = ListItemTrailingContentDataUi.Icon(
-                                    iconData = AppIcons.KeyboardArrowDown
-                                ),
                             ),
                             nestedItems = listOf(
                                 ExpandableListItemUi.SingleListItem(

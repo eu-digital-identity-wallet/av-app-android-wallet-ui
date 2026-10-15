@@ -148,7 +148,6 @@ class PresentationRequestInteractorImpl(
                 verifierIsTrusted = response.verifierIsTrusted,
                 requestDocuments = RequestTransformer.transformToUiItems(
                     documentsDomain = documentsDomain,
-                    resourceProvider = resourceProvider,
                 )
             )
         } else {

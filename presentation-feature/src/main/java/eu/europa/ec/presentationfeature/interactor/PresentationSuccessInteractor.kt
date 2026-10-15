@@ -27,10 +27,8 @@ import eu.europa.ec.corelogic.extension.toClaimPath
 import eu.europa.ec.eudi.wallet.document.IssuedDocument
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
-import eu.europa.ec.uilogic.component.AppIcons
 import eu.europa.ec.uilogic.component.ListItemDataUi
 import eu.europa.ec.uilogic.component.ListItemMainContentDataUi
-import eu.europa.ec.uilogic.component.ListItemTrailingContentDataUi
 import eu.europa.ec.uilogic.component.RelyingPartyDataUi
 import eu.europa.ec.uilogic.component.content.ContentHeaderConfig
 import eu.europa.ec.uilogic.component.wrap.ExpandableListItemUi
@@ -105,13 +103,9 @@ class PresentationSuccessInteractorImpl(
                             header = ListItemDataUi(
                                 itemId = documentId,
                                 mainContentData = ListItemMainContentDataUi.Text(text = document.name),
-                                supportingText = resourceProvider.getString(R.string.document_success_collapsed_supporting_text),
-                                trailingContentData = ListItemTrailingContentDataUi.Icon(
-                                    iconData = AppIcons.KeyboardArrowDown
-                                )
                             ),
                             nestedItems = disclosedClaimsUi,
-                            isExpanded = false,
+                            isExpanded = true,
                         )
 
                         documentsUi.add(disclosedDocumentUi)

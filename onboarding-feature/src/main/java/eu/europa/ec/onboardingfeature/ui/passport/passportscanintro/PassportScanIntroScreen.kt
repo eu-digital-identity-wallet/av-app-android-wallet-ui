@@ -283,8 +283,14 @@ private fun Content(
                     description = stringResource(R.string.passport_scan_intro_step_3_description)
                 ),
                 NumberedListItemData(
-                    title = stringResource(R.string.passport_scan_intro_step_5_title)
-                )
+
+                    title = stringResource(R.string.passport_scan_intro_step_4_title),
+                    description = stringResource(R.string.passport_scan_intro_step_4_description)
+                ),
+                NumberedListItemData(
+                    title = stringResource(R.string.passport_scan_intro_step_5_title),
+                    description = stringResource(R.string.passport_scan_intro_step_5_description)
+                ),
             )
         )
     }

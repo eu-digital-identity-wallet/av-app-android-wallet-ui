@@ -314,7 +314,6 @@ class TestPresentationRequestInteractor {
                         verifierIsTrusted = mockedVerifierIsTrusted,
                         requestDocuments = RequestTransformer.transformToUiItems(
                             documentsDomain = requestDataUi.getOrThrow(),
-                            resourceProvider = resourceProvider,
                         )
                     )
                     // Then

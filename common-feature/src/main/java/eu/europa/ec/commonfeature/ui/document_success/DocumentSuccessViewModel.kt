@@ -19,13 +19,10 @@ package eu.europa.ec.commonfeature.ui.document_success
 import android.net.Uri
 import eu.europa.ec.businesslogic.extension.toUri
 import eu.europa.ec.uilogic.component.AppIconAndTextDataUi
-import eu.europa.ec.uilogic.component.AppIcons
-import eu.europa.ec.uilogic.component.ListItemTrailingContentDataUi
 import eu.europa.ec.uilogic.component.content.ContentHeaderConfig
 import eu.europa.ec.uilogic.component.wrap.ExpandableListItemUi
 import eu.europa.ec.uilogic.config.ConfigNavigation
 import eu.europa.ec.uilogic.config.NavigationType
-import eu.europa.ec.uilogic.extension.toggleExpansionState
 import eu.europa.ec.uilogic.mvi.MviViewModel
 import eu.europa.ec.uilogic.mvi.ViewEvent
 import eu.europa.ec.uilogic.mvi.ViewSideEffect
@@ -86,44 +83,6 @@ abstract class DocumentSuccessViewModel : MviViewModel<Event, State, Effect>() {
 
             is Event.StickyButtonPressed -> doNavigation(
                 navigation = getNextScreenConfigNavigation()
-            )
-        }
-    }
-
-    private fun expandOrCollapseSuccessDocumentItem(id: String) {
-        val currentItems = viewState.value.items
-
-        val updatedItems = currentItems.map { successDocument ->
-            val newHeader = if (successDocument.header.itemId == id) {
-                val newIsExpanded = !successDocument.isExpanded
-                val newCollapsed = successDocument.header.copy(
-                    trailingContentData = ListItemTrailingContentDataUi.Icon(
-                        iconData = if (newIsExpanded) {
-                            AppIcons.KeyboardArrowUp
-                        } else {
-                            AppIcons.KeyboardArrowDown
-                        }
-                    )
-                )
-
-                successDocument.copy(
-                    header = newCollapsed,
-                    isExpanded = newIsExpanded
-                )
-            } else {
-                successDocument
-            }
-
-            successDocument.copy(
-                header = newHeader.header,
-                isExpanded = newHeader.isExpanded,
-                nestedItems = newHeader.nestedItems.toggleExpansionState(id)
-            )
-        }
-
-        setState {
-            copy(
-                items = updatedItems
             )
         }
     }
