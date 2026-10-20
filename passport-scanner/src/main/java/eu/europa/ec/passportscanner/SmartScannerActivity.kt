@@ -39,6 +39,7 @@ import android.view.ViewTreeObserver
 import android.view.Window
 import android.widget.TextView
 import android.widget.ToggleButton
+import androidx.appcompat.app.AlertDialog
 import androidx.camera.camera2.interop.Camera2Interop
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraInfoUnavailableException
@@ -56,6 +57,7 @@ import androidx.camera.view.PreviewView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.passportscanner.mrz.MRZAnalyzer.Companion.GUIDE_HEIGHT_IN_PX
@@ -106,6 +108,7 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
     private var yGuideView: View? = null
     private var captureHeaderText: TextView? = null
     private var captureSubHeaderText: TextView? = null
+    private var unsupportedDocumentDialog: AlertDialog? = null
 
     private lateinit var modelLayoutView: View
     private lateinit var coordinatorLayoutView: View
@@ -179,7 +182,12 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
         runOnUiThread {
             showMRZGuide()
 
-            val analyzer = NFCScanAnalyzer(this, intent, logController)
+            val analyzer = NFCScanAnalyzer(
+                this,
+                intent,
+                logController,
+                onUnsupportedDocument = ::showUnsupportedDocumentDialog
+            )
             viewFinder.visibility = VISIBLE
             // Set Analyzer and start camera
             startCamera(analyzer)
@@ -199,7 +207,20 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
 
     override fun onDestroy() {
         super.onDestroy()
+        unsupportedDocumentDialog?.dismiss()
         cameraExecutor.shutdown()
+    }
+
+    private fun showUnsupportedDocumentDialog() {
+        if (isFinishing || unsupportedDocumentDialog != null) return
+        // Stop analysing frames: every following frame would detect the same document
+        imageAnalyzer?.clearAnalyzer()
+        unsupportedDocumentDialog = MaterialAlertDialogBuilder(this)
+            .setTitle(string.mrz_error_unsupported_document_title)
+            .setMessage(string.mrz_error_unsupported_document_message)
+            .setCancelable(false)
+            .setPositiveButton(string.generic_ok) { _, _ -> finish() }
+            .show()
     }
 
     @SuppressLint("ClickableViewAccessibility", "UnsafeOptInUsageError")
