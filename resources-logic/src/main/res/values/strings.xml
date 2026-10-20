@@ -204,6 +204,8 @@
     <string name="mrz_error_document_expired">The scanned document has expired.</string>
     <string name="mrz_error_invalid_data">The scanned document data is invalid or incomplete.</string>
     <string name="mrz_error_processing_failed">Failed to process the document. Please try again.</string>
+    <string name="mrz_error_unsupported_document_title">Document not supported</string>
+    <string name="mrz_error_unsupported_document_message">This document can\'t be used to verify your age. Use a passport, or an ID card with a chip: the code on its back has 3 lines. You can also go back and choose another verification method.</string>
     <string name="mrz_initializing_camera">Initializing camera...</string>
     <string name="mrz_scanning">Scanning...</string>
     <string name="mrz_unknown_error">An unknown error occurred</string>

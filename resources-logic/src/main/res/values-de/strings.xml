@@ -204,6 +204,8 @@
     <string name="mrz_error_document_expired">Das gescannte Dokument ist abgelaufen.</string>
     <string name="mrz_error_invalid_data">Die gescannten Dokumentdaten sind ungültig oder unvollständig.</string>
     <string name="mrz_error_processing_failed">Dokument konnte nicht verarbeitet werden. Bitte versuchen Sie es erneut.</string>
+    <string name="mrz_error_unsupported_document_title">Dokument wird nicht unterstützt</string>
+    <string name="mrz_error_unsupported_document_message">Dieses Dokument kann nicht zur Bestätigung Ihres Alters verwendet werden. Verwenden Sie einen Reisepass oder einen Ausweis mit Chip: Der Code auf der Rückseite hat 3 Zeilen. Sie können auch zurückgehen und eine andere Verifizierungsmethode wählen.</string>
     <string name="mrz_initializing_camera">Kamera wird initialisiert...</string>
     <string name="mrz_scanning">Scannen...</string>
     <string name="mrz_unknown_error">Ein unbekannter Fehler ist aufgetreten</string>

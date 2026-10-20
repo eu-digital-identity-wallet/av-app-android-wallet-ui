@@ -24,6 +24,7 @@ import eu.europa.ec.passportscanner.parser.types.MrzFormat
 import eu.europa.ec.testlogic.base.TestApplication
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
@@ -61,6 +62,42 @@ class MRZScanPipelineTest {
         assertEquals(MrzFormat.MRTD_TD1, record!!.format)
         assertEquals("AB1234567", record.documentNumber)
         assertEquals("POPESCU", record.surname)
+    }
+
+    @Test
+    fun `TD2 ID card is recognised as TD2`() {
+        val record = scan(
+            "IDROUPOPESCU<<MARIA<<<<<<<<<<<<<<<<<",
+            "PH123456<7ROU8001014F300101912345672"
+        )
+
+        assertNotNull(record)
+        assertEquals(MrzFormat.MRTD_TD2, record!!.format)
+        assertEquals("PH123456", record.documentNumber)
+        assertEquals("POPESCU", record.surname)
+    }
+
+    @Test
+    fun `TD2 ID card is recognised when OCR also reads a line above the MRZ`() {
+        val record = scan(
+            "SEMNATURA",
+            "IDROUPOPESCU<<MARIA<<<<<<<<<<<<<<<<<",
+            "PH123456<7ROU8001014F300101912345672"
+        )
+
+        assertNotNull(record)
+        assertEquals(MrzFormat.MRTD_TD2, record!!.format)
+    }
+
+    @Test
+    fun `TD2 MRZ with wrong check digits is not recognised`() {
+        // Misread birth date (800101 read as 800107): check digits no longer match
+        val record = scan(
+            "IDROUPOPESCU<<MARIA<<<<<<<<<<<<<<<<<",
+            "PH123456<7ROU8001074F300101912345672"
+        )
+
+        assertNull(record)
     }
 
     @Test

@@ -30,6 +30,8 @@ class MRZLineSkipper(
 
     companion object {
         private const val TAG = "MRZLineSkipper"
+        private const val TD2_LINE_LENGTH = 36
+        private val TD2_DOCUMENT_CODES = setOf('I', 'A', 'C')
     }
 
     /**
@@ -49,7 +51,7 @@ class MRZLineSkipper(
         // Try window of 3 lines - TD1 format
         checkWindow(3, lines, isPassportCheck = false)?.let { return it }
 
-        // Try window of 2 lines - TD3/Passport format
+        // Try window of 2 lines - TD3/Passport and TD2 formats
         checkWindow(2, lines, isPassportCheck = true)?.let { return it }
 
         return null
@@ -62,7 +64,8 @@ class MRZLineSkipper(
      *
      * @param numLines Number of lines in each window (2 or 3)
      * @param linesArray Array of all detected lines
-     * @param isPassportCheck True for TD3 passport validation (first line starts with 'P', second ends with digit)
+     * @param isPassportCheck True for TD3/TD2 validation (first line starts with 'P' or is a
+     * 36 character line starting with 'I', 'A' or 'C', second ends with digit)
      * @return Valid MrzRecord if found, null otherwise
      */
     private fun checkWindow(
@@ -97,8 +100,10 @@ class MRZLineSkipper(
     private fun checkPassportRequirements(selectedLines: List<String>): Boolean {
         val firstLine = selectedLines.firstOrNull()
 
-        // First line must start with 'P'
-        if (firstLine.isNullOrEmpty() || !firstLine.startsWith("P")) {
+        // First line must start with 'P' (TD3), or be a TD2 line of an ID document
+        if (firstLine.isNullOrEmpty() ||
+            !(firstLine.startsWith("P") || isTd2DocumentLine(firstLine))
+        ) {
             return false
         }
 
@@ -109,6 +114,9 @@ class MRZLineSkipper(
         }
         return true
     }
+
+    private fun isTd2DocumentLine(line: String): Boolean =
+        line.length == TD2_LINE_LENGTH && line.first() in TD2_DOCUMENT_CODES
 
     /**
      * Generate all combinations of k elements from n elements (C(n,k))

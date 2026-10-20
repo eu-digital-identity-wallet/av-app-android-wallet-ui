@@ -23,6 +23,7 @@ import eu.europa.ec.passportscanner.parser.MrzRange
 import eu.europa.ec.passportscanner.parser.MrzRecord
 import eu.europa.ec.passportscanner.parser.records.MRP
 import eu.europa.ec.passportscanner.parser.records.MrtdTd1
+import eu.europa.ec.passportscanner.parser.records.MrtdTd2
 
 
 /**
@@ -39,7 +40,13 @@ enum class MrzFormat(
      */
     PASSPORT(2, 44, MRP::class.java),
 
-    MRTD_TD1(3, 30, MrtdTd1::class.java);
+    MRTD_TD1(3, 30, MrtdTd1::class.java),
+
+    /**
+     * MRTD TD2 format: A two line long, 36 characters per line format. Only recognised so that
+     * the scanner can tell the user the document is not supported.
+     */
+    MRTD_TD2(2, 36, MrtdTd2::class.java);
 
     /**
      * Checks if this format is able to parse given serialized MRZ record.
