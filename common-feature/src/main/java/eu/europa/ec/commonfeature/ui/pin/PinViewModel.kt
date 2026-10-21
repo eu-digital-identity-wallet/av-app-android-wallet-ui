@@ -217,6 +217,10 @@ class PinViewModel(
                 if (viewState.value.isLockedOut) {
                     return
                 }
+                // The text field can report the same value more than once
+                if (event.quickPin == viewState.value.pin) {
+                    return
+                }
                 validateForm(event.quickPin)
             }
 
@@ -454,8 +458,24 @@ class PinViewModel(
     }
 
     private fun validateForm(pin: String) {
+        // The field shows state.pin, so it is updated at once rather than after the validation,
+        // which runs on another thread.
+        setState {
+            copy(
+                pin = pin,
+                isButtonEnabled = false,
+                resetPin = false
+            )
+        }
+        val pinState = viewState.value.pinState
         viewModelScope.launch {
             val validationResult = interactor.validateForm(getListOfRules(pin))
+            // Drop a result that arrives after the user typed on or after the step changed:
+            // applying it would put the PIN of the previous step back into the field and
+            // confirm it on the user's behalf.
+            if (viewState.value.pin != pin || viewState.value.pinState != pinState) {
+                return@launch
+            }
             setState {
                 copy(
                     validationResult = validationResult,
