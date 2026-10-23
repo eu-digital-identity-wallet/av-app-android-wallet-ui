@@ -1,5 +1,38 @@
 # Changelog
 
+## 2026.10-1
+
+### Added
+
+- Consent screen note that the data-protection and ToS links are placeholders for
+  the production implementers (`consent_screen_additional_note`), with da/de/fr/it
+  translations
+
+### Changed
+
+- Refreshed user-facing copy across onboarding and the passport/ID flow, including
+  the landing, consent, enrollment/verification, passport scan intro, document
+  identification, and live-video screens, plus the issuance QR-scan screen, with
+  matching da/de/fr/it translations
+- Request and request-success claims are now always expanded: removed the
+  expand/collapse arrows, expanded nested claim groups, set request items expanded
+  by default, and made non-expandable cards truly non-clickable
+- Reduced complexity of the PIN-entry (`OtpTextField`) component: extracted the
+  accessibility description and decoration into helpers, inlined the value-change
+  handler, and replaced the `LaunchedEffect` length guard with `require`
+
+### Removed
+
+- Dead `document_success_collapsed_supporting_text` ("Credential details") string
+  key and its da/de/fr/it translations, along with the unused supporting-text
+  plumbing in the request, request-success and presentation-success view models
+
+### Fixed
+
+- Sharing a credential while the vault is locked: `shouldUseAppAuthenticationBeforePresentation`
+  now also returns `true` when the vault is locked, so the vault is unlocked before
+  the presentation loading step reads from it
+
 ## 2026.09-1
 
 ### Added
