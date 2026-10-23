@@ -173,7 +173,7 @@ private fun Content(
                     header = successItem.header,
                     data = successItem.nestedItems,
                     onItemClick = null,
-                    onExpandedChange = { },
+                    onExpandedChange = null,
                     isExpanded = true,
                     throttleClicks = false,
                     hideSensitiveContent = false,

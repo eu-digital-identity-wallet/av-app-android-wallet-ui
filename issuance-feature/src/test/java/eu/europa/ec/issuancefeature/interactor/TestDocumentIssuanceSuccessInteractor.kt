@@ -25,7 +25,6 @@ import eu.europa.ec.issuancefeature.util.mockedSdJwtPidClaims
 import eu.europa.ec.issuancefeature.util.mockedSuccessDescription
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
-import eu.europa.ec.testfeature.util.StringResourceProviderMocker.mockGetUiItemsStrings
 import eu.europa.ec.testfeature.util.StringResourceProviderMocker.mockIssuerName
 import eu.europa.ec.testfeature.util.StringResourceProviderMocker.mockTransformToDocumentDetailsDomainStrings
 import eu.europa.ec.testfeature.util.StringResourceProviderMocker.mockTransformToUiItemsStrings
@@ -34,7 +33,6 @@ import eu.europa.ec.testfeature.util.getMockedPidWithBasicFields
 import eu.europa.ec.testfeature.util.getMockedPidWithBasicFieldsAndMetadata
 import eu.europa.ec.testfeature.util.getMockedSdJwtPidWithBasicFields
 import eu.europa.ec.testfeature.util.mockedDefaultLocale
-import eu.europa.ec.testfeature.util.mockedDocumentSuccessCollapsedSupportingText
 import eu.europa.ec.testfeature.util.mockedGenericErrorMessage
 import eu.europa.ec.testfeature.util.mockedIssuerLogo
 import eu.europa.ec.testfeature.util.mockedIssuerName
@@ -44,10 +42,8 @@ import eu.europa.ec.testfeature.util.mockedUuid
 import eu.europa.ec.testlogic.extension.runFlowTest
 import eu.europa.ec.testlogic.extension.runTest
 import eu.europa.ec.testlogic.rule.CoroutineTestRule
-import eu.europa.ec.uilogic.component.AppIcons
 import eu.europa.ec.uilogic.component.ListItemDataUi
 import eu.europa.ec.uilogic.component.ListItemMainContentDataUi
-import eu.europa.ec.uilogic.component.ListItemTrailingContentDataUi
 import eu.europa.ec.uilogic.component.RelyingPartyDataUi
 import eu.europa.ec.uilogic.component.content.ContentHeaderConfig
 import eu.europa.ec.uilogic.component.wrap.ExpandableListItemUi
@@ -123,10 +119,6 @@ class TestDocumentIssuanceSuccessInteractor {
             // Given
             mockHeaderConfigDescription(isErrorCase = false)
             mockTransformToDocumentDetailsDomainStrings(resourceProvider)
-            mockGetUiItemsStrings(
-                resourceProvider = resourceProvider,
-                supportingText = mockedDocumentSuccessCollapsedSupportingText,
-            )
 
             val mockedPidWithBasicFields = getMockedPidWithBasicFields()
             mockGetDocumentByIdCall(response = mockedPidWithBasicFields)
@@ -143,10 +135,9 @@ class TestDocumentIssuanceSuccessInteractor {
                                 header = ListItemDataUi(
                                     itemId = mockedPidId,
                                     mainContentData = ListItemMainContentDataUi.Text(text = mockedPidWithBasicFields.name),
-                                    supportingText = mockedDocumentSuccessCollapsedSupportingText
                                 ),
                                 nestedItems = mockedMdocPidClaims,
-                                isExpanded = false
+                                isExpanded = true
                             )
                         ),
                         headerConfig = ContentHeaderConfig(
@@ -180,10 +171,6 @@ class TestDocumentIssuanceSuccessInteractor {
             mockHeaderConfigDescription(isErrorCase = false)
             mockProvideUuid()
             mockTransformToDocumentDetailsDomainStrings(resourceProvider)
-            mockGetUiItemsStrings(
-                resourceProvider = resourceProvider,
-                supportingText = mockedDocumentSuccessCollapsedSupportingText,
-            )
 
             val mockedSdJwtPidWithBasicFields = getMockedSdJwtPidWithBasicFields()
             mockGetDocumentByIdCall(response = mockedSdJwtPidWithBasicFields)
@@ -208,10 +195,9 @@ class TestDocumentIssuanceSuccessInteractor {
                                 header = ListItemDataUi(
                                     itemId = mockedSdJwtPidId,
                                     mainContentData = ListItemMainContentDataUi.Text(text = mockedSdJwtPidWithBasicFields.name),
-                                    supportingText = mockedDocumentSuccessCollapsedSupportingText
                                 ),
                                 nestedItems = mockedSdJwtPidClaims,
-                                isExpanded = false
+                                isExpanded = true
                             )
                         )
                     ),
@@ -237,10 +223,6 @@ class TestDocumentIssuanceSuccessInteractor {
             // Given
             mockHeaderConfigDescription(isErrorCase = false)
             mockTransformToDocumentDetailsDomainStrings(resourceProvider)
-            mockGetUiItemsStrings(
-                resourceProvider = resourceProvider,
-                supportingText = mockedDocumentSuccessCollapsedSupportingText,
-            )
 
             val mockedPidWithBasicFields = getMockedPidWithBasicFields()
             mockGetDocumentByIdCall(response = mockedPidWithBasicFields)
@@ -258,10 +240,9 @@ class TestDocumentIssuanceSuccessInteractor {
                                 header = ListItemDataUi(
                                     itemId = mockedPidWithBasicFields.id,
                                     mainContentData = ListItemMainContentDataUi.Text(text = mockedPidWithBasicFields.name),
-                                    supportingText = mockedDocumentSuccessCollapsedSupportingText
                                 ),
                                 nestedItems = mockedMdocPidClaims,
-                                isExpanded = false
+                                isExpanded = true
                             )
                         ),
                         headerConfig = ContentHeaderConfig(
@@ -293,10 +274,6 @@ class TestDocumentIssuanceSuccessInteractor {
             // Given
             mockHeaderConfigDescription(isErrorCase = true)
             mockTransformToDocumentDetailsDomainStrings(resourceProvider)
-            mockGetUiItemsStrings(
-                resourceProvider = resourceProvider,
-                supportingText = mockedDocumentSuccessCollapsedSupportingText,
-            )
             mockGetDocumentByIdCall(response = null)
             mockSdJwtGetDocumentByIdCall(docId = mockedSdJwtPidId, response = null)
 
@@ -336,10 +313,6 @@ class TestDocumentIssuanceSuccessInteractor {
             // Given
             mockHeaderConfigDescription(isErrorCase = true)
             mockTransformToDocumentDetailsDomainStrings(resourceProvider)
-            mockGetUiItemsStrings(
-                resourceProvider = resourceProvider,
-                supportingText = mockedDocumentSuccessCollapsedSupportingText,
-            )
             mockGetDocumentByIdCall(response = null)
             mockSdJwtGetDocumentByIdCall(docId = mockedSdJwtPidId, response = null)
 
@@ -379,10 +352,6 @@ class TestDocumentIssuanceSuccessInteractor {
             // Given
             mockHeaderConfigDescription(isErrorCase = false)
             mockTransformToDocumentDetailsDomainStrings(resourceProvider)
-            mockGetUiItemsStrings(
-                resourceProvider = resourceProvider,
-                supportingText = mockedDocumentSuccessCollapsedSupportingText,
-            )
             mockProvideUuid()
 
             val mockedPidWithBasicFields = getMockedPidWithBasicFields()
@@ -414,19 +383,17 @@ class TestDocumentIssuanceSuccessInteractor {
                                 header = ListItemDataUi(
                                     itemId = mockedPidId,
                                     mainContentData = ListItemMainContentDataUi.Text(text = mockedPidWithBasicFields.name),
-                                    supportingText = mockedDocumentSuccessCollapsedSupportingText
                                 ),
                                 nestedItems = mockedMdocPidClaims,
-                                isExpanded = false
+                                isExpanded = true
                             ),
                             ExpandableListItemUi.NestedListItem(
                                 header = ListItemDataUi(
                                     itemId = mockedSdJwtPidId,
                                     mainContentData = ListItemMainContentDataUi.Text(text = mockedSdJwtPidWithBasicFields.name),
-                                    supportingText = mockedDocumentSuccessCollapsedSupportingText
                                 ),
                                 nestedItems = mockedSdJwtPidClaims,
-                                isExpanded = false
+                                isExpanded = true
                             )
                         )
                     ),
@@ -482,10 +449,6 @@ class TestDocumentIssuanceSuccessInteractor {
             // Given
             mockHeaderConfigDescription(isErrorCase = false)
             mockTransformToDocumentDetailsDomainStrings(resourceProvider)
-            mockGetUiItemsStrings(
-                resourceProvider = resourceProvider,
-                supportingText = mockedDocumentSuccessCollapsedSupportingText,
-            )
 
             val mockedPidWithBasicFieldsAndMetadata = getMockedPidWithBasicFieldsAndMetadata()
             mockGetDocumentByIdCall(response = mockedPidWithBasicFieldsAndMetadata)
@@ -502,10 +465,9 @@ class TestDocumentIssuanceSuccessInteractor {
                                 header = ListItemDataUi(
                                     itemId = mockedPidId,
                                     mainContentData = ListItemMainContentDataUi.Text(text = mockedPidWithBasicFieldsAndMetadata.name),
-                                    supportingText = mockedDocumentSuccessCollapsedSupportingText
                                 ),
                                 nestedItems = mockedMdocPidClaims,
-                                isExpanded = false
+                                isExpanded = true
                             )
                         ),
                         headerConfig = ContentHeaderConfig(

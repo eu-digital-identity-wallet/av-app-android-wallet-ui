@@ -184,7 +184,7 @@ private fun handleNavigationEffect(
 fun ConsentAndTosSection(
     tosCheckBoxData: CheckboxWithTextData,
     dataProtectionCheckBoxData: CheckboxWithTextData,
-    personalDataCheckBoxData : CheckboxWithTextData
+    personalDataCheckBoxData: CheckboxWithTextData,
 ) {
     val context = LocalContext.current
     Column(
@@ -222,6 +222,14 @@ fun ConsentAndTosSection(
                 isExternal = true
             ),
             onClick = { openWebLink("https://www.example.com", context) },
+        )
+
+        WrapText(
+            text = stringResource(R.string.consent_screen_additional_note),
+            textConfig = TextConfig(
+                style = MaterialTheme.typography.bodyLarge,
+                maxLines = Int.MAX_VALUE,
+            )
         )
     }
 }

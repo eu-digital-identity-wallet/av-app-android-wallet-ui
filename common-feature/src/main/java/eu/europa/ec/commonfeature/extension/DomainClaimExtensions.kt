@@ -21,7 +21,6 @@ import eu.europa.ec.commonfeature.util.keyIsPortrait
 import eu.europa.ec.commonfeature.util.keyIsSignature
 import eu.europa.ec.corelogic.model.ClaimDomain
 import eu.europa.ec.eudi.wallet.document.ElementIdentifier
-import eu.europa.ec.uilogic.component.AppIcons
 import eu.europa.ec.uilogic.component.ListItemDataUi
 import eu.europa.ec.uilogic.component.ListItemLeadingContentDataUi
 import eu.europa.ec.uilogic.component.ListItemMainContentDataUi
@@ -42,12 +41,11 @@ fun ClaimDomain.toSelectiveExpandableListItems(docId: String): ExpandableListIte
                 header = ListItemDataUi(
                     itemId = path.toId(docId),
                     mainContentData = ListItemMainContentDataUi.Text(text = displayTitle),
-                    trailingContentData = ListItemTrailingContentDataUi.Icon(iconData = AppIcons.KeyboardArrowDown)
                 ),
                 nestedItems = items.map {
                     it.toSelectiveExpandableListItems(docId)
                 },
-                isExpanded = false
+                isExpanded = true
             )
         }
 
@@ -77,10 +75,9 @@ fun ClaimDomain.toExpandableListItems(docId: String): ExpandableListItemUi {
                 header = ListItemDataUi(
                     itemId = path.toId(docId),
                     mainContentData = ListItemMainContentDataUi.Text(text = displayTitle),
-                    trailingContentData = ListItemTrailingContentDataUi.Icon(iconData = AppIcons.KeyboardArrowDown)
                 ),
                 nestedItems = items.map { it.toExpandableListItems(docId = docId) },
-                isExpanded = false
+                isExpanded = true
             )
         }
 
