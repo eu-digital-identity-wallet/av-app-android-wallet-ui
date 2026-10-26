@@ -204,6 +204,8 @@
     <string name="mrz_error_document_expired">Det scannede dokument er udløbet.</string>
     <string name="mrz_error_invalid_data">De scannede dokumentdata er ugyldige eller ufuldstændige.</string>
     <string name="mrz_error_processing_failed">Kunne ikke behandle dokumentet. Prøv venligst igen.</string>
+    <string name="mrz_error_unsupported_document_title">Dokumentet understøttes ikke</string>
+    <string name="mrz_error_unsupported_document_message">Dette dokument kan ikke bruges til at bekræfte din alder. Brug et pas eller et ID-kort med chip: koden på bagsiden har 3 linjer. Du kan også gå tilbage og vælge en anden bekræftelsesmetode.</string>
     <string name="mrz_initializing_camera">Initialiserer kamera...</string>
     <string name="mrz_scanning">Scanner...</string>
     <string name="mrz_unknown_error">Der opstod en ukendt fejl</string>

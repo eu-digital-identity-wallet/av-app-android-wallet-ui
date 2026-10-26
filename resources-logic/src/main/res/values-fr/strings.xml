@@ -206,6 +206,8 @@
     <string name="mrz_error_document_expired">Le document scanné a expiré.</string>
     <string name="mrz_error_invalid_data">Les données du document scanné sont invalides ou incomplètes.</string>
     <string name="mrz_error_processing_failed">Échec du traitement du document. Veuillez réessayer.</string>
+    <string name="mrz_error_unsupported_document_title">Document non pris en charge</string>
+    <string name="mrz_error_unsupported_document_message">Ce document ne peut pas être utilisé pour vérifier votre âge. Utilisez un passeport ou une carte d\'identité à puce : son code au verso comporte 3 lignes. Vous pouvez aussi revenir en arrière et choisir une autre méthode de vérification.</string>
     <string name="mrz_initializing_camera">Initialisation de la caméra...</string>
     <string name="mrz_scanning">Numérisation...</string>
     <string name="mrz_unknown_error">Une erreur inconnue s\'est produite</string>

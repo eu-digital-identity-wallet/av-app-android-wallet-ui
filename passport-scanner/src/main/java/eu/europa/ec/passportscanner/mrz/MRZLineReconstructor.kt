@@ -51,8 +51,13 @@ object MRZLineReconstructor {
 
         val lines = groupBlocksIntoLines(blocks)
 
-        val isTd3Passport = lines.any { lineBlocks ->
-            lineBlocks.firstOrNull()?.text?.startsWith("P") == true
+        // The first line of a TD3 passport MRZ starts with 'P' and is followed by a second line.
+        // The last line can start with 'P' on other documents too: the name line of a TD1 ID card
+        // (e.g. "POPESCU<<ION") or the document number line of a TD2 card (e.g. "PH123456<"),
+        // so it only counts when it is the only line read so far.
+        val isTd3Passport = lines.withIndex().any { (index, lineBlocks) ->
+            (index < lines.lastIndex || lines.size == 1) &&
+                    lineBlocks.firstOrNull()?.text?.startsWith("P") == true
         }
 
         val reconstructedLines = lines.map { lineBlocks ->

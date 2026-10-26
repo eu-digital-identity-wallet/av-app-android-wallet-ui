@@ -378,6 +378,40 @@ class MRZLineReconstructorTest {
     }
 
     @Test
+    fun `reconstruct does not pad TD1 ID card whose name line starts with P`() {
+        val blocks = listOf(
+            TextBlock("IDROUAB12345671<<<<<<<<<<<<<<<", Rect(0, 0, 300, 20)),
+            TextBlock("9002155M3106305ROU<<<<<<<<<<<4", Rect(0, 30, 300, 50)),
+            TextBlock("POPESCU<<ION<<<<<<<<<<<<<<<<<<", Rect(0, 60, 300, 80))
+        )
+
+        val result = MRZLineReconstructor.reconstruct(blocks)
+
+        assertEquals(
+            "IDROUAB12345671<<<<<<<<<<<<<<<\n" +
+                    "9002155M3106305ROU<<<<<<<<<<<4\n" +
+                    "POPESCU<<ION<<<<<<<<<<<<<<<<<<",
+            result
+        )
+    }
+
+    @Test
+    fun `reconstruct does not pad TD2 ID card whose document number starts with P`() {
+        val blocks = listOf(
+            TextBlock("IDROUPOPESCU<<MARIA<<<<<<<<<<<<<<<<<", Rect(0, 0, 360, 20)),
+            TextBlock("PH123456<7ROU8001014F300101912345672", Rect(0, 30, 360, 50))
+        )
+
+        val result = MRZLineReconstructor.reconstruct(blocks)
+
+        assertEquals(
+            "IDROUPOPESCU<<MARIA<<<<<<<<<<<<<<<<<\n" +
+                    "PH123456<7ROU8001014F300101912345672",
+            result
+        )
+    }
+
+    @Test
     fun `reconstruct with zero-height blocks uses fallback grouping`() {
         val blocks = listOf(
             TextBlock("P<FRATEST", Rect(0, 10, 100, 10)),

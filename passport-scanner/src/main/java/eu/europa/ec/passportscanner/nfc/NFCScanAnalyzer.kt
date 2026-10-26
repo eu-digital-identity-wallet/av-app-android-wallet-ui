@@ -33,6 +33,7 @@ open class NFCScanAnalyzer(
     override val activity: Activity,
     override val intent: Intent,
     override val logController: LogController,
+    private val onUnsupportedDocument: () -> Unit = {},
 ) : MRZAnalyzer(activity, intent, logController) {
 
     override fun processResult(result: String, bitmap: Bitmap, rotation: Int) {
@@ -44,6 +45,8 @@ open class NFCScanAnalyzer(
         when (mrzRecord.format) {
             MrzFormat.PASSPORT -> startNFCScanActivity(result)
             MrzFormat.MRTD_TD1 -> startNFCScanActivity(result)
+            // Only TD3 passports and TD1 ID cards carry a chip the app can read
+            MrzFormat.MRTD_TD2 -> onUnsupportedDocument()
             else -> throw MrzParseException("Unrecognized MRZ format", null, null)
         }
     }

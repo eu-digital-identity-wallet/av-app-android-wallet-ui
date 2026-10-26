@@ -206,6 +206,8 @@
     <string name="mrz_error_document_expired">Il documento scansionato è scaduto.</string>
     <string name="mrz_error_invalid_data">I dati del documento scansionato non sono validi o sono incompleti.</string>
     <string name="mrz_error_processing_failed">Impossibile elaborare il documento. Riprova.</string>
+    <string name="mrz_error_unsupported_document_title">Documento non supportato</string>
+    <string name="mrz_error_unsupported_document_message">Questo documento non può essere usato per verificare la tua età. Usa un passaporto o una carta d\'identità con chip: il codice sul retro ha 3 righe. Puoi anche tornare indietro e scegliere un altro metodo di verifica.</string>
     <string name="mrz_initializing_camera">Inizializzazione fotocamera...</string>
     <string name="mrz_scanning">Scansione...</string>
     <string name="mrz_unknown_error">Si è verificato un errore sconosciuto</string>
