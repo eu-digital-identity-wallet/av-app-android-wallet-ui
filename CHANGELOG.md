@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- Declining a presentation request while the vault is locked (after the app was
+  backgrounded) no longer crashes with "Vault key not available".
+  `WalletCoreTransactionLogControllerImpl.log` now checks `VaultKeyProvider.isUnlocked()`
+  before opening the vault-encrypted transaction-log database and drops the entry
+  (with a warning) when the vault is locked. A failure while storing a transaction
+  log is caught and logged instead of propagating to the IO dispatcher. Follow-up
+  to EUDIWALLET-2184 / GitHub issue #135.
+
 ## 2026.10-1
 
 ### Added
