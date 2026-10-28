@@ -10,6 +10,7 @@
 * [Batch Document Issuance Configuration](#batch-document-issuance-configuration)
 * [Theme configuration](#theme-configuration)
 * [Pin Storage configuration](#pin-storage-configuration)
+* [Transaction logs](#transaction-logs)
 * [Analytics configuration](#analytics-configuration)
 
 ## General configuration
