@@ -155,7 +155,8 @@ val avScheme = "av"
 val avHost = "*"
 
 val credentialOfferScheme = "openid-credential-offer"
-val credentialOfferHost = "credential_offer"
+val credentialOfferHost = "*"
+val credentialOfferLegacyHost = "credential_offer"
 
 val openId4VciAuthorizationScheme = "eu.europa.ec.av"
 val openId4VciAuthorizationHost = "authorization"
@@ -183,7 +184,8 @@ val avScheme = "av"
 val avHost = "*"
 
 val credentialOfferScheme = "custom-my-offer"
-val credentialOfferHost = "credential_offer"
+val credentialOfferHost = "*"
+val credentialOfferLegacyHost = "credential_offer"
 
 val openId4VciAuthorizationScheme = "eu.europa.ec.av"
 val openId4VciAuthorizationHost = "authorization"
@@ -195,11 +197,18 @@ AndroidLibraryConventionPlugin:
 
 ```kotlin
 val credentialOfferScheme = "openid-credential-offer"
-val credentialOfferHost = "credential_offer"
+val credentialOfferHost = "*"
+val credentialOfferLegacyHost = "credential_offer"
 
 val myOwnCredentialOfferScheme = "custom-my-offer"
 val myOwnCredentialOfferHost = "*"
 ```
+
+The wildcard host only lets the intent filter match. *DeepLinkHelper* still validates every link on a
+*CREDENTIAL_OFFER* scheme, including your own: the host must be empty (e.g.
+`custom-my-offer://?credential_offer=...`) or equal to `CREDENTIAL_OFFER_LEGACY_HOST`, and the link
+must carry a non-blank `credential_offer` or `credential_offer_uri` query parameter. Links on any other
+host, such as `custom-my-offer://my-host?credential_offer=...`, are not treated as credential offers.
 
 ```kotlin
 // Manifest placeholders used for OpenId4VCI
