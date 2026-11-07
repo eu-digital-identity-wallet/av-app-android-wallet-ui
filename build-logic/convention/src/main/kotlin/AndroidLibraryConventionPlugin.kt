@@ -59,7 +59,9 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             val openid4VpHost = "authorize"
 
             val credentialOfferScheme = "openid-credential-offer"
-            val credentialOfferHost = "credential_offer"
+            // Spec offers have an empty host, which only a wildcard matches; DeepLinkHelper validates offers instead.
+            val credentialOfferHost = "*"
+            val credentialOfferLegacyHost = "credential_offer"
 
             val openId4VciAuthorizationScheme = "eu.europa.ec.av"
             val openId4VciAuthorizationHost = "authorization"
@@ -87,6 +89,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                     addConfigField("AVSP_SCHEME", avspScheme)
                     addConfigField("AV_SCHEME", avScheme)
                     addConfigField("CREDENTIAL_OFFER_SCHEME", credentialOfferScheme)
+                    addConfigField("CREDENTIAL_OFFER_LEGACY_HOST", credentialOfferLegacyHost)
                     addConfigField("ISSUE_AUTHORIZATION_SCHEME", openId4VciAuthorizationScheme)
                     addConfigField("ISSUE_AUTHORIZATION_HOST", openId4VciAuthorizationHost)
                     addConfigField(

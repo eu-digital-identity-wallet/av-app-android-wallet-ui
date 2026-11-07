@@ -10,6 +10,7 @@
 * [Batch Document Issuance Configuration](#batch-document-issuance-configuration)
 * [Theme configuration](#theme-configuration)
 * [Pin Storage configuration](#pin-storage-configuration)
+* [Transaction logs](#transaction-logs)
 * [Analytics configuration](#analytics-configuration)
 
 ## General configuration
@@ -154,7 +155,8 @@ val avScheme = "av"
 val avHost = "*"
 
 val credentialOfferScheme = "openid-credential-offer"
-val credentialOfferHost = "credential_offer"
+val credentialOfferHost = "*"
+val credentialOfferLegacyHost = "credential_offer"
 
 val openId4VciAuthorizationScheme = "eu.europa.ec.av"
 val openId4VciAuthorizationHost = "authorization"
@@ -182,7 +184,8 @@ val avScheme = "av"
 val avHost = "*"
 
 val credentialOfferScheme = "custom-my-offer"
-val credentialOfferHost = "credential_offer"
+val credentialOfferHost = "*"
+val credentialOfferLegacyHost = "credential_offer"
 
 val openId4VciAuthorizationScheme = "eu.europa.ec.av"
 val openId4VciAuthorizationHost = "authorization"
@@ -194,11 +197,18 @@ AndroidLibraryConventionPlugin:
 
 ```kotlin
 val credentialOfferScheme = "openid-credential-offer"
-val credentialOfferHost = "credential_offer"
+val credentialOfferHost = "*"
+val credentialOfferLegacyHost = "credential_offer"
 
 val myOwnCredentialOfferScheme = "custom-my-offer"
 val myOwnCredentialOfferHost = "*"
 ```
+
+The wildcard host only lets the intent filter match. *DeepLinkHelper* still validates every link on a
+*CREDENTIAL_OFFER* scheme, including your own: the host must be empty (e.g.
+`custom-my-offer://?credential_offer=...`) or equal to `CREDENTIAL_OFFER_LEGACY_HOST`, and the link
+must carry a non-blank `credential_offer` or `credential_offer_uri` query parameter. Links on any other
+host, such as `custom-my-offer://my-host?credential_offer=...`, are not treated as credential offers.
 
 ```kotlin
 // Manifest placeholders used for OpenId4VCI
@@ -628,6 +638,31 @@ fun provideStorageConfig(
     biometryImpl = biometryStorageProvider
 )
 ```
+
+## Transaction logs
+
+The wallet core reports presentation/issuance transaction metadata through
+`WalletCoreTransactionLogController` (a `TransactionLogger` implementation in `core-logic`),
+which persists each entry to the vault-encrypted Room database via `DatabaseManager.transactionLogDao()`.
+
+Because the database is SQLCipher-encrypted with a key derived from the in-memory vault key,
+the DAO can only be opened while the vault is unlocked. The vault key is wiped on `ON_STOP`
+(see `Application.initializeVaultKeyLocking`), so when a presentation is stopped or an error
+is reported after the app was backgrounded, the transaction-log callback fires while the
+vault is locked.
+
+Behaviour of `WalletCoreTransactionLogControllerImpl.log`:
+
+- If `VaultKeyProvider.isUnlocked()` is `false`, the log entry is **deliberately dropped** and
+  a warning is emitted via `LogController.w`. The vault-encrypted database is never opened, so
+  no `"Vault key not available"` exception is raised. Entries are **not buffered** in an
+  unencrypted side store, to avoid introducing a plaintext copy of transaction metadata.
+- If the vault is unlocked, the entry is stored as today (UUID identifier + JSON payload).
+- Any failure while storing (vault locked race, SQLCipher error, etc.) is caught and logged
+  via `LogController.e`; a transaction-log failure never crashes the process.
+
+This applies equally to the decline path (`stopRemotePresentation` → `TransactionsListener.logStopped`)
+and the error path (`TransferEvent.Error`).
 
 ## Analytics configuration
 
