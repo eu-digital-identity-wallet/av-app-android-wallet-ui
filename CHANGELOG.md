@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026.11-1
+
+### Added
+
+- Credential offer links in the spec format (`openid-credential-offer://?credential_offer=...`
+  or `credential_offer_uri=...`, with an empty host) are now accepted, alongside the
+  legacy `credential_offer` host
+- Scanning a credential offer QR code from the dashboard scanner now opens the
+  document offer flow instead of failing as a presentation request
+
+### Fixed
+
+- Declining a presentation request while the vault is locked (after the app was
+  backgrounded) no longer crashes with "Vault key not available": the transaction
+  log entry is dropped with a warning when the vault is locked, and a failure while
+  storing a transaction log is logged instead of crashing the app
+- Credential offer links on an unknown host, or without a `credential_offer` /
+  `credential_offer_uri` parameter, are rejected instead of being treated as offers
+
 ## 2026.10-1
 
 ### Added

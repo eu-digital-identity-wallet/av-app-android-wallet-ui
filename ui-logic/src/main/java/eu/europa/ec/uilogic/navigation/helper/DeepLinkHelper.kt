@@ -81,14 +81,22 @@ fun generateNewTaskDeepLink(
         addFlags(flags)
     }
 
+private val CREDENTIAL_OFFER_PARAMETERS = listOf("credential_offer", "credential_offer_uri")
+
 fun hasDeepLink(deepLinkUri: Uri?): DeepLinkAction? {
     return safeLet(
         deepLinkUri,
         deepLinkUri?.scheme
     ) { uri, scheme ->
         DeepLinkAction(link = uri, type = DeepLinkType.parse(scheme, uri.host))
+            .takeUnless { it.type == DeepLinkType.CREDENTIAL_OFFER && !uri.isCredentialOffer() }
     }
 }
+
+private fun Uri.isCredentialOffer(): Boolean =
+    isHierarchical
+            && (host.isNullOrEmpty() || host.equals(BuildConfig.CREDENTIAL_OFFER_LEGACY_HOST, ignoreCase = true))
+            && CREDENTIAL_OFFER_PARAMETERS.any { !getQueryParameter(it).isNullOrBlank() }
 
 fun handleDeepLinkAction(
     navController: NavController,
