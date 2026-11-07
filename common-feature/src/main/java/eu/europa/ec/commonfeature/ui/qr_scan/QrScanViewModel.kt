@@ -18,6 +18,7 @@ package eu.europa.ec.commonfeature.ui.qr_scan
 
 import android.content.Context
 import androidx.lifecycle.viewModelScope
+import eu.europa.ec.businesslogic.extension.toUri
 import eu.europa.ec.businesslogic.validator.Form
 import eu.europa.ec.businesslogic.validator.FormValidator
 import eu.europa.ec.businesslogic.validator.Rule
@@ -40,8 +41,10 @@ import eu.europa.ec.uilogic.mvi.ViewState
 import eu.europa.ec.uilogic.navigation.IssuanceScreens
 import eu.europa.ec.uilogic.navigation.LandingScreens
 import eu.europa.ec.uilogic.navigation.PresentationScreens
+import eu.europa.ec.uilogic.navigation.helper.DeepLinkType
 import eu.europa.ec.uilogic.navigation.helper.generateComposableArguments
 import eu.europa.ec.uilogic.navigation.helper.generateComposableNavigationLink
+import eu.europa.ec.uilogic.navigation.helper.hasDeepLink
 import eu.europa.ec.uilogic.serializer.UiSerializer
 import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
@@ -156,18 +159,22 @@ class QrScanViewModel(
                     scanResult = scannedQr
                 )
             } else {
-                // Increment failed attempts
-                val updatedFailedAttempts = currentState.failedScanAttempts + 1
-                val maxFailedAttemptsExceeded = updatedFailedAttempts > MAX_ALLOWED_FAILED_SCANS
-
-                setState {
-                    copy(
-                        failedScanAttempts = updatedFailedAttempts,
-                        showInformativeText = maxFailedAttemptsExceeded,
-                        finishedScanning = false,
-                    )
-                }
+                onScanFailed()
             }
+        }
+    }
+
+    private fun onScanFailed() {
+        // Increment failed attempts
+        val updatedFailedAttempts = viewState.value.failedScanAttempts + 1
+        val maxFailedAttemptsExceeded = updatedFailedAttempts > MAX_ALLOWED_FAILED_SCANS
+
+        setState {
+            copy(
+                failedScanAttempts = updatedFailedAttempts,
+                showInformativeText = maxFailedAttemptsExceeded,
+                finishedScanning = false,
+            )
         }
     }
 
@@ -183,13 +190,30 @@ class QrScanViewModel(
         scanResult: String,
     ) {
         when (qrScanFlow) {
-            is QrScanFlow.Presentation -> navigateToPresentationRequest(scanResult)
+            is QrScanFlow.Presentation -> when {
+                scanResult.isCredentialOffer() -> navigateToDocumentOffer(
+                    scanResult = scanResult,
+                    issuanceFlowType = IssuanceFlowType.ExtraDocument(formatType = null)
+                )
+
+                // An offer scheme that DeepLinkHelper rejected, e.g. on an unknown host
+                scanResult.hasCredentialOfferScheme() -> onScanFailed()
+
+                else -> navigateToPresentationRequest(scanResult)
+            }
+
             is QrScanFlow.Issuance -> navigateToDocumentOffer(
                 scanResult = scanResult,
                 issuanceFlowType = qrScanFlow.issuanceFlowType
             )
         }
     }
+
+    private fun String.isCredentialOffer(): Boolean =
+        hasDeepLink(toUri())?.type == DeepLinkType.CREDENTIAL_OFFER
+
+    private fun String.hasCredentialOfferScheme(): Boolean =
+        toUri().scheme?.let { DeepLinkType.parse(it) } == DeepLinkType.CREDENTIAL_OFFER
 
     private fun calculateInformativeText(
         qrScanFlow: QrScanFlow,
