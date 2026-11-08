@@ -18,9 +18,11 @@ package eu.europa.ec.commonfeature.ui.pin
 
 import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.businesslogic.provider.ElapsedRealtimeClock
+import eu.europa.ec.businesslogic.validator.Form
 import eu.europa.ec.businesslogic.validator.FormValidationResult
 import eu.europa.ec.commonfeature.interactor.QuickPinInteractor
 import eu.europa.ec.commonfeature.interactor.QuickPinInteractorPinValidPartialState
+import eu.europa.ec.commonfeature.interactor.QuickPinInteractorSetPinPartialState
 import eu.europa.ec.commonfeature.model.PinFlow
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
@@ -29,8 +31,10 @@ import eu.europa.ec.uilogic.serializer.UiSerializer
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -46,7 +50,11 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyVararg
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.never
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
@@ -143,6 +151,87 @@ class TestPinViewModel {
             assertNull(viewModel.viewState.value.lockoutMessage)
             assertNull(viewModel.viewState.value.quickPinError)
         }
+
+    /**
+     * The text field can report the last digit twice. When the second validation finished after the
+     * step had moved on, it put the first PIN back into the empty confirmation field and confirmed
+     * it, so the user never typed the PIN a second time.
+     */
+    @Test
+    fun `Given the last digit is reported twice, Then the confirmation step stays empty`() =
+        coroutineRule.testScope.runTest {
+            var validations = 0
+            whenever(interactor.validateForm(any())).doSuspendableAnswer {
+                delay(if (validations++ == 0) 10L else 20L)
+                FormValidationResult(true)
+            }
+
+            val viewModel = createPinViewModel(PinFlow.CREATE)
+
+            viewModel.setEvent(Event.OnQuickPinEntered("147258"))
+            viewModel.setEvent(Event.OnQuickPinEntered("147258"))
+            advanceUntilIdle()
+
+            assertEquals(PinValidationState.REENTER, viewModel.viewState.value.pinState)
+            assertEquals("", viewModel.viewState.value.pin)
+            verify(interactor, never()).setPin(any(), any())
+        }
+
+    /**
+     * Validation runs off the main thread, so the result for an earlier digit can arrive after the
+     * PIN was complete and the step had moved on.
+     */
+    @Test
+    fun `Given validations finish out of order, Then a stale result does not fill the confirmation step`() =
+        coroutineRule.testScope.runTest {
+            whenever(interactor.validateForm(any())).doSuspendableAnswer {
+                val pin = it.getArgument<Form>(0).inputs.values.single()
+                if (pin.length < 6) {
+                    delay(20L)
+                    FormValidationResult(false)
+                } else {
+                    delay(10L)
+                    FormValidationResult(true)
+                }
+            }
+
+            val viewModel = createPinViewModel(PinFlow.CREATE)
+
+            viewModel.setEvent(Event.OnQuickPinEntered("14725"))
+            viewModel.setEvent(Event.OnQuickPinEntered("147258"))
+            advanceUntilIdle()
+
+            assertEquals(PinValidationState.REENTER, viewModel.viewState.value.pinState)
+            assertEquals("", viewModel.viewState.value.pin)
+        }
+
+    @Test
+    fun `Given the PIN is entered twice, Then it is saved once`() =
+        coroutineRule.testScope.runTest {
+            whenever(interactor.validateForm(any())).thenReturn(FormValidationResult(true))
+            whenever(interactor.setPin(any(), any()))
+                .thenReturn(flowOf(QuickPinInteractorSetPinPartialState.Success))
+
+            val viewModel = createPinViewModel(PinFlow.CREATE)
+
+            viewModel.setEvent(Event.OnQuickPinEntered("147258"))
+            advanceUntilIdle()
+            assertEquals(PinValidationState.REENTER, viewModel.viewState.value.pinState)
+
+            viewModel.setEvent(Event.OnQuickPinEntered("147258"))
+            advanceUntilIdle()
+
+            verify(interactor, times(1)).setPin(eq("147258"), eq("147258"))
+        }
+
+    private fun createPinViewModel(pinFlow: PinFlow) = PinViewModel(
+        interactor = interactor,
+        resourceProvider = resourceProvider,
+        uiSerializer = uiSerializer,
+        logController = logController,
+        clock = clock,
+        pinFlow = pinFlow,
+    )
 
     private companion object {
         const val LOCKED_OUT = "Too many failed attempts."
